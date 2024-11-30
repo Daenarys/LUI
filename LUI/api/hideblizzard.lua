@@ -32,25 +32,6 @@ do
 	
 	local compact_raid
 
-	local actionbarFrames = {
-		MainMenuBar = true,
-		MultiBarLeft = true,
-		MultiBarRight = true,
-		MultiBarBottomLeft = true,
-		MultiBarBottomRight = true,
-		MultiCastActionBarFrame = true,
-		ShapeshiftBarFrame = true,
-		PossessBarFrame = true,
-		ExtraActionBarFrame = true,
-	}
-	local actionbarStates = {}
-	local setActonbarToShown = function(frame)
-		actionbarStates[frame] = 1
-	end
-	local setActionbarToHidden = function(frame)
-		actionbarStates[frame] = nil
-	end
-
 	hide = {
 		player = function()
 		-- Only hide the PlayerFrame, do not mess with the events.
@@ -132,43 +113,7 @@ do
 		end,
 		aura = function()
 			BuffFrame:Hide()
-			TemporaryEnchantFrame:Hide()
 			BuffFrame:UnregisterAllEvents()
-		end,
-		actionbars = function()
-			for frame, hide in pairs(actionbarFrames) do
-				frame = _G[frame]
-				-- Set frame to ignore Blizzard's UIPARENT_MANAGED_FRAME_POSITIONS
-				frame.ignoreFramePositionManager = true
-
-				if hide then
-					frame:UnregisterAllEvents()
-
-					actionbarStates[frame] = frame:IsShown()
-					frame.Show = setActonbarToShown
-					frame:Hide()
-					frame.Hide = setActionbarToHidden
-				end
-			end
-
-			-- for i = 1, 6 do
-			-- 	_G["VehicleMenuBarActionButton" .. i]:UnregisterAllEvents()
-			-- end
-
-			for i = 1, 12 do
-				_G["BonusActionButton" .. i]:UnregisterAllEvents()
-				_G["MultiCastActionButton" .. i]:UnregisterEvent("UPDATE_BINDINGS")
-			end
-
-			local talentFrame = PlayerTalentFrame
-			if talentFrame then
-				talentFrame:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-			else
-				Blizzard:SecureHook("TalentFrame_LoadUI", function()
-					Blizzard:Unhook("TalentFrame_LoadUI")
-					PlayerTalentFrame:UnregisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
-				end)
-			end
 		end,
 	}
 	show = {
@@ -260,50 +205,6 @@ do
 		-- This isn't perfect.  It doesn't update the buffs till the next aura update.  However, in Cata it causes taint to force the update.
 		-- However, it should work for 99% of peoples use cases, which is toggling it on and off to see what it does or setting it and leaving it set.
 		-- BuffFrame:GetScript("OnEvent")(BuffFrame, "UNIT_AURA", PlayerFrame.unit)
-		end,
-		actionbars = function()
-			for frame, hide in pairs(actionbarFrames) do
-				frame = _G[frame]
-				-- re-initiate frame into Blizzard's UIPARENT_MANAGED_FRAME_POSITIONS
-				frame.ignoreFramePositionManager = nil
-
-				if hide then
-					frame.Show = nil
-					frame.Hide = nil
-
-					local onload = frame:GetScript("OnLoad")
-					if onload then
-						onload(frame)
-					end
-
-					if actionbarStates[frame] then
-						frame:Show()
-						actionbarStates[frame] = nil
-					end
-				end
-			end
-
-			--[[ -- TODO: Test these
-			for i = 1, 6 do
-				local button = _G["VehicleMenuBarActionButton" .. i]
-				button:GetScript("OnLoad")(button)
-			end
-
-			for i = 1, 12 do
-				local button = _G["BonusActionButton" .. i]
-				button:GetScript("OnLoad")(button)
-				local multibutton = _G["MultiCastActionButton" .. i]
-				multibutton:RegisterEvent("UPDATE_BINDINGS")
-				multibutton:GetScript("OnEvent", "UPDATE_BINDINGS") -- TODO: find if other args are needed
-			end
-			--]]
-
-			local talentFrame = PlayerTalentFrame
-			if talentFrame then
-				talentFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED") -- TODO: find out if we need to force fire this after registering it
-			else
-				Blizzard:Unhook("TalentFrame_LoadUI")
-			end
 		end
 	}
 

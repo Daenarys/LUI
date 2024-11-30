@@ -504,58 +504,6 @@ end
 -- 	ccvf:SetScript("OnEvent", ChatNameColorEvent)
 -- 	ccvf:Show()
 
-local function configureTab(tab, minimalist)
-	if minimalist then
-		if module:IsHooked(tab, "OnMouseWheel") then return end
-
-		tab:SetHeight(29)
-		tab.leftTexture:Hide()
-		tab.middleTexture:Hide()
-		tab.rightTexture:Hide()
-		tab.leftSelectedTexture:SetAlpha(0)
-		tab.rightSelectedTexture:SetAlpha(0)
-		tab.middleSelectedTexture:SetAlpha(0)
-		tab.leftHighlightTexture:SetAlpha(0)
-		tab.middleHighlightTexture:SetAlpha(0)
-		tab.rightHighlightTexture:SetAlpha(0)
-		tab:EnableMouseWheel(true)
-		module:HookScript(tab, "OnMouseWheel")
-	else
-		tab:SetHeight(32)
-		tab.leftTexture:Show()
-		tab.middleTexture:Show()
-		tab.rightTexture:Show()
-		tab.leftSelectedTexture:SetAlpha(1)
-		tab.rightSelectedTexture:SetAlpha(1)
-		tab.middleSelectedTexture:SetAlpha(1)
-		tab.leftHighlightTexture:SetAlpha(1)
-		tab.middleHighlightTexture:SetAlpha(1)
-		tab.rightHighlightTexture:SetAlpha(1)
-		tab:EnableMouseWheel(false)
-		module:Unhook(tab, "OnMouseWheel")
-	end
-
-	FCFTab_UpdateAlpha(_G[CHAT_FRAMES[tab:GetID()]])
-end
-
-local function configureTabs(minimalist)
-	if minimalist then
-		_G.CHAT_FRAME_FADE_OUT_TIME = 0.5
-		_G.CHAT_TAB_HIDE_DELAY = 0
-		_G.CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0
-		_G.CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = 0
-	else
-		_G.CHAT_FRAME_FADE_OUT_TIME = 2
-		_G.CHAT_TAB_HIDE_DELAY = 1
-		_G.CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0.4
-		_G.CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = 0.2
-	end
-
-	for i, name in ipairs(CHAT_FRAMES) do
-		configureTab(_G[name.."Tab"], minimalist)
-	end
-end
-
 local function urlFilterFunc(frame, event, msg, ...)
 	if not msg then return false, msg, ... end
 
@@ -613,12 +561,6 @@ end
 function module:FCF_OpenTemporaryWindow()
 	local frame = FCF_GetCurrentChatFrame()
 	unclampChatFrame(frame)
-	if db.General.MinimalistTabs then
-		if GENERAL_CHAT_DOCK:IsMouseOver() or GENERAL_CHAT_DOCK.selected:IsMouseOver() then
-			frame.hasBeenFaded = true
-		end
-		configureTab(_G[frame:GetName().."Tab"], true)
-	end
 
 	frame:SetFont(Media:Fetch("font", db.General.Font.Font), db.General.Font.Size, db.General.Font.Flag)
 
@@ -869,7 +811,6 @@ function module:Refresh(info, value)
 		FCF_SetWindowAlpha(frame, a)
 	end
 
-	configureTabs(db.General.MinimalistTabs)
 	ChatNameColorEvent(db.General.ShowClassColor)
 
 	self:LibSharedMedia_Registered("font", db.General.Font.Font)
@@ -953,10 +894,6 @@ function module:OnDisable()
 	Media.UnregisterCallback(self, "LibSharedMedia_Registered")
 
 	self:UnhookAll()
-
-	if db.General.MinimalistTabs then
-		configureTabs(false)
-	end
 
 	for i, name in ipairs(CHAT_FRAMES) do
 		local chatFrame = _G[name]

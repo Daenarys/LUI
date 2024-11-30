@@ -311,13 +311,13 @@ function module:SetMicroMenu()
 	local getBagsFrame = function()
 		if LUI:Module("Bags").db.profile.Enable then
 			bagsFrame = LUIBags
-		elseif IsAddOnLoaded("Stuffing") then
+		elseif C_AddOns.IsAddOnLoaded("Stuffing") then
 			bagsFrame = StuffingFrameBags
-		elseif IsAddOnLoaded("Bagnon") then
+		elseif C_AddOns.IsAddOnLoaded("Bagnon") then
 			bagsFrame = BagnonFrameinventory
-		elseif IsAddOnLoaded("ArkInventory") then
+		elseif C_AddOns.IsAddOnLoaded("ArkInventory") then
 			bagsFrame = ARKINV_Frame1
-		elseif IsAddOnLoaded("OneBag") then
+		elseif C_AddOns.IsAddOnLoaded("OneBag") then
 			bagsFrame = OneBagFrame
 		else
 			bagsFrame = nil
@@ -488,7 +488,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Store.Clicker:SetScript("OnUpdate", function(self)
-		if IsAddOnLoaded("Blizzard_StoreUI") then
+		if C_AddOns.IsAddOnLoaded("Blizzard_StoreUI") then
 			if not LUI.MicroMenu.Buttons.Store.Clicker.State and not StoreFrame_IsShown() then
 				LUI.MicroMenu.Buttons.Store.Clicker:SetAlpha(0)
 			else
@@ -539,7 +539,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Pets.Clicker:SetScript("OnUpdate", function(self)
-		if IsAddOnLoaded("Blizzard_Collections") then
+		if C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
 			if not LUI.MicroMenu.Buttons.Pets.Clicker.State and not CollectionsJournal:IsShown() then
 				LUI.MicroMenu.Buttons.Pets.Clicker:SetAlpha(0)
 			else
@@ -649,7 +649,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Journal.Clicker:SetScript("OnUpdate", function(self)
-		if IsAddOnLoaded("Blizzard_EncounterJournal") then
+		if C_AddOns.IsAddOnLoaded("Blizzard_EncounterJournal") then
 			if not LUI.MicroMenu.Buttons.Journal.Clicker.State and not EncounterJournal:IsShown() then
 				LUI.MicroMenu.Buttons.Journal.Clicker:SetAlpha(0)
 			else
@@ -738,7 +738,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Guild.Clicker:SetScript("OnLeave", function(self)
-		if not FriendsFrame:IsShown() and not GuildFrame:IsShown() then
+		if not FriendsFrame:IsShown() and not CommunitiesFrame:IsShown() then
 			self:SetAlpha(0)
 		end
 		self.State = nil
@@ -758,20 +758,20 @@ function module:SetMicroMenu()
 	end)
 
 	FriendsFrame:HookScript("OnHide", function(self)
-		if not GuildFrame:IsShown() and not LUI.MicroMenu.Buttons.Guild.Clicker.State then
+		if not CommunitiesFrame:IsShown() and not LUI.MicroMenu.Buttons.Guild.Clicker.State then
 			LUI.MicroMenu.Buttons.Guild.Clicker:SetAlpha(0)
 		end
 	end)
 
-	if not GuildFrame then
-		LoadAddOn("Blizzard_GuildUI")
+	if not CommunitiesFrame then
+		C_AddOns.LoadAddOn("Blizzard_Communities")
 	end
 
-	GuildFrame:HookScript("OnShow", function(self)
+	CommunitiesFrame:HookScript("OnShow", function(self)
 		LUI.MicroMenu.Buttons.Guild.Clicker:SetAlpha(1)
 	end)
 
-	GuildFrame:HookScript("OnHide", function(self)
+	CommunitiesFrame:HookScript("OnHide", function(self)
 		if not FriendsFrame:IsShown() and not LUI.MicroMenu.Buttons.Guild.Clicker.State then
 			LUI.MicroMenu.Buttons.Guild.Clicker:SetAlpha(0)
 		end
@@ -808,29 +808,11 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Quests.Clicker:SetScript("OnLeave", function(self)
-		if not QuestLogFrame:IsShown() then
-			self:SetAlpha(0)
-		end
 		self.State = nil
 		GameTooltip:Hide()
 	end)
 
 	LUI.MicroMenu.Buttons.Quests.Clicker:SetScript("OnClick", function(self)
-		if QuestLogFrame:IsShown() then
-			HideUIPanel(QuestLogFrame)
-		else
-			ShowUIPanel(QuestLogFrame)
-		end
-	end)
-
-	QuestLogFrame:HookScript("OnShow", function(self)
-		LUI.MicroMenu.Buttons.Quests.Clicker:SetAlpha(1)
-	end)
-
-	QuestLogFrame:HookScript("OnHide", function(self)
-		if not LUI.MicroMenu.Buttons.Quests.Clicker.State then
-			LUI.MicroMenu.Buttons.Quests.Clicker:SetAlpha(0)
-		end
 	end)
 
 	LUI.MicroMenu.Buttons.AC = LUI:CreateMeAFrame("Frame", nil, LUI.MicroMenu.Buttons.Quests, 64, 64, 1, "BACKGROUND", 3, "LEFT", LUI.MicroMenu.Buttons.Quests, "LEFT", -33, 0, 1)
@@ -874,7 +856,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.AC.Clicker:SetScript("OnUpdate", function(self)
-		if IsAddOnLoaded("Blizzard_AchievementUI") then
+		if C_AddOns.IsAddOnLoaded("Blizzard_AchievementUI") then
 			if not LUI.MicroMenu.Buttons.AC.Clicker.State and not AchievementFrame:IsShown() then
 				LUI.MicroMenu.Buttons.AC.Clicker:SetAlpha(0)
 			else
@@ -917,7 +899,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Talents.Clicker:SetScript("OnLeave", function(self)
-		if not PlayerTalentFrame:IsShown() then
+		if not PlayerSpellsFrame:IsShown() then
 			self:SetAlpha(0)
 		end
 		self.State = nil
@@ -926,26 +908,26 @@ function module:SetMicroMenu()
 
 	LUI.MicroMenu.Buttons.Talents.Clicker:SetScript("OnClick", function(self)
 		if UnitLevel("player") >= 10 then
-			if PlayerTalentFrame:IsShown() then
-				HideUIPanel(PlayerTalentFrame)
+			if PlayerSpellsFrame:IsShown() then
+				HideUIPanel(PlayerSpellsFrame)
 			else
-				ShowUIPanel(PlayerTalentFrame)
+				ShowUIPanel(PlayerSpellsFrame)
 			end
 		end
 	end)
 
-	if not PlayerTalentFrame then
-		LoadAddOn("Blizzard_TalentUI")
+	if not PlayerSpellsFrame then
+		C_AddOns.LoadAddOn("Blizzard_PlayerSpells")
 		-- Fix for Events firing before TalentFrame is fully loaded (aka: blizz fail with patch 4.0.6)
-		ShowUIPanel(PlayerTalentFrame)
-		HideUIPanel(PlayerTalentFrame)
+		ShowUIPanel(PlayerSpellsFrame)
+		HideUIPanel(PlayerSpellsFrame)
 	end
 
-	PlayerTalentFrame:HookScript("OnShow", function(self)
+	PlayerSpellsFrame:HookScript("OnShow", function(self)
 		LUI.MicroMenu.Buttons.Talents.Clicker:SetAlpha(1)
 	end)
 
-	PlayerTalentFrame:HookScript("OnHide", function(self)
+	PlayerSpellsFrame:HookScript("OnHide", function(self)
 		if not LUI.MicroMenu.Buttons.Talents.Clicker.State then
 			LUI.MicroMenu.Buttons.Talents.Clicker:SetAlpha(0)
 		end
@@ -982,7 +964,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Spellbook.Clicker:SetScript("OnLeave", function(self)
-		if not SpellBookFrame:IsShown() then
+		if not PlayerSpellsFrame.SpellBookFrame:IsShown() then
 			self:SetAlpha(0)
 		end
 		self.State = nil
@@ -991,18 +973,18 @@ function module:SetMicroMenu()
 
 	LUI.MicroMenu.Buttons.Spellbook.Clicker:SetScript("OnClick", function(self)
 		if InCombatLockdown() then return end
-		if SpellBookFrame:IsShown() then
-			HideUIPanel(SpellBookFrame)
+		if PlayerSpellsFrame.SpellBookFrame:IsShown() then
+			HideUIPanel(PlayerSpellsFrame.SpellBookFrame)
 		else
-			ShowUIPanel(SpellBookFrame)
+			ShowUIPanel(PlayerSpellsFrame.SpellBookFrame)
 		end
 	end)
 
-	SpellBookFrame:HookScript("OnShow", function(self)
+	PlayerSpellsFrame.SpellBookFrame:HookScript("OnShow", function(self)
 		LUI.MicroMenu.Buttons.Spellbook.Clicker:SetAlpha(1)
 	end)
 
-	SpellBookFrame:HookScript("OnHide", function(self)
+	PlayerSpellsFrame.SpellBookFrame:HookScript("OnHide", function(self)
 		if not LUI.MicroMenu.Buttons.Spellbook.Clicker.State then
 			LUI.MicroMenu.Buttons.Spellbook.Clicker:SetAlpha(0)
 		end
@@ -1065,12 +1047,6 @@ function module:SetMicroMenu()
 	end)
 
 	self:SetMicroMenuPosition()
-
-	-- Alert Frames
-	if LUI.isRetail then module:SecureHook(HelpTip, "Show", "ScanHelpTips") end
-	if LUI.isRetail and HelpTip.framePool.numActiveObjects > 0 then
-		module:ScanHelpTips()
-	end
 end
 
 function module:ScanHelpTips()

@@ -10,7 +10,7 @@ local addonname, LUI = ...
 LUI.Versions.bartender = 3300
 
 function LUI:InstallBartender()
-	if not IsAddOnLoaded("Bartender4") then return end
+	if not C_AddOns.IsAddOnLoaded("Bartender4") then return end
 
 	local CharName = UnitName("player")
 	local _, CharClass = UnitClass("player")
