@@ -1,0 +1,61 @@
+2024.11.16  Unitframes: Hotfix for Deathknight not updating player frame.
+
+2024.11.12  Core: Disabled install check for Vuhdo
+
+2024.11.09  Core: update for changes involved with retail patch 11.05 
+
+2024.6.8    Unitframes: Update to warlockbar so it updates properly.
+
+            Bags: Increased sort speed.
+            
+2024.5.24   Unitframes: Major overhaul to update for Cataclysm with some future proofing for later expansions.
+
+            Core: version update to Cataclysm.
+
+            Datatext: Small update to guild frames BackdropTemplate.
+
+2024.5.20   Unitframes: Intitial compat for cataclysm
+
+            Infotext: Update for Cataclysm
+
+2024.3.13   oUF: Fixed focus frame error in classic era.
+
+2023.12.2   Infotext: Fixed Calendar not opening in WoTLK.
+
+2023.11.30  Minimap: fixed error with SoD addition.
+
+            Core: Initial Support for Season of Discovery.
+
+2023.10.13  Datatext: Fixed error when no talents have been spent.
+
+            Micromenu: Updated for ICC patch 3.5.3.51739
+
+2023.6.11   InfoText: Dual spec module fixed and re-enabled.
+
+2023.6.8    Infotext: Added Pet Happiness && Loyalty module.
+ 
+            Bags: Updated C_Container naming conventions to enable sorting, still… 
+
+            Merchant: Updated C_Container naming conventions.
+ 
+            Localization: Updated text to WoTLKC.
+
+2023.6.6    Fix aura counts, stop initial error for vertex color in buffs
+
+2023.1.24   Unitframes: Added PR update that was missed from PR #21.
+
+            Bags: Fixed error with battlepay textures.
+
+2023.1.23   Core: Updated to client version 3.4.1 and fixed a host of issues. Bags are working with colored borders now, side bars have been fixed as well to open/close like they used to.
+
+2022.10.11  Hotfix: Memory infotext causing lag.
+
+2022.24.10  Hotfix: For error `LUI.args.Bars.args.Bottombar5.args.Fader.args: expected a table, got 'nil'`
+
+            Bars: Fixed issue with none shaman characters getting an error upon install.
+
+            Bars: Disabled till project is merged with Retail branch.
+
+            Bars: Added Totembar to the Bartender template.
+
+            Bars: Changed default to off, in leu of issues with the bar module. Advice is to use Bartender till more work is done.
