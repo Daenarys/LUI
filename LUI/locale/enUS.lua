@@ -11,7 +11,6 @@ silent = true
 
 local L = _G.LibStub("AceLocale-3.0"):NewLocale(addonname, "enUS", true)
 
-
 -- Core
 L["Adjust the bottom inset of the background"] = true
 L["Adjust the horizontal position"] = true
