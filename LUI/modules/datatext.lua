@@ -208,7 +208,7 @@ function module:SetBags()
 
 	if db.Bags.Enable and not stat.Created then
 		-- Localized functions
-		local GetContainerNumFreeSlots, GetContainerNumSlots = GetContainerNumFreeSlots, GetContainerNumSlots
+		local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
 
 		local bagTypes = {
 			[0x0000] = "Normal", -- 0

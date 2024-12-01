@@ -1,13 +1,54 @@
-## Interface: 90205
-## Version: 3.38
+## Interface: 110005
+## Version: 1.00
 ## Title: LUI
-## Author: Siku, Mule, Hix, Thaly, Zista
-## FormerAuthor: Louí @EU-Das Syndikat
+## Author: luckfore
 ## Notes: User Interface Modification
 ## SavedVariables: LUIDB, LUIGold, LUI_Themes, LUI_Layouts
 ## SavedVariablesPerCharacter: LUICONFIG
 ## OptionalDeps: Masque, Masque_Darion
-## X-oUF: oUF_LUI
-
 libs\libs.xml
-LUI.xml
+
+locale\locale.xml
+init.lua
+tools\profiler.lua
+debug.lua
+tools\outofcombatwrapper.lua
+devapi.lua
+tools\restore.lua
+tools\hideblizzard.lua
+
+LUI.lua
+modules\themes.lua
+modules\panels.lua
+modules\frames.lua
+modules\fader.lua
+
+addons\bartender.lua
+addons\plexus.lua
+addons\omen.lua
+addons\recount.lua
+addons\details.lua
+
+modules\auras\auras.xml
+modules\chat\chat.xml
+modules\minimap.lua
+modules\bags.lua
+modules\cooldown\cooldown.xml
+modules\tooltip.lua
+modules\datatext.lua
+modules\faq.lua
+modules\micromenu.lua
+modules\raidmenu.xml
+modules\threatbar.lua
+modules\merchant.lua
+modules\removethatbuff.lua
+modules\mirrorbar.lua
+modules\artwork.lua
+
+scripts\autoinvite.lua
+scripts\blizzscale.lua
+scripts\colourpicker.lua
+scripts\errorhider.lua
+scripts\frameidentifier.lua
+
+media\Masque_Darion\Darion.lua

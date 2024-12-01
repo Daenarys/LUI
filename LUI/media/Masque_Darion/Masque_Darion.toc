@@ -7,5 +7,4 @@
 ## X-Website: http://www.curse.com/addons/wow/masque_darion
 ## X-Category: Interface Enhancements
 ## X-Credits: StormFX
-
 Darion.lua

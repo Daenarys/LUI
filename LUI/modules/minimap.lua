@@ -965,7 +965,7 @@ function module:GARRISON_SHOW_LANDING_PAGE()
 end
 
 function module:OnEnable()
-	if IsAddOnLoaded("SexyMap") then
+	if C_AddOns.IsAddOnLoaded("SexyMap") then
 		LUI:Printf("|cffFF0000%s could not be enabled because of a conflicting addon: SexyMap.", self:GetName())
 		return
 	end

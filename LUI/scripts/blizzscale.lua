@@ -1,7 +1,7 @@
 local addonname, LUI = ...
 local script = LUI:NewScript("BlizzScale", "AceEvent-3.0", "AceHook-3.0")
 
-local IsAddOnLoaded = IsAddOnLoaded
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local _G = _G
 
 local blizzFrames = {
@@ -68,7 +68,7 @@ local blizzEvents = {
 	"AUCTION_HOUSE_SHOW",
 	"BARBER_SHOP_OPEN",
 	"INSPECT_READY",
-	"VOID_STORAGE_OPEN",
+	"VOID_STORAGE_UPDATE",
 	"TRANSMOGRIFY_OPEN",
 	"TRADE_SKILL_SHOW",
 	"SOCKET_INFO_UPDATE",
@@ -99,7 +99,7 @@ function script:ApplyBlizzScaling()
 		--Check if the frame exists
 		if frame then
 			--Check if the frame has no conflicting addons, or that the addon isn't loaded.
-			if not conflictAddons[frameName] or not IsAddOnLoaded(conflictAddons[frameName]) then
+			if not conflictAddons[frameName] or not C_AddOns.IsAddOnLoaded(conflictAddons[frameName]) then
 				frame:SetScale(scale)
 			end
 			
