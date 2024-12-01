@@ -23,25 +23,12 @@ modules\panels.lua
 modules\frames.lua
 modules\fader.lua
 
-addons\bartender.lua
-addons\plexus.lua
-addons\omen.lua
-addons\recount.lua
-addons\details.lua
-
-modules\auras\auras.xml
 modules\chat\chat.xml
 modules\minimap.lua
 modules\bags.lua
-modules\cooldown\cooldown.xml
-modules\tooltip.lua
 modules\datatext.lua
 modules\faq.lua
 modules\micromenu.lua
-modules\raidmenu.xml
-modules\threatbar.lua
-modules\merchant.lua
-modules\removethatbuff.lua
 modules\mirrorbar.lua
 modules\artwork.lua
 

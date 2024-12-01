@@ -2493,8 +2493,8 @@ function module:SetMemory()
 
 	if db.Memory.Enable and not stat.Created then
 		-- Localized functions
-		local UpdateAddOnMemoryUsage, IsAddOnLoaded, InCombatLockdown = UpdateAddOnMemoryUsage, IsAddOnLoaded, InCombatLockdown
-		local GetNumAddOns, GetAddOnInfo, GetAddOnMemoryUsage = GetNumAddOns, GetAddOnInfo, GetAddOnMemoryUsage
+		local UpdateAddOnMemoryUsage, IsAddOnLoaded, InCombatLockdown = UpdateAddOnMemoryUsage, C_AddOns.IsAddOnLoaded, InCombatLockdown
+		local GetNumAddOns, GetAddOnInfo, GetAddOnMemoryUsage = C_AddOns.GetNumAddOns, C_AddOns.GetAddOnInfo, GetAddOnMemoryUsage
 		local floor, format, sort, collectgarbage, select = floor, format, sort, collectgarbage, select
 
 		-- Local variables
