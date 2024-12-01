@@ -26,7 +26,6 @@ modules\minimap.lua
 modules\datatext.lua
 modules\faq.lua
 modules\micromenu.lua
-modules\mirrorbar.lua
 modules\artwork.lua
 
 scripts\blizzscale.lua
