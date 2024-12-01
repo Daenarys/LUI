@@ -378,57 +378,6 @@ function LUI:SyncAddonVersion()
 end
 
 ------------------------------------------------------
--- / BlIZZARD HIDING / --
-------------------------------------------------------
-
-function LUI:HideBlizzard()
-	local HiddenFrame = CreateFrame("Frame", nil, UIParent)
-	HiddenFrame:SetAllPoints(UIParent)
-	HiddenFrame:Hide()
-
-	local function apply(func, ...)
-	    for i = 1, select('#', ...) do
-	        local name = (select(i, ...))
-	        local frame = _G[name]
-
-	        if frame then
-	            func(frame)
-	        else
-				self:Printf('Could not find frame %q', name)
-	        end
-	    end
-	end
-
-	local function banish(frame)
-	    (frame.HideBase or frame.Hide)(frame)
-	    frame:SetParent(HiddenFrame)
-	end
-
-	local function unregisterEvents(frame)
-	    frame:UnregisterAllEvents()
-	end
-
-	apply(banish,
-		"MicroButtonAndBagsBar",
-		"BagsBar",
-		"MicroMenu",
-		"MicroMenuContainer"
-	)
-
-	apply(unregisterEvents,
-		"BagsBar",
-		"MicroMenu",
-		"MicroMenuContainer"
-	)
-
-	hooksecurefunc(_G.HelpTip, 'Show', function(frame)
-		for frame in _G.HelpTip.framePool:EnumerateActive() do
-			frame:Acknowledge()
-		end
-	end)
-end
-
-------------------------------------------------------
 -- / SET DAMAGE FONT / --
 ------------------------------------------------------
 
@@ -503,27 +452,6 @@ function LUI:Update()
 
 	update_frame:RegisterForClicks("AnyUp")
 	update_frame:SetScript("OnClick", function(self)
-
-		if C_AddOns.IsAddOnLoaded("Plexus") then
-			LUI.db.global.luiconfig[ProfileName].Versions.plexus = nil
-			LUI:InstallPlexus()
-		end
-
-		if C_AddOns.IsAddOnLoaded("Recount") then
-			LUI.db.global.luiconfig[ProfileName].Versions.recount = nil
-			LUI:InstallRecount()
-		end
-
-		if C_AddOns.IsAddOnLoaded("Details") then
-			LUICONFIG.Versions.details = nil
-			LUI:InstallDetails()
-		end
-
-		if C_AddOns.IsAddOnLoaded("Omen") or C_AddOns.IsAddOnLoaded("Omen3") then
-			LUI.db.global.luiconfig[ProfileName].Versions.omen = nil
-			LUI:InstallOmen()
-		end
-
 		LUI.db.global.luiconfig[ProfileName].Versions.lui = LUI.Versions.lui
 		ReloadUI()
 	end)
@@ -534,8 +462,8 @@ end
 ------------------------------------------------------
 
 function LUI:Configure()
-	if InterfaceOptionsFrame:IsShown() then
-		InterfaceOptionsFrame:Hide()
+	if SettingsPanel:IsShown() then
+		SettingsPanel:Hide()
 	end
 
 	local configureBG = LUI:CreateMeAFrame("FRAME","configureBG",UIParent,2400,2000,1,"HIGH",5,"CENTER",UIParent,"CENTER",0,0,1)
@@ -591,12 +519,6 @@ function LUI:Configure()
 		if LUI.db.global.luiconfig[ProfileName].Versions then
 			wipe(LUI.db.global.luiconfig[ProfileName].Versions)
 		end
-
-		LUI:InstallPlexus()
-		LUI:InstallRecount()
-		LUI:InstallOmen()
-		LUI:InstallBartender()
-		LUI:InstallDetails()
 
 		LUI.db.global.luiconfig[ProfileName].Versions.lui = LUI.Versions.lui
 		LUI.db.global.luiconfig[ProfileName].IsConfigured = true
@@ -1147,127 +1069,6 @@ local function getOptions()
 									name = "Restore Addon Defaults",
 									type = "header",
 									order = 1,
-								},
-								ResetBartender = {
-									order = 2,
-									type = "execute",
-									name = "Restore Bartender",
-									func = function()
-										LUI.db.global.luiconfig[ProfileName].Versions.bartender = nil
-										LUI:InstallBartender()
-										StaticPopup_Show("RELOAD_UI")
-									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Bartender4") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Bartender4") end,
-								},
-								ResetPlexus = {
-									order = 2,
-									type = "execute",
-									name = "Restore Plexus",
-									func = function()
-										LUI.db.global.luiconfig[ProfileName].Versions.plexus = nil
-										LUI:InstallPlexus()
-										StaticPopup_Show("RELOAD_UI")
-									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Plexus") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Plexus") end,
-								},
-								ResetOmen = {
-									order = 2,
-									type = "execute",
-									name = "Restore Omen",
-									func = function()
-										LUI.db.global.luiconfig[ProfileName].Versions.omen = nil
-										LUI:InstallOmen()
-										StaticPopup_Show("RELOAD_UI")
-									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Omen") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Omen") end,
-								},
-								ResetRecount = {
-									order = 2,
-									type = "execute",
-									name = "Restore Recount",
-									func = function()
-										LUI.db.global.luiconfig[ProfileName].Versions.recount = nil
-										LUI:InstallRecount()
-										StaticPopup_Show("RELOAD_UI")
-									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-								},
-								ResetDetails = {
-									order = 2,
-									type = "execute",
-									name = "Restore Details!",
-									func = function()
-										LUICONFIG.Versions.details = nil
-										LUI:InstallDetails()
-										LUI:GetModule("Panels"):ApplyBackground("Dps")
-										--StaticPopup_Show("RELOAD_UI")
-									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Details") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Details") end,
-								},
-								Header2 = {
-									name = "Recount Settings",
-									type = "header",
-									order = 3,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-								},
-								RecountHack = {
-									name = "Force Font Size",
-									desc = "Whether or not to apply a font size fix to Recount.",
-									type = "toggle",
-									order = 4,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-									get = function() return db.Recount.FontHack end,
-									set = function() LUI.RecountFontHack:Toggle() end,
-								},
-								RecountFontSize = {
-									name = "Font Size",
-									desc = "Set the font size for Recount's bars.",
-									type = "range",
-									min = 0,
-									max = 100,
-									step = 1,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Recount") or not db.Recount.FontHack end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-									get = function() return db.Recount.FontSize end,
-									set = function(self, size)
-										db.Recount.FontSize = size
-										Recount:BarsChanged()
-									end,
-									order = 5,
-								},
-								RecountFont = {
-									name = "Font",
-									desc = "Choose the font that Recount will use. This is to overcome issues with Recount loading before LUI.",
-									type = "select",
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-									dialogControl = "LSM30_Font",
-									values = widgetLists.font,
-									get = function()
-										return db.Recount.Font
-									end,
-									set = function(self, font)
-										db.Recount.Font = font
-										Recount:BarsChanged()
-									end,
-									order = 6,
-								},
-								Header3 = {
-									name = "Restore ALL Addon Defaults",
-									type = "header",
-									order = 7,
-								},
-								ResetDesc = {
-									order = 8,
-									width = "full",
-									type = "description",
-									name = "ATTENTION:\nAll SavedVariables from Plexus, Recount, Omen, Bartender and Details will be reset!"
 								},
 								Reset = {
 									order = 9,
@@ -1844,7 +1645,6 @@ function LUI:OnEnable()
 --	print("For more Information visit lui.maydia.org")
 
 	self:SyncAddonVersion()
-	self:HideBlizzard()
 end
 
 function LUI:MergeDefaults(target, source)
