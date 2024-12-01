@@ -42,7 +42,7 @@ local addonAnchors = {
 	meter = {
 		Recount = "Recount_MainWindow",
 		Omen = "OmenAnchor",
-		Skada = "SkadaBarWindowSkada",
+		SkadaF = "SkadaBarWindowSkada",
 		Details = "DetailsBaseFrame1",
 		Details_2nd = "DetailsBaseFrame2",
 	}
