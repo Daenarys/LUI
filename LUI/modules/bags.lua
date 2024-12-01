@@ -2,21 +2,6 @@
 	Project....: LUI NextGenWoWUserInterface
 	File.......: bags.lua
 	Description: Bags Module
-	Version....: 1.3.2
-	Rev Date...: 27/04/11 [dd/mm/yy]
-
-	Edits:
-		v1.0: Loui
-		-  a: Chaoslux
-		v1.1: Chaoslux
-		v1.2: Chaoslux
-		v1.3: Chaoslux
-		v1.3.1: Xolsom (Stack & Sort Function)
-		v1.3.2: Xolsom (WoW 4.1 Fix)
-
-	A featureless, 'pure' version of Stuffing.
-	This version should work on absolutely everything,
-	but I've removed pretty much all of the options.
 ]]
 
 -- External references.
@@ -727,12 +712,6 @@ function module:SetBags()
 		self.gold:SetText(GetMoneyString(GetMoney(), 12))
 		self.currency:SetText(GetTrackedCurrency())
 	end)
-
-	--Hooking this function allows to update watched currencies without a ReloadUI
-	function module:BackpackTokenFrame_Update()
-		currency:SetText(GetTrackedCurrency())
-	end
-	module:SecureHook("BackpackTokenFrame_Update")
 
 	LUIBags:RegisterEvent("PLAYER_MONEY")
 	LUIBags:RegisterEvent("PLAYER_LOGIN")

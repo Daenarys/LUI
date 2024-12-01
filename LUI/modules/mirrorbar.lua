@@ -23,6 +23,7 @@ local db, dbd
 local floor = math.floor
 local format = string.format
 local PAUSED
+local MIRRORTIMER_NUMTIMERS = 3
 
 LUI.Versions.mirrorbar = 1.0
 Profiler.TraceScope(module, "Mirror Bar", "LUI")
@@ -380,7 +381,7 @@ function module:Refresh(...)
 	end
 end
 
-function module:CreateMirrorbars(self)
+function module:CreateMirrorbars()
 	local mirrorbar = self.MirrorBar
 	if not mirrorbar then
 		self.MirrorBar = {}
@@ -442,12 +443,8 @@ function module:OnInitialize()
 end
 
 function module:OnEnable()
-	for i = 1, MIRRORTIMER_NUMTIMERS do
-		local f = _G['MirrorTimer'..i]
-		f:UnregisterAllEvents()
-	end
-	UIParent:UnregisterEvent'MIRROR_TIMER_START'
-	module:CreateMirrorbars(self)
+	MirrorTimerContainer:UnregisterEvent('MIRROR_TIMER_START')
+	module:CreateMirrorbars()
 	for i = 1, MIRRORTIMER_NUMTIMERS do
 		self.MirrorBar[i]:Hide()
 	end
@@ -457,39 +454,27 @@ function module:OnEnable()
 	self:RegisterEvent('MIRROR_TIMER_PAUSE', MIRROR_TIMER_PAUSE, self)
 	-- Archaeology Update
 	if db.General.ArchyBar then
-		if not ArcheologyDigsiteProgressBar then
+		if not _G.ArcheologyDigsiteProgressBar then
 			LoadAddOn("Blizzard_ArchaeologyUI")
 		end
-		if ArcheologyDigsiteProgressBar then
-			ArcheologyDigsiteProgressBar:Hide()
-			ArcheologyDigsiteProgressBar._Show = ArcheologyDigsiteProgressBar.Show
-			ArcheologyDigsiteProgressBar.Show = ArcheologyDigsiteProgressBar.Hide
-		end
-		UIParent:UnregisterEvent'ARCHAEOLOGY_SURVEY_CAST'
+		LUI:Kill(_G.ArcheologyDigsiteProgressBar)
+		UIParent:UnregisterEvent('ARCHAEOLOGY_SURVEY_CAST')
 		self:RegisterEvent('ARCHAEOLOGY_SURVEY_CAST', SURVEY_CAST, self)
 		self:RegisterEvent('ARCHAEOLOGY_FIND_COMPLETE', SURVEY_COMPLETE, self)
 	end
 end
 
 function module:OnDisable()
-	for i = 1, MIRRORTIMER_NUMTIMERS do
-		local f = _G['MirrorTimer'..i]
-		f:Hide()
-		f:RegisterAllEvents'MIRROR_TIMER_PAUSE'
-		f:RegisterAllEvents'MIRROR_TIMER_STOP'
-		f:RegisterAllEvents'PLAYER_ENTERING_WORLD'
-	end
-	UIParent:RegisterEvent'MIRROR_TIMER_START'
+	MirrorTimerContainer:RegisterEvent('MIRROR_TIMER_START')
 
 	self:UnregisterEvent('MIRROR_TIMER_START', MIRROR_TIMER_START)
 	self:UnregisterEvent('MIRROR_TIMER_STOP', MIRROR_TIMER_STOP)
 	self:UnregisterEvent('MIRROR_TIMER_PAUSE', MIRROR_TIMER_PAUSE)
+
 	-- Archaeology Update
-	UIParent:RegisterAllEvents'ARCHAEOLOGY_SURVEY_CAST'
-	if ArcheologyDigsiteProgressBar and ArcheologyDigsiteProgressBar._Show then
-		ArcheologyDigsiteProgressBar.Show = ArcheologyDigsiteProgressBar._Show
-		ArcheologyDigsiteProgressBar._Show = nil
-	end
+	LUI:Unkill(_G.ArcheologyDigsiteProgressBar)
+	UIParent:RegisterAllEvents('ARCHAEOLOGY_SURVEY_CAST')
+	
 	MIRROR_TIMER_STOP(self, "ARCHAEOLOGY_FIND_COMPLETE", "ARCHY")
 	self:UnregisterEvent('ARCHAEOLOGY_SURVEY_CAST', SURVEY_CAST)
 	self:UnregisterEvent('ARCHAEOLOGY_FIND_COMPLETE', SURVEY_COMPLETE)
