@@ -32,7 +32,6 @@ modules\artwork.lua
 
 scripts\autoinvite.lua
 scripts\blizzscale.lua
-scripts\colourpicker.lua
 scripts\errorhider.lua
 scripts\frameidentifier.lua
 

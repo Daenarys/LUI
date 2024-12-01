@@ -2,14 +2,6 @@
 	Project....: LUI NextGenWoWUserInterface
 	File.......: minimap.lua
 	Description: Minimap Module
-	Version....: 1.1
-	Rev Date...: 02/01/2011
-
-	Edits:
-		v1.0: Loui
-		v1.1: Zista
-		v1.2: Darkruler
-		v1.2b: Thaly
 ]]
 
 -- External references.
@@ -22,19 +14,13 @@ local widgetLists = AceGUIWidgetLSMlists
 local db
 local shouldntSetPoint = false
 local fontflags = {'OUTLINE', 'THICKOUTLINE', 'MONOCHROME', 'NONE'}
-local defaultGarrisonState = false
 
 function module:SetAdditionalFrames()
 	if db.Minimap.Enable ~= true then return end
-	self:SecureHook(DurabilityFrame, "SetPoint", "DurabilityFrame_SetPoint")
-	self:SecureHook(VehicleSeatIndicator, "SetPoint", "VehicleSeatIndicator_SetPoint")
-	self:SecureHook(ObjectiveTrackerFrame, "SetPoint", "ObjectiveTrackerFrame_SetPoint")
 	self:SecureHook(UIWidgetTopCenterContainerFrame, "SetPoint", "AlwaysUpFrame_SetPoint")
 	self:SecureHook(TicketStatusFrame, "SetPoint", "TicketStatus_SetPoint")
 	self:SecureHook(UIWidgetBelowMinimapContainerFrame, "SetPoint", "CaptureBar_SetPoint")
-	self:SecureHook(PlayerPowerBarAlt, "SetPoint", "PlayerPowerBarAlt_SetPoint")
 	self:SecureHook(GroupLootContainer, "SetPoint", "GroupLootContainer_SetPoint")
-	self:SecureHook(MawBuffsBelowMinimapFrame, "SetPoint", "MawBuffs_SetPoint")
 end
 
 function module:SetPosition(frame)
@@ -42,48 +28,18 @@ function module:SetPosition(frame)
 	if frame == "AlwaysUpFrame" and db.Minimap.Frames.SetAlwaysUpFrame then
 		UIWidgetTopCenterContainerFrame:ClearAllPoints()
 		UIWidgetTopCenterContainerFrame:SetPoint("TOP", UIParent, "TOP", db.Minimap.Frames.AlwaysUpFrameX, db.Minimap.Frames.AlwaysUpFrameY)
-	elseif frame == "VehicleSeatIndicator" and db.Minimap.Frames.SetVehicleSeatIndicator then
-		VehicleSeatIndicator:ClearAllPoints()
-		VehicleSeatIndicator:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", db.Minimap.Frames.VehicleSeatIndicatorX, db.Minimap.Frames.VehicleSeatIndicatorY)
-	elseif frame == "DurabilityFrame" and db.Minimap.Frames.SetDurabilityFrame then
-		DurabilityFrame:ClearAllPoints()
-		DurabilityFrame:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", db.Minimap.Frames.DurabilityFrameX, db.Minimap.Frames.DurabilityFrameY)
-	elseif frame == "ObjectiveTrackerFrame" and db.Minimap.Frames.SetObjectiveTrackerFrame then
-		--ObjectiveTrackerFrame:ClearAllPoints() -- Cause a lot of odd behaviors with the quest tracker.
-		ObjectiveTrackerFrame:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", db.Minimap.Frames.ObjectiveTrackerFrameX, db.Minimap.Frames.ObjectiveTrackerFrameY)
 	elseif frame == "TicketStatus" and db.Minimap.Frames.SetTicketStatus then
 		TicketStatusFrame:ClearAllPoints()
 		TicketStatusFrame:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", db.Minimap.Frames.TicketStatusX, db.Minimap.Frames.TicketStatusY)
 	elseif frame == "CaptureBar" and db.Minimap.Frames.SetCaptureBar then
 		UIWidgetBelowMinimapContainerFrame:ClearAllPoints()
 		UIWidgetBelowMinimapContainerFrame:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", db.Minimap.Frames.CaptureBarX, db.Minimap.Frames.CaptureBarY)
-	elseif frame == "PlayerPowerBarAlt" and db.Minimap.Frames.SetPlayerPowerBarAlt then
-		PlayerPowerBarAlt:ClearAllPoints()
-		PlayerPowerBarAlt:SetPoint("BOTTOM", UIParent, "BOTTOM", db.Minimap.Frames.PlayerPowerBarAltX, db.Minimap.Frames.PlayerPowerBarAltY)
 	elseif frame == "GroupLootContainer" and db.Minimap.Frames.SetGroupLootContainer then
 		GroupLootContainer:ClearAllPoints()
 		GroupLootContainer:SetPoint("BOTTOM", UIParent, "BOTTOM", db.Minimap.Frames.GroupLootContainerX, db.Minimap.Frames.GroupLootContainerY)
-	elseif frame == "MawBuffs" and db.Minimap.Frames.SetMawBuffs then
-		MawBuffsBelowMinimapFrame:ClearAllPoints()
-		MawBuffsBelowMinimapFrame:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", db.Minimap.Frames.MawBuffsX, db.Minimap.Frames.MawBuffsY)
 	end
 
 	shouldntSetPoint = false
-end
-
-function module:DurabilityFrame_SetPoint()
-	if shouldntSetPoint then return end
-	self:SetPosition('DurabilityFrame')
-end
-
-function module:ObjectiveTrackerFrame_SetPoint()
-	if shouldntSetPoint then return end
-	self:SetPosition('ObjectiveTrackerFrame')
-end
-
-function module:VehicleSeatIndicator_SetPoint()
-	if shouldntSetPoint then return end
-	self:SetPosition('VehicleSeatIndicator')
 end
 
 function module:AlwaysUpFrame_SetPoint()
@@ -101,19 +57,9 @@ function module:GroupLootContainer_SetPoint()
 	self:SetPosition('GroupLootContainer')
 end
 
-function module:PlayerPowerBarAlt_SetPoint()
-	if shouldntSetPoint then return end
-	self:SetPosition('PlayerPowerBarAlt')
-end
-
 function module:TicketStatus_SetPoint()
 	if shouldntSetPoint then return end
 	self:SetPosition('TicketStatus')
-end
-
-function module:MawBuffs_SetPoint()
-	if shouldntSetPoint then return end
-	self:SetPosition('MawBuffs')
 end
 
 function module:SetColors()
@@ -131,7 +77,7 @@ function module:SetMinimapFrames()
 
 	local fminimap_border = LUI:CreateMeAFrame("FRAME","fminimap_border",Minimap,143,143,1,"BACKGROUND",2,"CENTER",Minimap,"CENTER",0,0,1)
 	fminimap_border:SetBackdrop({bgFile="Interface\\Tooltips\\UI-Tooltip-Background", edgeFile=glowTex, tile=0, tileSize=0, edgeSize=7, insets={left=0, right=0, top=0, bottom=0}})
-	fminimap_border:SetBackdropColor(color_r,color_g,color_b,0)
+	fminimap_border:SetBackdropColor(minimap_r,minimap_g,minimap_b,0)
 	fminimap_border:SetBackdropBorderColor(0,0,0,1)
 
 	local fminimap_texture1 = LUI:CreateMeAFrame("FRAME","fminimap_texture1",Minimap,50,50,1,"BACKGROUND",1,"BOTTOMLEFT",Minimap,"BOTTOMLEFT",-7,-7,1)
@@ -141,7 +87,7 @@ function module:SetMinimapFrames()
 
 	local fminimap_texture2 = LUI:CreateMeAFrame("FRAME","fminimap_texture2",Minimap,56,56,1,"BACKGROUND",0,"BOTTOMLEFT",Minimap,"BOTTOMLEFT",-10,-10,1)
 	fminimap_texture2:SetBackdrop({bgFile="Interface\\Tooltips\\UI-Tooltip-Background", edgeFile=glowTex, tile=0, tileSize=0, edgeSize=6, insets={left=3, right=3, top=3, bottom=3}})
-	fminimap_texture2:SetBackdropColor(color_r,color_g,color_b,0)
+	fminimap_texture2:SetBackdropColor(minimap_r,minimap_g,minimap_b,0)
 	fminimap_texture2:SetBackdropBorderColor(0,0,0,1)
 
 	local fminimap_texture3 = LUI:CreateMeAFrame("FRAME","fminimap_texture3",Minimap,50,50,1,"BACKGROUND",1,"BOTTOMRIGHT",Minimap,"BOTTOMRIGHT",7,-7,1)
@@ -151,7 +97,7 @@ function module:SetMinimapFrames()
 
 	local fminimap_texture4 = LUI:CreateMeAFrame("FRAME","fminimap_texture4",Minimap,56,56,1,"BACKGROUND",0,"BOTTOMRIGHT",Minimap,"BOTTOMRIGHT",10,-10,1)
 	fminimap_texture4:SetBackdrop({bgFile="Interface\\Tooltips\\UI-Tooltip-Background", edgeFile=glowTex, tile=0, tileSize=0, edgeSize=6, insets={left=3, right=3, top=3, bottom=3}})
-	fminimap_texture4:SetBackdropColor(color_r,color_g,color_b,0)
+	fminimap_texture4:SetBackdropColor(minimap_r,minimap_g,minimap_b,0)
 	fminimap_texture4:SetBackdropBorderColor(0,0,0,1)
 
 	local fminimap_texture5 = LUI:CreateMeAFrame("FRAME","fminimap_texture5",Minimap,50,50,1,"BACKGROUND",1,"TOPRIGHT",Minimap,"TOPRIGHT",7,7,1)
@@ -161,7 +107,7 @@ function module:SetMinimapFrames()
 
 	local fminimap_texture6 = LUI:CreateMeAFrame("FRAME","fminimap_texture6",Minimap,56,56,1,"BACKGROUND",0,"TOPRIGHT",Minimap,"TOPRIGHT",10,10,1)
 	fminimap_texture6:SetBackdrop({bgFile="Interface\\Tooltips\\UI-Tooltip-Background", edgeFile=glowTex, tile=0, tileSize=0, edgeSize=6, insets={left=3, right=3, top=3, bottom=3}})
-	fminimap_texture6:SetBackdropColor(color_r,color_g,color_b,0)
+	fminimap_texture6:SetBackdropColor(minimap_r,minimap_g,minimap_b,0)
 	fminimap_texture6:SetBackdropBorderColor(0,0,0,1)
 
 	local fminimap_texture7 = LUI:CreateMeAFrame("FRAME","fminimap_texture7",Minimap,50,50,1,"BACKGROUND",1,"TOPLEFT",Minimap,"TOPLEFT",-7,7,1)
@@ -171,7 +117,7 @@ function module:SetMinimapFrames()
 
 	local fminimap_texture8 = LUI:CreateMeAFrame("FRAME","fminimap_texture8",Minimap,56,56,1,"BACKGROUND",0,"TOPLEFT",Minimap,"TOPLEFT",-10,10,1)
 	fminimap_texture8:SetBackdrop({bgFile="Interface\\Tooltips\\UI-Tooltip-Background", edgeFile=glowTex, tile=0, tileSize=0, edgeSize=6, insets={left=3, right=3, top=3, bottom=3}})
-	fminimap_texture8:SetBackdropColor(color_r,color_g,color_b,0)
+	fminimap_texture8:SetBackdropColor(minimap_r,minimap_g,minimap_b,0)
 	fminimap_texture8:SetBackdropBorderColor(0,0,0,1)
 
 	for i=1, 8, 1 do
@@ -239,9 +185,6 @@ function module:SetMinimap()
 	self:SetMinimapFrames()
 	self:SetMinimapPosition()
 	self:SetMinimapSize()
-	self:SetPosition('DurabilityFrame')
-	self:SetPosition('ObjectiveTrackerFrame')
-	self:SetPosition('VehicleSeatIndicator')
 	self:SetPosition('AlwaysUpFrame')
 	self:SetPosition('CaptureBar')
 	self:SetPosition('TicketStatus')
@@ -251,95 +194,32 @@ function module:SetMinimap()
 	--------------------------------------------------------------------
 	-- MINIMAP SETTINGS
 	--------------------------------------------------------------------
-
-	-- Hide Border
-	MinimapBorder:Hide()
-	MinimapBorderTop:Hide()
-
-	-- Hide Zoom Buttons
-	MinimapZoomIn:Hide()
-	MinimapZoomOut:Hide()
-
-	-- GuildInstanceDifficulty
-	GuildInstanceDifficulty:UnregisterAllEvents()
-	GuildInstanceDifficulty.NewShow = MiniMapInstanceDifficulty.Show
-	GuildInstanceDifficulty.Show = GuildInstanceDifficulty.Hide
-	GuildInstanceDifficulty:Hide()
-
-	-- MiniMapInstanceDifficulty
-	MiniMapInstanceDifficulty.NewShow = MiniMapInstanceDifficulty.Show
-	MiniMapInstanceDifficulty.Show = MiniMapInstanceDifficulty.Hide
-	MiniMapInstanceDifficulty:Hide()
-
-	-- MiniMapChallengeMode 
-	MiniMapChallengeMode.NewShow = MiniMapChallengeMode.Show
-	MiniMapChallengeMode.Show = MiniMapChallengeMode.Hide
-	MiniMapChallengeMode:Hide()
-
-	-- Hide Voice Chat Frame
-	--MiniMapVoiceChatFrame:Hide()
-
-	-- Hide North texture at top
-	MinimapNorthTag:SetTexture(nil)
-
-	-- Hide Zone Frame
-	MinimapZoneTextButton:Hide()
-
-	-- Hide Clock
-	TimeManagerClockButton:Hide()
+	-- Hide Default Frames
+	LUI:Kill(MinimapCompassTexture)
+	LUI:Kill(MinimapCluster.BorderTop)
+	LUI:Kill(MinimapCluster.ZoneTextButton)
+	LUI:Kill(Minimap.ZoomHitArea)
+	LUI:Kill(Minimap.ZoomIn)
+	LUI:Kill(Minimap.ZoomOut)
 	LUI:Kill(TimeManagerClockButton)
+	LUI:Kill(GameTimeFrame)
 
-	-- Hide Tracking Button
-	MiniMapTracking:Hide()
-
-	-- Hide Calendar Button
-	GameTimeFrame:Hide()
+	MinimapCluster.InstanceDifficulty.NewShow = MinimapCluster.InstanceDifficulty.Show
+	MinimapCluster.InstanceDifficulty.Show = MinimapCluster.InstanceDifficulty.Hide
+	MinimapCluster.InstanceDifficulty:Hide()
+	MinimapCluster.InstanceDifficulty:ClearAllPoints()
+	MinimapCluster.InstanceDifficulty:SetParent(Minimap)
+	MinimapCluster.InstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 0, 0)
 
 	-- Move Mail icon
-	MiniMapMailFrame:ClearAllPoints()
-	MiniMapMailFrame:SetPoint(db.Minimap.Icon.Mail, Minimap, LUI:Scale(3), LUI:Scale(6))
-	MiniMapMailBorder:Hide()
+	MinimapCluster.IndicatorFrame.MailFrame:ClearAllPoints()
+	MinimapCluster.IndicatorFrame.MailFrame:SetPoint(db.Minimap.Icon.Mail, Minimap, LUI:Scale(3), LUI:Scale(6))
 	MiniMapMailIcon:SetTexture(LUI.Media.mail)
 
-	-- Move battleground icon
-	QueueStatusMinimapButton:ClearAllPoints()
-	QueueStatusMinimapButton:SetPoint(db.Minimap.Icon.BG, Minimap, LUI:Scale(3), 0)
-	QueueStatusMinimapButtonBorder:Hide()
-
-	-- Move Garrison icon
-	module:SecureHook("GarrisonLandingPageMinimapButton_UpdateIcon", function()
-		GarrisonLandingPageMinimapButton:SetSize(32,32)
-		GarrisonLandingPageMinimapButton:ClearAllPoints()
-		if MiniMapMailFrame:IsShown() then
-			GarrisonLandingPageMinimapButton:SetPoint("BOTTOMLEFT", MiniMapMailFrame, "TOPLEFT", 0, LUI:Scale(-5))
-		else
-			GarrisonLandingPageMinimapButton:SetPoint(db.Minimap.Icon.Mail, Minimap, LUI:Scale(3), LUI:Scale(15))
-		end
+	MinimapCluster.IndicatorFrame.MailFrame:HookScript("OnShow", function()
 	end)
-
-	MiniMapMailFrame:HookScript("OnShow", function()
-		GarrisonLandingPageMinimapButton:ClearAllPoints()
-		GarrisonLandingPageMinimapButton:SetPoint("BOTTOMLEFT", MiniMapMailFrame, "TOPLEFT", 0, LUI:Scale(-5))
+	MinimapCluster.IndicatorFrame.MailFrame:HookScript("OnHide", function()
 	end)
-	MiniMapMailFrame:HookScript("OnHide", function()
-		GarrisonLandingPageMinimapButton:ClearAllPoints()
-		GarrisonLandingPageMinimapButton:SetPoint(db.Minimap.Icon.Mail, Minimap, LUI:Scale(3), LUI:Scale(15))
-	end)
-
-	-- Hide world map button
-	MiniMapWorldMapButton:Hide()
-
-	-- shitty 3.3 flag to move
-	MiniMapInstanceDifficulty:ClearAllPoints()
-	MiniMapInstanceDifficulty:SetParent(Minimap)
-	MiniMapInstanceDifficulty:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 0, 0)
-
-	local function UpdateLFG()
-		QueueStatusMinimapButton:ClearAllPoints()
-		QueueStatusMinimapButton:SetPoint(db.Minimap.Icon.LFG, Minimap, db.Minimap.Icon.LFG, LUI:Scale(2), LUI:Scale(1))
-		QueueStatusMinimapButtonBorder:Hide()
-	end
-	hooksecurefunc("EyeTemplate_OnUpdate", UpdateLFG)
 
 	-- Enable mouse scrolling
 	Minimap:EnableMouseWheel(true)
@@ -355,9 +235,9 @@ function module:SetMinimap()
 			module:SetMinimapSize()
 		else
 			if d > 0 then
-				_G.MinimapZoomIn:Click()
+				_G.Minimap.ZoomIn:Click()
 			elseif d < 0 then
-				_G.MinimapZoomOut:Click()
+				_G.Minimap.ZoomOut:Click()
 			end
 		end
 	end)
@@ -383,15 +263,13 @@ function module:SetMinimap()
 	}
 
 	Minimap:SetScript("OnMouseUp", function(self, btn)
+		local trackingAnchor = AnchorUtil.CreateAnchor("TOPRIGHT", Minimap, "TOPLEFT", -10, 8)
 		if btn == "RightButton" then
-			ToggleDropDownMenu(1, nil, MiniMapTrackingDropDown, self)
-		elseif btn == "MiddleButton" then
-			EasyMenu(menuList, menuFrame, "cursor", 0, 0, "MENU", 2)
+			Menu.GetManager():OpenMenu(Minimap, _G.MinimapCluster.Tracking.Button.menuDescription, trackingAnchor)
 		else
-			Minimap_OnClick(self)
+			Minimap:OnClick(self)
 		end
 	end)
-
 
 	-- Set Square Map Mask
 	Minimap:SetMaskTexture('Interface\\ChatFrame\\ChatFrameBackground')
@@ -449,7 +327,7 @@ function module:SetMinimap()
 					x = math.floor(100 * x)
 					y = math.floor(100 * y)
 					m_coord_text:SetFormattedText("%.2d, %.2d", x, y)
-					--LUI:Print("valid Coords:", m_coord_text:GetText())
+					-- LUI:Print("valid Coords:", m_coord_text:GetText())
 					return
 				end
 			end
@@ -541,6 +419,7 @@ local defaults = {
 			ShowTextures = true,
 			ShowBorder = true,
 			ShowCoord = true,
+			TrackingIcon = true,
 			MissionReport = true,
 		},
 		Font = {
@@ -550,38 +429,24 @@ local defaults = {
 		},
 		Icon = {
 			Mail = "BOTTOMLEFT", -- LFG and MAIL icon positions changed for better visibilty of the Tooltip
+			Tracking = "TOPLEFT",
 			BG = "BOTTOMRIGHT",
 			LFG = "TOPRIGHT", -- LFG and MAIL icon positions changed for better visibilty of the Tooltip
-			GMTicket = "TOPLEFT",
+			GMTicket = "TOP",
 		},
 		Frames = {
 			AlwaysUpFrameX = "300",
 			AlwaysUpFrameY = "-35",
-			VehicleSeatIndicatorX = "-10",
-			VehicleSeatIndicatorY = "-260",
-			DurabilityFrameX = "-20",
-			DurabilityFrameY = "-260",
-			ObjectiveTrackerFrameX = "-150",
-			ObjectiveTrackerFrameY = "-300",
 			CaptureBarX = "-5",
 			CaptureBarY = "-235",
 			TicketStatusX = "-175",
 			TicketStatusY = "-70",
-			PlayerPowerBarAltX = "0",
-			PlayerPowerBarAltY = "160",
 			GroupLootContainerX = "0",
 			GroupLootContainerY = "120",
-			MawBuffsX = "-180",
-			MawBuffsY = "-70",
 			SetAlwaysUpFrame = true,
-			SetVehicleSeatIndicator = true,
-			SetDurabilityFrame = true,
-			SetObjectiveTrackerFrame = true,
 			SetCaptureBar = true,
 			SetTicketStatus = true,
-			SetPlayerPowerBarAlt = false,
 			SetGroupLootContainer = false,
-			SetMawBuffs = true,
 		},
 	},
 }
@@ -704,7 +569,7 @@ function module:LoadOptions()
 						},
 						AlwaysShow = {
 							name = "Always show Minimap text",
-							desc = "Whether or not the Minimap Location and Coords text to always be shown.\n",
+							desc = "Whether you want to show the Minimap Location and Coords Text or not.\n",
 							disabled = function() return not db.Minimap.Enable end,
 							type = "toggle",
 							width = "full",
@@ -725,7 +590,7 @@ function module:LoadOptions()
 						},
 						ShowCoord = {
 							name = "Show Coordinates",
-							desc = "Whether or not the Minimap Coordinates.\n",
+							desc = "Whether you want to show the Minimap Coordinates or not.\n",
 							disabled = function() return not db.Minimap.Enable end,
 							type = "toggle",
 							width = "full",
@@ -741,16 +606,19 @@ function module:LoadOptions()
 							end,
 							order = 4,
 						},
-						MissionReport = {
-							name = "Show Mission Report Button",
-							desc = "Whether or not the Mission Report in the corner of the minimap.\n\n The button will be in a 'dead' corner of the minimap in which Blizzard will never spawn icons or other information.",
+						TrackingIcon = {
+							name = "Show Tracking Icon",
+							desc = "Whether you want to show the Tracking Icon or not.\n",
 							disabled = function() return not db.Minimap.Enable end,
 							type = "toggle",
 							width = "full",
-							get = function() return db.Minimap.General.MissionReport end,
-							set = function(_)
-								db.Minimap.General.MissionReport = not db.Minimap.General.MissionReport
-								module:ToggleMissionReport()
+							get = function() return db.Minimap.General.TrackingIcon end,
+							set = function(_) 
+								db.Minimap.General.TrackingIcon = not db.Minimap.General.TrackingIcon
+								MiniMapTracking:Hide()
+								if db.Minimap.General.TrackingIcon then
+									MiniMapTracking:Show()
+								end
 							end,
 							order = 4.5,
 						},
@@ -899,12 +767,6 @@ function module:LoadOptions()
 			childGroups = "tab",
 			disabled = function() return not db.Minimap.Enable end,
 			args = {
-				ObjectiveTrackerFrame = createTemplate("ObjectiveTrackerFrame", 1, "Objectives Tracker",
-					"This Frame occurs when tracking Quests and Achievements."
-				),
-				PlayerPowerBarAlt = createTemplate("PlayerPowerBarAlt", 2, "Alternate Power Bar",
-					"This Frame is the special bar that appears during certain fights or events. Example: Sanity bar during Visions."
-				),
 				GroupLootContainer = createTemplate("GroupLootContainer", 3, "Group Loot Container",
 					"This Frame is the anchor point for many Loot-based frames such as the Need/Greed and Bonus Roll frames."
 				),
@@ -913,15 +775,6 @@ function module:LoadOptions()
 				),
 				CaptureBar = createTemplate("CaptureBar", 5, "Capture Bar",
 					"This Frame occurs when trying to capture a pvp objective."
-				),
-				VehicleSeatIndicator = createTemplate("VehicleSeatIndicator", 6, "Vehicle Seat Indicator",
-					"This Frame occurs in some special Mounts and Vehicles. Example: Traveler's Tundra Mammoth."
-				),
-				DurabilityFrame = createTemplate("DurabilityFrame", 7, "Durability Frame",
-					"This Frame occurs when your gear is damaged or broken."
-				),
-				MawBuffs = createTemplate("MawBuffs", 7, "Sanctum Anima Powers",
-					"This Frame is shown in certain parts of the Sanctum of Domination."
 				),
 				TicketStatus = createTemplate("TicketStatus", 8, "GM Ticket Status",
 					"This Frame occurs when waiting on a ticket response", {
@@ -956,14 +809,6 @@ function module:OnInitialize()
 	LUI:RegisterModule(self)
 end
 
-function module:GARRISON_HIDE_LANDING_PAGE()
-	defaultGarrisonState = false
-end
-
-function module:GARRISON_SHOW_LANDING_PAGE()
-	defaultGarrisonState = true
-end
-
 function module:OnEnable()
 	if C_AddOns.IsAddOnLoaded("SexyMap") then
 		LUI:Printf("|cffFF0000%s could not be enabled because of a conflicting addon: SexyMap.", self:GetName())
@@ -971,8 +816,4 @@ function module:OnEnable()
 	end
 	self:SetMinimap()
 	self:SetAdditionalFrames()
-	self:RegisterEvent("GARRISON_HIDE_LANDING_PAGE")
-	self:RegisterEvent("GARRISON_SHOW_LANDING_PAGE")
-	C_Timer.After(0.25, self.ToggleMissionReport)
-	self:SecureHook(MawBuffsBelowMinimapFrameMixin, "OnShow", function() self:SetPosition('MawBuffs') end)
 end
