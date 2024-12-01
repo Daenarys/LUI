@@ -962,7 +962,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Spellbook.Clicker:SetScript("OnLeave", function(self)
-		if not PlayerSpellsFrame.SpellBookFrame:IsShown() then
+		if not PlayerSpellsFrame:IsShown() then
 			self:SetAlpha(0)
 		end
 		self.State = nil
@@ -971,10 +971,10 @@ function module:SetMicroMenu()
 
 	LUI.MicroMenu.Buttons.Spellbook.Clicker:SetScript("OnClick", function(self)
 		if InCombatLockdown() then return end
-		if PlayerSpellsFrame.SpellBookFrame:IsShown() then
-			HideUIPanel(PlayerSpellsFrame.SpellBookFrame)
+		if PlayerSpellsFrame:IsShown() then
+			HideUIPanel(PlayerSpellsFrame)
 		else
-			ShowUIPanel(PlayerSpellsFrame.SpellBookFrame)
+			ShowUIPanel(PlayerSpellsFrame)
 		end
 	end)
 
