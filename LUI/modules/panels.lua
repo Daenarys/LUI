@@ -80,7 +80,7 @@ function module:CheckPanels()
 		Frames:SetNaviAlpha("Chat", 1)
 
 		ChatAlphaAnchor:SetAlpha(1)
-		if LUI.db.profile.Chat.SecondChatFrame then ChatAlphaAnchor2:SetAlpha(1) end
+		--if LUI.db.profile.Chat.SecondChatFrame then ChatAlphaAnchor2:SetAlpha(1) end
 
 		db.Chat.IsShown = true
 		LUI:SetChatVisible(true)
@@ -88,10 +88,10 @@ function module:CheckPanels()
 		Frames:SetNaviAlpha("Chat", 0)
 
 		ChatAlphaAnchor:SetAlpha(0)
-		if LUI.db.profile.Chat.SecondChatFrame then ChatAlphaAnchor2:SetAlpha(0) end
+		--if LUI.db.profile.Chat.SecondChatFrame then ChatAlphaAnchor2:SetAlpha(0) end
 
 		db.Chat.IsShown = false
-		LUI:SetChatVisible(false)
+		--LUI:SetChatVisible(false)
 		LUI:SetChatVisible(true)
 	end
 
@@ -314,10 +314,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, a)
 		f.br:SetVertexColor(r, g, b, a)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, a)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, a)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, a)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, a)
 	elseif d == "LEFT" then
 		f.c:SetTexture(fdir.."panelbg2.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -328,10 +328,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, a)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, a)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
 	elseif d == "TOP" then
 		f.c:SetTexture(fdir.."panelbg2.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -342,10 +342,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, a)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, a)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, a)
 	elseif d == "RIGHT" then
 		f.c:SetTexture(fdir.."panelbg2.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -356,10 +356,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, a)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, a)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, a)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, a)
 	elseif d == "BOTTOM" then
 		f.c:SetTexture(fdir.."panelbg2.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -370,10 +370,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, a)
 		f.br:SetVertexColor(r, g, b, a)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, a)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, 0)
 	elseif d == "TOPLEFT" then
 		f.c:SetTexture(fdir.."panelbg3.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -384,10 +384,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, a)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
 	elseif d == "TOPRIGHT" then
 		f.c:SetTexture(fdir.."panelbg3.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -398,10 +398,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, a)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, a)
 	elseif d == "BOTTOMRIGHT" then
 		f.c:SetTexture(fdir.."panelbg3.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -412,10 +412,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, a)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, a)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, 0)
 	elseif d == "BOTTOMLEFT" then
 		f.c:SetTexture(fdir.."panelbg3.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -426,10 +426,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, a)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
 	end
 
 end
@@ -506,14 +506,14 @@ end
 
 function module:AlphaIn(kind)
 	if not backgrounds[kind] then return end
-	if _G[backgrounds[kind].frame]:IsProtected() and InCombatLockdown() then return end
+	--if _G[backgrounds[kind].frame]:IsProtected() and InCombatLockdown() then return end
 	db[kind].IsShown = true
 
 	if LUI:CanAlterFrame(_G[backgrounds[kind].frame]) then
 		_G[backgrounds[kind].frame]:Show()
 
-		-- if kind == "Chat" and LUI.db.profile.Chat.SecondChatFrame then ChatAlphaAnchor2:Show() end
-		for _, f in pairs(self:LoadAdditional(db[kind].Additional)) do
+		--if kind == "Chat" and LUI.db.profile.Chat.SecondChatFrame then ChatAlphaAnchor2:Show() end
+		for _, f in pairs(module:LoadAdditional(db[kind].Additional)) do
 			if LUI:CanAlterFrame(_G[f]) then _G[f]:Show() end
 		end
 	end
@@ -521,9 +521,9 @@ function module:AlphaIn(kind)
 	if db[kind].Animation == "AlphaSlide" then
 		backgrounds[kind].AlphaIn:Show()
 
-		-- if kind == "Chat" and LUI.db.profile.Chat.SecondChatFrame then
-		-- 	backgrounds.Chat2.AlphaIn:Show()
-		-- end
+		--[[if kind == "Chat" and LUI.db.profile.Chat.SecondChatFrame then
+			backgrounds.Chat2.AlphaIn:Show()
+		end]]
 	else
 		_G[backgrounds[kind].frame]:SetAlpha(1)
 
@@ -533,7 +533,7 @@ end
 
 function module:AlphaOut(kind)
 	if not backgrounds[kind] then return end
-	if _G[backgrounds[kind].frame]:IsProtected() and InCombatLockdown() then return end
+	--if _G[backgrounds[kind].frame]:IsProtected() and InCombatLockdown() then return end
 	db[kind].IsShown = false
 
 	if db[kind].Animation == "AlphaSlide" then
@@ -543,7 +543,7 @@ function module:AlphaOut(kind)
 		_G[backgrounds[kind].frame]:SetAlpha(0)
 		_G[backgrounds[kind].frame]:Hide()
 
-		for _, f in pairs(Panels:LoadAdditional(db[kind].Additional)) do
+		for _, f in pairs(module:LoadAdditional(db[kind].Additional)) do
 			if LUI:CanAlterFrame(_G[f]) then
 				_G[f]:SetAlpha(0)
 				_G[f]:Hide()
@@ -697,17 +697,17 @@ module.defaults = {
 		},
 		Chat = {
 			OffsetX = 0,
-			OffsetY = -2,
+			OffsetY = 0,
 			AlwaysShow = false,
 			IsShown = false,
 			Direction = "TOPRIGHT",
 			Animation = "AlphaSlide",
-			Width = 412,
-			Height = 177
+			Width = 429,
+			Height = 181
 		},
 		Tps = {
-			OffsetX = 1,
-			OffsetY = -1,
+			OffsetX = 0,
+			OffsetY = 0,
 			Anchor = "OmenAnchor",
 			Additional = "",
 			AlwaysShow = false,
@@ -730,8 +730,8 @@ module.defaults = {
 			Height = 181
 		},
 		Raid = {
-			OffsetX = -4,
-			OffsetY = 4,
+			OffsetX = 0,
+			OffsetY = 0,
 			Anchor = "oUF_LUI_raid",
 			Additional = "",
 			AlwaysShow = false,
@@ -875,7 +875,7 @@ function module:LoadOptions()
 
 	local options = {
 		Chat = CreateOptionsPart("Chat", 1),
-		-- Chat2 = CreateOptionsPart("Chat2", 2),
+		--Chat2 = CreateOptionsPart("Chat2", 2),
 		Tps = CreateOptionsPart("Tps", 3),
 		Dps = CreateOptionsPart("Dps", 4),
 		Raid = CreateOptionsPart("Raid", 5),
@@ -902,7 +902,7 @@ function module:OnEnable()
 	self:SetPanels()
 
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
-		-- self:CheckPanels()
+		self:CheckPanels()
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	end)
 

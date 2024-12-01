@@ -13,7 +13,6 @@ local StickyChannels = module:Module("StickyChannels")
 local Themes = LUI:Module("Themes")
 local Media = LibStub("LibSharedMedia-3.0")
 local widgetLists = AceGUIWidgetLSMlists
--- local "CHAT_MSG_CHANNEL" = "CHAT_MSG_CHANNEL"
 
 local L = LUI.L
 local db, dbd
@@ -385,7 +384,7 @@ do
 		[L["Battleground"]] = "[BG]",
 		[L["Battleground Leader"]] = "[BL]",
 		[L["General"]] = "[General]",
-		[L["Trade - City"]] = "[Trade]",
+		[L["Trade"]] = "[Trade]",
 		[L["LocalDefense"]] = "[LocalDefense]",
 		[L["WorldDefense"]] = "[WorldDefense]",
 		[L["LookingForGroup"]] = "[LFG]",
@@ -474,35 +473,58 @@ local function positionChatFrame()
 	FCF_SavePositionAndDimensions(frame)
 	FCF_SetLocked(frame, 1)
 end
--- local chatEvents = --[[ "CHAT_MSG_BATTLEGROUND", "CHAT_MSG_BATTLEGROUND_LEADER",  ]]"CHAT_MSG_CHANNEL", "CHAT_MSG_EMOTE", "CHAT_MSG_GUILD", "CHAT_MSG_OFFICER", "CHAT_MSG_PARTY", "CHAT_MSG_RAID", "CHAT_MSG_RAID_LEADER", "CHAT_MSG_RAID_WARNING", "CHAT_MSG_PARTY_LEADER", "CHAT_MSG_SAY", "CHAT_MSG_WHISPER", "CHAT_MSG_BN_WHISPER", "CHAT_MSG_WHISPER_INFORM", "CHAT_MSG_YELL", "CHAT_MSG_BN_WHISPER_INFORM" -- , "CHAT_MSG_BN_CONVERSATION"
--- local _SetCVar = SetCVar -- Keep a local copy of SetCVar so we don't call the hooked version
--- local SetCVar = function(...)
--- 	local status, err = pcall(function(...) return _SetCVar(...) end, ...)
--- 	return status
--- end
 
--- hooksecurefunc('ConsoleExec', function(msg)
--- 	local cmd, cvar, value = msg:match('^(%S+)%s+(%S+)%s*(%S*)')
--- 	if cmd == 'set' then -- /console SET cvar value
--- 			TraceCVar(cvar, value)
--- 		else -- /console cvar value
--- 			TraceCVar(cmd, cvar)
--- 		end
--- 	end
--- end)
+local function configureTab(tab, minimalist)
+	if minimalist then
+		if module:IsHooked(tab, "OnMouseWheel") then return end
 
-local function ChatNameColorEvent()
-	-- print((db.General.ClassColor))
-	-- if db.General.ClassColor == Always then hooksecurefunc('ConsoleExec', function("^chatClassColorOverride 0")
-	-- elseif db.General.ClassColor == Never then hooksecurefunc('ConsoleExec', function("^SET chatClassColorOverride 1")
-	-- elseif db.General.ClassColor == Legacy then hooksecurefunc('ConsoleExec', function("^SET chatClassColorOverride 2")
-	-- end
+		tab:SetHeight(29)
+		tab.leftTexture:Hide()
+		tab.middleTexture:Hide()
+		tab.rightTexture:Hide()
+		tab.leftSelectedTexture:SetAlpha(0)
+		tab.rightSelectedTexture:SetAlpha(0)
+		tab.middleSelectedTexture:SetAlpha(0)
+		tab.leftHighlightTexture:SetAlpha(0)
+		tab.middleHighlightTexture:SetAlpha(0)
+		tab.rightHighlightTexture:SetAlpha(0)
+		tab:EnableMouseWheel(true)
+		module:HookScript(tab, "OnMouseWheel")
+	else
+		tab:SetHeight(32)
+		tab.leftTexture:Show()
+		tab.middleTexture:Show()
+		tab.rightTexture:Show()
+		tab.leftSelectedTexture:SetAlpha(1)
+		tab.rightSelectedTexture:SetAlpha(1)
+		tab.middleSelectedTexture:SetAlpha(1)
+		tab.leftHighlightTexture:SetAlpha(1)
+		tab.middleHighlightTexture:SetAlpha(1)
+		tab.rightHighlightTexture:SetAlpha(1)
+		tab:EnableMouseWheel(false)
+		module:Unhook(tab, "OnMouseWheel")
+	end
+
+	FCFTab_UpdateAlpha(_G[CHAT_FRAMES[tab:GetID()]])
 end
 
--- local ccvf = CreateFrame("Frame")
--- 	ccvf:RegisterEvent(chatEvents)
--- 	ccvf:SetScript("OnEvent", ChatNameColorEvent)
--- 	ccvf:Show()
+local function configureTabs(minimalist)
+	if minimalist then
+		_G.CHAT_FRAME_FADE_OUT_TIME = 0.5
+		_G.CHAT_TAB_HIDE_DELAY = 0
+		_G.CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0
+		_G.CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = 0
+	else
+		_G.CHAT_FRAME_FADE_OUT_TIME = 2
+		_G.CHAT_TAB_HIDE_DELAY = 1
+		_G.CHAT_FRAME_TAB_SELECTED_NOMOUSE_ALPHA = 0.4
+		_G.CHAT_FRAME_TAB_NORMAL_NOMOUSE_ALPHA = 0.2
+	end
+
+	for i, name in ipairs(CHAT_FRAMES) do
+		configureTab(_G[name.."Tab"], minimalist)
+	end
+end
 
 local function urlFilterFunc(frame, event, msg, ...)
 	if not msg then return false, msg, ... end
@@ -546,6 +568,7 @@ function module:SetColors()
 		EditBox:ChatEdit_UpdateHeader(_G[name].editBox)
 	end
 end
+
 function module:LibSharedMedia_Registered(mediaType, key)
 	if mediaType == "font" and key == db.General.Font.Font then
 		for i, name in ipairs(CHAT_FRAMES) do
@@ -561,6 +584,12 @@ end
 function module:FCF_OpenTemporaryWindow()
 	local frame = FCF_GetCurrentChatFrame()
 	unclampChatFrame(frame)
+	if db.General.MinimalistTabs then
+		if GENERAL_CHAT_DOCK:IsMouseOver() or GENERAL_CHAT_DOCK.selected:IsMouseOver() then
+			frame.hasBeenFaded = true
+		end
+		configureTab(_G[frame:GetName().."Tab"], true)
+	end
 
 	frame:SetFont(Media:Fetch("font", db.General.Font.Font), db.General.Font.Size, db.General.Font.Flag)
 
@@ -597,6 +626,20 @@ end
 function module:SetItemRef(link, text, button, chatFrame)
 	if IsAltKeyDown() and strsub(link, 1, 6) == "player" then
 		C_PartyInfo.InviteUnit(link:match("player:([^:]+)"))
+		if ChatEdit_GetActiveWindow() then
+        	ChatEdit_OnEscapePressed(ChatEdit_GetActiveWindow())
+        end
+		return false
+	end
+	return true
+end
+
+function module:SetHyperlink(frame, link, ...)
+	if IsAltKeyDown() and strsub(link, 1, 6) == "player" then
+		C_PartyInfo.InviteUnit(link:match("player:([^:]+)"))
+		if ChatEdit_GetActiveWindow() then
+        	ChatEdit_OnEscapePressed(ChatEdit_GetActiveWindow())
+        end
 		return
 	end
 
@@ -608,7 +651,7 @@ function module:SetItemRef(link, text, button, chatFrame)
 		return
 	end
 
-	return self.hooks.SetItemRef(link, text, button, chatFrame)
+	return self.hooks[frame].SetHyperlink(frame, link, ...)
 end
 
 function module:AddMessage(frame, text, ...)
@@ -685,7 +728,7 @@ module.defaults = {
 		y = 46,
 		point = "BOTTOMLEFT",
 		width = 404,
-		height = 173,
+		height = 171,
 		General = {
 			Font = {
 				Font = (function()
@@ -697,10 +740,9 @@ module.defaults = {
 					end
 				end)(),
 				Size = 14,
-				Flag = "",
+				Flag = "NONE",
 			},
 			ShortChannelNames = true,
-			ClassColor = "Always",
 			DisableFading = true,
 			MinimalistTabs = true,
 			LinkHover = true,
@@ -732,11 +774,7 @@ function module:LoadOptions()
 
 		positionChatFrame()
 	end
-	local ClassColorOpt = {
-		b = "Legacy",
-		a = "Always",
-		c = "Never",
-	}
+
 	local options = {
 		General = self:NewGroup(L["General Settings"], 1, {
 			Font = self:NewGroup(L["Font"], 1, true, {
@@ -745,15 +783,6 @@ function module:LoadOptions()
 				Size = self:NewSlider(L["Size"], L["Choose a fontsize"], 3, 6, 20, 1, true, false, "full")
 			}),
 			ShortChannelNames = self:NewToggle(L["Short channel names"], L["Use abreviated channel names"], 2, true),
-			-- ClassColor = {
-			-- 	name = "Color names by class",
-			-- 	desc = "Colors player names by their designated class color.",
-			-- 	type = "select",
-			-- 	get = function() return db.General.ClassColorOpt end,
-			-- 	set = function(info, value) if "always" then db.General.ClassColorOpt = "always" and SetCVar("chatClassColorOverride", 2)
-			-- 				elseif "legacy" then db.General.ClassColorOpt = "legacy" and SetCVar("chatClassColorOverride", 1) end,
-			-- 	order = 1,
-			ClassColor = self:NewSelect("Color names by class", "Colors player names by their designated class color", 2, ClassColorOpt),
 			DisableFading = self:NewToggle(L["Disable fading"], L["Stop the chat from fading out over time"], 3, true),
 			MinimalistTabs = self:NewToggle(L["Minimalist tabs"], L["Use minimalist style tabs"], 4, true),
 			LinkHover = self:NewToggle(L["Link hover tooltip"], L["Show tooltip when mousing over links in chat"], 5, true),
@@ -811,7 +840,7 @@ function module:Refresh(info, value)
 		FCF_SetWindowAlpha(frame, a)
 	end
 
-	ChatNameColorEvent(db.General.ShowClassColor)
+	configureTabs(db.General.MinimalistTabs)
 
 	self:LibSharedMedia_Registered("font", db.General.Font.Font)
 
@@ -868,9 +897,10 @@ function module:OnEnable()
 
 	positionChatFrame()
 
+	self:RawHook(_G.ItemRefTooltip, "SetHyperlink", true)
 	self:SecureHook("FCF_SavePositionAndDimensions")
 	self:SecureHook("FCF_OpenTemporaryWindow")
-	self:RawHook("SetItemRef", true)
+	self:SecureHook("SetItemRef")
 
 	for i, name in ipairs(CHAT_FRAMES) do
 		local frame = _G[name]
@@ -894,6 +924,10 @@ function module:OnDisable()
 	Media.UnregisterCallback(self, "LibSharedMedia_Registered")
 
 	self:UnhookAll()
+
+	if db.General.MinimalistTabs then
+		configureTabs(false)
+	end
 
 	for i, name in ipairs(CHAT_FRAMES) do
 		local chatFrame = _G[name]

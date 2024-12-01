@@ -50,14 +50,14 @@ function module:LoadOptions()
 	local funcs = {
 		Enabled = function() return not db.Enabled end
 	}
-	NextOrder = 1
+	nextOrder = 1
 	local options = self:NewGroup("StickyChannels", 4, "generic", "Refresh", {
 		Enabled = self:NewToggle("Enable Sticky Channels", nil, 1, true),
 		Channels = self:NewGroup("Sticky Channels", 2, true, funcs.Enabled, {}),
 	})
 	for k, v in pairs(chans) do
-		options.args.Channels.args[k] = self:NewToggle(channels[k].desc, "Enable sticky flag for " .. channels[k].desc, NextOrder, true, "normal")
-		NextOrder = NextOrder + 1		
+		options.args.Channels.args[k] = self:NewToggle(channels[k].desc, "Enable sticky flag for " .. channels[k].desc, nextOrder, true, "normal")
+		nextOrder = nextOrder + 1		
 	end
 
 	return options

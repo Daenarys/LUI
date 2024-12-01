@@ -1,10 +1,13 @@
-## Interface: 110005
-## Version: 1.00
+## Interface: 90205
+## Version: 3.38
 ## Title: LUI
-## Author: luckfore
+## Author: Siku, Mule, Hix, Thaly, Zista
+## FormerAuthor: Louí @EU-Das Syndikat
 ## Notes: User Interface Modification
 ## SavedVariables: LUIDB, LUIGold, LUI_Themes, LUI_Layouts
 ## SavedVariablesPerCharacter: LUICONFIG
-## OptionalDeps: Ace3, Masque, Masque_Darion
+## OptionalDeps: Masque, Masque_Darion
+## X-oUF: oUF_LUI
+
 libs\libs.xml
 LUI.xml

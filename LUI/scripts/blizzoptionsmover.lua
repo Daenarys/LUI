@@ -19,20 +19,12 @@ end
 function script:PLAYER_ENTERING_WORLD(event)
 	self:UnregisterEvent(event)
 	
-	if InterfaceOptionsFrame then
-		self:MakeMovable(InterfaceOptionsFrame)
-	end
-	if ChatConfigFrame then
-		self:MakeMovable(ChatConfigFrame)
-	end
-	if AudioOptionsFrame then
-		self:MakeMovable(AudioOptionsFrame)
-	end
-	if VideoOptionsFrame then
-		self:MakeMovable(VideoOptionsFrame)
-	end
+	self:MakeMovable(InterfaceOptionsFrame)
+	self:MakeMovable(ChatConfigFrame)
+	self:MakeMovable(AudioOptionsFrame)
+	self:MakeMovable(VideoOptionsFrame)
 	if MacOptionsFrame then
-	   	self:MakeMovable(MacOptionsFrame)
+	   self:MakeMovable(MacOptionsFrame)
 	end
 end
 

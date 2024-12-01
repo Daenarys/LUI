@@ -15,18 +15,13 @@ local AceAddon = LibStub("AceAddon-3.0")
 _G.LUI = LUI
 _G.oUF = LUI.oUF
 
-LUI.isRetail = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE)
-LUI.isClassic = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC)
-LUI.isBCC = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_BURNING_CRUSADE_CLASSIC)
-LUI.isWrath = (_G.WOW_PROJECT_ID == _G.WOW_PROJECT_WRATH_CLASSIC)
-
 local Media = LibStub("LibSharedMedia-3.0")
 local Profiler = LUI.Profiler
 local widgetLists = AceGUIWidgetLSMlists
 local ACD = LibStub("AceConfigDialog-3.0")
 local ACR = LibStub("AceConfigRegistry-3.0")
 
-LUI.Versions = {lui = 3700}
+LUI.Versions = {lui = 3403}
 
 LUI.dummy = function() return end
 
@@ -86,7 +81,7 @@ LUI.Media = {
 }
 
 LUI.FontFlags = {
-	[""] = L["None"],
+	NONE = L["None"],
 	OUTLINE = L["Outline"],
 	THICKOUTLINE = L["Thick Outline"],
 	MONOCHROME = L["Monochrome"],
@@ -171,10 +166,9 @@ local db = setmetatable({}, {
 })
 
 local function CheckResolution()
-	local ScreenWidth = string.match(({GetScreenResolutions()})[GetCurrentResolution()], "(%d+)x%d+")
-	local ScreenHeight = string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)")
+	local uiWidth, uiHeight = GetPhysicalScreenSize()
 
-	if ScreenWidth == "1280" and ScreenHeight == "1024" then
+	if uiWidth == "1280" and uiHeight == "1024" then
 		-- Repostion Info Texts
 		local Infotext = LUI:Module("Infotext", true)
 		if Infotext and false then -- broken with false until proper positions have been determined
@@ -184,8 +178,8 @@ local function CheckResolution()
 			Infotext.db.defaults.profile.Memory.X = 190
 		end
 
-		LUI.defaults.profile.Frames.Dps.X = -878
-		LUI.defaults.profile.Frames.Dps.Y = 862
+		LUI.defaults.profile.Frames.Dps.X = -968
+		LUI.defaults.profile.Frames.Dps.Y = 863
 
 		LUI.defaults.profile.Frames.Tps.X = 5
 		LUI.defaults.profile.Frames.Tps.Y = 882
@@ -230,7 +224,7 @@ function LUI:CreatePanel(f, w, h, a1, p, a2, x, y)
 	f:SetWidth(sw)
 	f:SetFrameStrata("BACKGROUND")
 	f:SetPoint(a1, p, a2, x, y)
-		Mixin(f, BackdropTemplateMixin)
+	if not f.SetBackdrop then Mixin(f, BackdropTemplateMixin) end
 	f:SetBackdrop({
 		bgFile = LUI.Media.blank,
 		edgeFile = LUI.Media.blank,
@@ -238,8 +232,8 @@ function LUI:CreatePanel(f, w, h, a1, p, a2, x, y)
 		insets = { left = -LUI.mult, right = -LUI.mult, top = -LUI.mult, bottom = -LUI.mult}
 	})
 	f:SetBackdropColor(.1,.1,.1,1)
-	f:SetBackdropBorderColor(.6,.6,.6,1) 
-end 
+	f:SetBackdropBorderColor(.6,.6,.6,1)
+end
 
 function LUI:StyleButton(b, checked)
 	local name = b:GetName()
@@ -255,7 +249,7 @@ function LUI:StyleButton(b, checked)
 	local normaltexture   = _G[name.."NormalTexture"]
 	local icontexture     = _G[name.."IconTexture"]
 
-	local hover = b:CreateTexture("frame", nil) -- hover
+	local hover = b:CreateTexture("frame", nil, self) -- hover
 	hover:SetColorTexture(1,1,1,0.2)
 	hover:SetHeight(button:GetHeight())
 	hover:SetWidth(button:GetWidth())
@@ -263,7 +257,7 @@ function LUI:StyleButton(b, checked)
 	hover:SetPoint("BOTTOMRIGHT",button,-2,2)
 	button:SetHighlightTexture(hover)
 
-	local pushed = b:CreateTexture("frame", nil) -- pushed
+	local pushed = b:CreateTexture("frame", nil, self) -- pushed
 	pushed:SetColorTexture(0.9,0.8,0.1,0.3)
 	pushed:SetHeight(button:GetHeight())
 	pushed:SetWidth(button:GetWidth())
@@ -275,7 +269,7 @@ function LUI:StyleButton(b, checked)
 	count:SetFont(Media:Fetch("font", (Infotext and Infotext.db.profile.FPS.Font or "vibroceb")), (Infotext and Infotext.db.profile.FPS.FontSize or 12), "OUTLINE")
 
 	if checked then
-		local checked = b:CreateTexture("frame", nil) -- checked
+		local checked = b:CreateTexture("frame", nil, self) -- checked
 		checked:SetColorTexture(0,1,0,0.3)
 		checked:SetHeight(button:GetHeight())
 		checked:SetWidth(button:GetWidth())
@@ -289,7 +283,8 @@ end
 -- / CREATE ME A FRAME FUNC / --
 ------------------------------------------------------
 
-function LUI:CreateMeAFrame(fart,fname,fparent,fwidth,fheight,fscale,fstrata,flevel,fpoint,frelativeFrame,frelativePoint,fofsx,fofsy,falpha,finherit)
+function LUI:CreateMeAFrame(fart,fname,fparent,fwidth,fheight,fscale,fstrata,flevel,
+							fpoint,frelativeFrame,frelativePoint,fofsx,fofsy,falpha,finherit)
 	local f = CreateFrame(fart,fname,fparent,finherit)
 	if BackdropTemplateMixin then Mixin(f, BackdropTemplateMixin) end
 	local sw = scale(fwidth)
@@ -311,7 +306,7 @@ end
 ------------------------------------------------------
 
 function LUI:SyncAddonVersion()
-	local luiversion, version, newVersion = C_AddOns.GetAddOnMetadata(addonname, "Version"), "", ""
+	local luiversion, version, newVersion = GetAddOnMetadata(addonname, "Version"), "", ""
 	local myRealm, myFaction, inGroup = GetRealmName(), (UnitFactionGroup("player") == "Horde" and 0 or 1), false
 
 	while luiversion ~= nil do
@@ -367,15 +362,15 @@ function LUI:SyncAddonVersion()
 	for i = 1, C_FriendList.GetNumFriends() do -- send to friends via whisper on login
 		local friend = C_FriendList.GetFriendInfoByIndex(i)
 		if friend.name and friend.connected then
-			sendVersion("WHISPER", name)
+			sendVersion("WHISPER", friend.name)
 		end
 	end
 	for i = 1, BNGetNumFriends() do -- send to BN friends (on your realm) via whisper on login
-		local _, _, _, toonName, toonID, client, isOnline = C_FriendList.GetFriendInfoByIndex(i)
-		if toonName and isOnline and client == "WoW" then
-			local _, _, _, realmName, _, faction = BNGetToonInfo(toonID or 0)
-			if realmName == myRealm and faction == myFaction then
-				sendVersion("WHISPER", toonName)
+		local friend = C_BattleNet.GetFriendAccountInfo(i)
+		local toon = friend and friend.gameAccountInfo
+		if toon and toon.characterName and toon.isOnline and toon.clientProgram == "WoW" then
+			if toon.realmName == myRealm and toon.factionName == myFaction then
+				sendVersion("WHISPER", toon.characterName)
 			end
 		end
 	end
@@ -404,10 +399,10 @@ end
 ------------------------------------------------------
 
 function LUI:LoadExtraModules()
-	for i=1, C_AddOns.GetNumAddOns() do
-		local name, _, _, enabled, loadable = C_AddOns.GetAddOnInfo(i)
+	for i=1, GetNumAddOns() do
+		local name, _, _, enabled, loadable = GetAddOnInfo(i)
 		if strfind(name, "LUI_") and enabled and loadable then
-			C_AddOns.LoadAddOn(i)
+			LoadAddOn(i)
 		end
 	end
 end
@@ -460,29 +455,25 @@ function LUI:Update()
 	update_frame:RegisterForClicks("AnyUp")
 	update_frame:SetScript("OnClick", function(self)
 
-		if C_AddOns.IsAddOnLoaded("Grid") then
-			LUI.db.global.luiconfig[ProfileName].Versions.grid = nil
-			LUI:InstallGrid()
-		end
-		if C_AddOns.IsAddOnLoaded("Plexus") then
+		if IsAddOnLoaded("Plexus") then
 			LUI.db.global.luiconfig[ProfileName].Versions.plexus = nil
 			LUI:InstallPlexus()
 		end
 
-		if C_AddOns.IsAddOnLoaded("Details") then
+		if IsAddOnLoaded("Recount") then
+			LUI.db.global.luiconfig[ProfileName].Versions.recount = nil
+			LUI:InstallRecount()
+		end
+
+		if IsAddOnLoaded("Details") then
 			LUICONFIG.Versions.details = nil
 			LUI:InstallDetails()
 		end
 
-		if C_AddOns.IsAddOnLoaded("Omen") or C_AddOns.IsAddOnLoaded("Omen3") then
+		if IsAddOnLoaded("Omen") or IsAddOnLoaded("Omen3") then
 			LUI.db.global.luiconfig[ProfileName].Versions.omen = nil
 			LUI:InstallOmen()
 		end
-
-		-- if C_AddOns.IsAddOnLoaded("VuhDo") then
-		-- 	LUI.db.global.luiconfig[ProfileName].Versions.vudho = nil
-		-- 	LUI:InstallVudho()
-		-- end
 
 		LUI.db.global.luiconfig[ProfileName].Versions.lui = LUI.Versions.lui
 		ReloadUI()
@@ -494,9 +485,9 @@ end
 ------------------------------------------------------
 
 function LUI:Configure()
-	-- if InterfaceOptionsFrame:IsShown() then
-	-- 	InterfaceOptionsFrame:Hide()
-	-- end
+	if InterfaceOptionsFrame:IsShown() then
+		InterfaceOptionsFrame:Hide()
+	end
 
 	local configureBG = LUI:CreateMeAFrame("FRAME","configureBG",UIParent,2400,2000,1,"HIGH",5,"CENTER",UIParent,"CENTER",0,0,1)
 	configureBG:SetBackdrop({bgFile="Interface\\Tooltips\\UI-Tooltip-Background", edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", edgeSize=1, insets={left=0, right=0, top=0, bottom=0}})
@@ -547,18 +538,16 @@ function LUI:Configure()
 		SetCVar("useUiScale", 1)
 		SetCVar("chatMouseScroll", 1)
 		SetCVar("chatStyle", "classic")
-		SetCVar("colorChatNamesByClass", 1)
 
 		if LUI.db.global.luiconfig[ProfileName].Versions then
 			wipe(LUI.db.global.luiconfig[ProfileName].Versions)
 		end
 
-		LUI:InstallGrid()
 		LUI:InstallPlexus()
+		LUI:InstallRecount()
 		LUI:InstallOmen()
 		LUI:InstallBartender()
 		LUI:InstallDetails()
-		-- LUI:InstallVudho()
 
 		LUI.db.global.luiconfig[ProfileName].Versions.lui = LUI.Versions.lui
 		LUI.db.global.luiconfig[ProfileName].IsConfigured = true
@@ -698,7 +687,7 @@ end
 
 local function conflictChecker(...)
 	for i=1, select("#", ...) do
-		if C_AddOns.IsAddOnLoaded(select(i, ...)) then
+		if IsAddOnLoaded(select(i, ...)) then
 			return select(i, ...)
 		end
 	end
@@ -811,11 +800,11 @@ local function getOptions()
 							args = {
 								IntroImage = {
 									order = 1,
-									image = [[Interface\AddOns\LUI\media\textures\logo.blp]],
+									image = [[Interface\AddOns\LUI\media\textures\logo]],
 									imageWidth = 512,
 									width = "full",
-									imageHeight = 190,
-									imageCoords = { 0, 1, -0.08, 1 },
+									imageHeight = 128,
+									imageCoords = { 0, 1, 0, 1 },
 									type = "description",
 									name = " ",
 								},
@@ -829,26 +818,22 @@ local function getOptions()
 									order = 3,
 									width = "full",
 									type = "description",
-									name = L["Welcome to LUI v3 for World of Warcraft Classic"].."\n\n"..L["Please read the FAQ"].."\n\n\n",
+									name = L["Welcome to LUI v3"].."\n\n"..L["Please read the FAQ"].."\n\n\n",
 								},
 								VerText = {
 									order = 4,
 									width = "full",
 									type = "description",
-									name = L["Version: "]..C_AddOns.GetAddOnMetadata(addonname, "Version"),
-								},
-								RevText = {
-									order = 5,
-									width = "full",
-									type = "description",
+									fontSize = "large",
 									name = function()
-										local revision = LUI.Rev
-										if revision and strmatch(revision,"-%d+") then
-											revision = gsub( strmatch(revision,"-%d+"), "-", "r")
-										elseif revision and strmatch(revision, "%d") then
-											revision = revision
+										local version, alpha, git = strsplit("-", LUI.Rev)
+										if not version then
+											return "Version: "..GetAddOnMetadata(addonname, "Version")
+										elseif not alpha then
+											return "Version: "..version
+										else
+											return format("Version: %s Alpha %s", version, alpha)
 										end
-										return L["Revision: "]..(revision or "???")
 									end,
 								},
 							},
@@ -931,7 +916,7 @@ local function getOptions()
 									end,
 									order = 9,
 								},
-								alwaysShowRaid = {
+								alwaysShowPlexus = {
 									name = "Show Raid",
 									desc = "Whether you want to show your Raid Panel by entering World or not.\n",
 									type = "toggle",
@@ -1169,20 +1154,8 @@ local function getOptions()
 										LUI:InstallBartender()
 										StaticPopup_Show("RELOAD_UI")
 									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Bartender4") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Bartender4") end,
-								},
-								ResetGrid = {
-									order = 2,
-									type = "execute",
-									name = "Restore Grid",
-									func = function()
-										LUI.db.global.luiconfig[ProfileName].Versions.grid = nil
-										LUI:InstallGrid()
-										StaticPopup_Show("RELOAD_UI")
-									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Grid") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Grid") end,
+									disabled = function() return not IsAddOnLoaded("Bartender4") end,
+									hidden = function() return not IsAddOnLoaded("Bartender4") end,
 								},
 								ResetPlexus = {
 									order = 2,
@@ -1193,20 +1166,8 @@ local function getOptions()
 										LUI:InstallPlexus()
 										StaticPopup_Show("RELOAD_UI")
 									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Plexus") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Plexus") end,
-								},
-								ResetVudho = {
-									order = 2,
-									type = "execute",
-									name = "Restore VuhDo",
-									func = function()
-										LUI.db.global.luiconfig[ProfileName].Versions.vudho = nil
-										LUI:InstallVudho()
-										StaticPopup_Show("RELOAD_UI")
-									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("VuhDo") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("VuhDo") end,
+									disabled = function() return not IsAddOnLoaded("Plexus") end,
+									hidden = function() return not IsAddOnLoaded("Plexus") end,
 								},
 								ResetOmen = {
 									order = 2,
@@ -1217,8 +1178,8 @@ local function getOptions()
 										LUI:InstallOmen()
 										StaticPopup_Show("RELOAD_UI")
 									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Omen") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Omen") end,
+									disabled = function() return not IsAddOnLoaded("Omen") end,
+									hidden = function() return not IsAddOnLoaded("Omen") end,
 								},
 								ResetRecount = {
 									order = 2,
@@ -1229,8 +1190,8 @@ local function getOptions()
 										LUI:InstallRecount()
 										StaticPopup_Show("RELOAD_UI")
 									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
+									disabled = function() return not IsAddOnLoaded("Recount") end,
+									hidden = function() return not IsAddOnLoaded("Recount") end,
 								},
 								ResetDetails = {
 									order = 2,
@@ -1242,22 +1203,22 @@ local function getOptions()
 										LUI:GetModule("Panels"):ApplyBackground("Dps")
 										--StaticPopup_Show("RELOAD_UI")
 									end,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Details") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Details") end,
+									disabled = function() return not IsAddOnLoaded("Details") end,
+									hidden = function() return not IsAddOnLoaded("Details") end,
 								},
 								Header2 = {
 									name = "Recount Settings",
 									type = "header",
 									order = 3,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
+									hidden = function() return not IsAddOnLoaded("Recount") end,
 								},
 								RecountHack = {
 									name = "Force Font Size",
 									desc = "Whether or not to apply a font size fix to Recount.",
 									type = "toggle",
 									order = 4,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
+									disabled = function() return not IsAddOnLoaded("Recount") end,
+									hidden = function() return not IsAddOnLoaded("Recount") end,
 									get = function() return db.Recount.FontHack end,
 									set = function() LUI.RecountFontHack:Toggle() end,
 								},
@@ -1268,8 +1229,8 @@ local function getOptions()
 									min = 0,
 									max = 100,
 									step = 1,
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Recount") or not db.Recount.FontHack end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
+									disabled = function() return not IsAddOnLoaded("Recount") or not db.Recount.FontHack end,
+									hidden = function() return not IsAddOnLoaded("Recount") end,
 									get = function() return db.Recount.FontSize end,
 									set = function(self, size)
 										db.Recount.FontSize = size
@@ -1281,8 +1242,8 @@ local function getOptions()
 									name = "Font",
 									desc = "Choose the font that Recount will use. This is to overcome issues with Recount loading before LUI.",
 									type = "select",
-									disabled = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
-									hidden = function() return not C_AddOns.IsAddOnLoaded("Recount") end,
+									disabled = function() return not IsAddOnLoaded("Recount") end,
+									hidden = function() return not IsAddOnLoaded("Recount") end,
 									dialogControl = "LSM30_Font",
 									values = widgetLists.font,
 									get = function()
@@ -1303,7 +1264,7 @@ local function getOptions()
 									order = 8,
 									width = "full",
 									type = "description",
-									name = "ATTENTION:\nAll SavedVariables from Grid, Plexus, Recount, Omen, Bartender and Details will be reset!"
+									name = "ATTENTION:\nAll SavedVariables from Plexus, Recount, Omen, Bartender and Details will be reset!"
 								},
 								Reset = {
 									order = 9,
@@ -1337,14 +1298,14 @@ local function getOptions()
 									width = "full",
 									type = "description",
 									fontSize = "medium",
-									name = "Current V3 Devs: |cffe6cc80Nitsah, Siku|r\n",
+									name = "Current V3 Devs: |cffe6cc80Siku, Mule|r\n",
 								},
 								OldStaff = {
 									order = 5,
 									width = "full",
 									type = "description",
 									fontSize = "medium",
-									name = "Former V3 Devs: |cffe6cc80Loui, Sinaris, Zista, hix, Thaly, Shendrela, Darkruler, Yunai, Mule|r\n\n",
+									name = "Former V3 Devs: |cffe6cc80Loui, Sinaris, Zista, hix, Thaly, Shendrela, Darkruler, Yunai|r\n\n",
 								},
 								Donators = {
 									order = 6,
@@ -1357,7 +1318,7 @@ local function getOptions()
 									width = "full",
 									type = "description",
 									fontSize = "large",
-									name = "|cffa335eeQoke, StephenFOlson, Fearon Whitcomb, Ragnarok, Skinny Man Music, David Cook, Dalton Matheson, Curtis Motzner, Christoph Fischer, Michael Rowan, Hansth, Michael Swancott, Steph Lee, rb4havoc, Max McBurn, Michelle Larrew, Grant Sundstrom, Cory Linnerooth, Eagle Billie".."\n",
+									name = "|cffa335eeQoke, StephenFOlson, Fearon Whitcomb, Skinny Man Music, David Cook, Dalton Matheson, Curtis Motzner, Christoph Fischer, Hansth, Michael Swancott, Steph Lee, rb4havoc, Max McBurn, Michelle Larrew, Grant Sundstrom, Cory Linnerooth, Eagle Billie, Angryrice, Ian Huisman, Greta Kratz, Sacrosact Stars, Leisulong, Christopher Rhea".."\n",
 								},
 								
 								OtherPatrons = {
@@ -1365,7 +1326,7 @@ local function getOptions()
 									width = "full",
 									type = "description",
 									fontSize = "medium",
-									name = "|cff1eff00Adam Moody, Andrew DePaola, Angryrice, Anthony Béchard, apexius, Azona, BIRDki, Brandon Burr, Chris Manring, Confatalis, Dochouse, gnuheike, Ian Huisman, Joseph Arnett, Kris Springer, Lyra, Lysa Richey, Mathias Reffeldt, Max McBurn, Melvin de Grauw, Michael Walker, Mike, McCabe, Mike Williams, Nathan Adams, Nick Giovanni, necr0, Oscar Olofsson, Philipp Rissle, Preston Cheek, Ranarok, Richard Scholten, Romain Gorgibus, Saturos Zed, Scott Crawford, Sean O'Shea, Shawn Pitts, Slawomir Baran, Spencer Sommers, Srg Kuja, Thomas A Hutto, Tobias Lidén, Xenthe, Ziri".."\n",
+									name = "|cff1eff00Adam Moody, Andrew DePaola, Anthony Béchard, apexius, Azona, BIRDki, Brandon Burr, Chris Manring, Confatalis, Darkion43, Dochouse, gnuheike, Joseph Arnett, Kris Springer, Lyra, Lysa Richey, Mathias Reffeldt, Melvin de Grauw, Michael Rowan, Michael Walker, Mike, McCabe, Mike Williams, Nathan Adams, Nick Giovanni, necr0, Oscar Olofsson, Philipp Rissle, Ragnarok, Richard Scholten, Romain Gorgibus, Saturos Zed, Scott Crawford, Sean O'Shea, Shawn Pitts, Slawomir Baran, Spencer Sommers, Srg Kuja, Thomas A Hutto, Tobias Lidén, Xenthe, Ziri".."\n",
 								},
 							},
 						},
@@ -1514,7 +1475,7 @@ function LUI:RegisterOptions(module)
 end
 
 function LUI:RegisterAddon(module, addon)
-	if C_AddOns.IsAddOnLoaded(addon) then
+	if IsAddOnLoaded(addon) then
 		LUI:RegisterOptions(module)
 	end
 end
@@ -1653,7 +1614,7 @@ function LUI:NewNamespace(module, enableButton, version)
 	end
 
 	-- Set module enabled state
-	if not self.enabledState or (module.addon and not C_AddOns.IsAddOnLoaded(module.addon)) then
+	if not self.enabledState or (module.addon and not IsAddOnLoaded(module.addon)) then
 		module:SetEnabledState(false)
 	elseif module.db.profile.Enable ~= nil then
 		module:SetEnabledState(module.db.profile.Enable)
@@ -1720,7 +1681,7 @@ function LUI:Namespace(module, toggleButton, version) -- no metatables (note: do
 	if self.db.children and self.db.children[mName] then return module.db.profile, module.db.defaults.profile end
 
 	-- Add options loader function to list
-	if not module.isNestedModule and (not module.addon or C_AddOns.IsAddOnLoaded(module.addon)) then
+	if not module.isNestedModule and (not module.addon or IsAddOnLoaded(module.addon)) then
 		table.insert(newModuleOptions, mName)
 	end
 
@@ -1748,7 +1709,7 @@ function LUI:Namespace(module, toggleButton, version) -- no metatables (note: do
 	end
 
 	-- Set Enabled state
-	if not self.enabledState or (module.addon and not C_AddOns.IsAddOnLoaded(module.addon)) then
+	if not self.enabledState or (module.addon and not IsAddOnLoaded(module.addon)) then
 		module:SetEnabledState(false)
 	elseif self.db.profile.modules[mName] ~= nil then
 		module:SetEnabledState(self.db.profile.modules[mName])

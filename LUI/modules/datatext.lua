@@ -17,15 +17,12 @@ local addonname, LUI = ...
 local module = LUI:Module("Infotext", "AceHook-3.0")
 local Media = LibStub("LibSharedMedia-3.0")
 local widgetLists = AceGUIWidgetLSMlists
-local Themes = LUI:Module("Themes")
 
 local db, dbd
 
 local CLASS_BUTTONS = CLASS_ICON_TCOORDS
 local BNET_CLIENT_WOW = BNET_CLIENT_WOW
 local BNET_CLIENT_MOBILE = "BSAp"
-local GetItemCount, GetItemInfo = GetItemCount, GetItemInfo
-local GetContainerItemID, GetContainerItemInfo, GetContainerNumSlots, UseContainerItem =  GetContainerItemID, GetContainerItemInfo, GetContainerNumSlots, UseContainerItem
 
 ------------------------------------------------------
 -- / LOCAL VARIABLES / --
@@ -91,7 +88,7 @@ local function NewIcon(stat, tex)
 	icon:SetWidth(15)
 	icon:SetHeight(15)
 	icon:SetFrameStrata("HIGH")
-	icon:SetBackdrop({bgFile = tex or [[Interface\Icons\Spell_Nature_MoonKey]], edgeFile = nil, tile = false, edgeSize = 0, insets = {top = 0, bottom, 0, left = 0, right = 0}})
+	--icon:SetBackdrop({bgFile = tex or [[Interface\Icons\Spell_Nature_MoonKey]], edgeFile = nil, tile = false, edgeSize = 0, insets = {top = 0, bottom, 0, left = 0, right = 0}})
 	icon:Show()
 
 	stat.icon = icon
@@ -210,59 +207,8 @@ function module:SetBags()
 	local stat = NewStat("Bags")
 
 	if db.Bags.Enable and not stat.Created then
-		
-		function module:ItemTracked(info, item) -- info = true: remove item from list
-			if type(info) == "table" and not GetItemInfo(item) then
-				if CursorHasItem() then
-					item = select(2, GetCursorInfo())
-					ClearCursor()
-				elseif strfind(item, "Button") then
-					return OpenAllBags(true)
-				end
-			end
-		
-			local _, itemLink, _,_,_,_,_,_,_,_, itemPrice = GetItemInfo(item)
-		
-			-- Check item.
-			if not itemLink then
-				print(item .. " |cffff0000is not a valid item.")
-				return
-			end
-		
-			local itemID = tonumber(string.match(itemLink, "item:(%d+)"))
-		
-			if info == true then -- remove
-				db.Bags.Tracked[itemID] = nil
-		
-				-- if db.Bags.Settings.ShowTracked then
-					print("|cff00ff00Successfully removed|r "..itemLink.." |cff00ff00from the tracking list.")
-				-- end
-			else
-				if db.Bags.Tracked[itemID] then
-					-- if db.Bags.Settings.ShowTracked then
-						print(itemLink.." |cffff0000 is already in the tracking list.")
-					-- end
-				-- elseif itemPrice <= 0 then
-					print(itemLink.." |cffff0000 has no sell price and can't be excluded.")
-				else
-					db.Bags.Tracked[itemID] = true
-		
-					-- if db.Bags.Settings.ShowTracked then
-						print("|cff00ff00Successfully added|r "..itemLink.." |cff00ff00to the tracking list.")
-					-- end
-				end
-			end
-		end
-	
-		function module:ClearTracked()
-			wipe(db.Bags.Tracked)
-		
-			-- if db.Bags.Settings.ShowTracked then
-				print("|cff00ff00Successfully cleared the tracking list.")
-			-- end
-		end
-	
 		-- Localized functions
+		local GetContainerNumFreeSlots, GetContainerNumSlots = GetContainerNumFreeSlots, GetContainerNumSlots
 
 		local bagTypes = {
 			[0x0000] = "Normal", -- 0
@@ -285,25 +231,17 @@ function module:SetBags()
 		}
 
 		-- Event functions
-		stat.Events = {"BAG_UPDATE",}
+		stat.Events = {"BAG_UPDATE"}
 
 		stat.BAG_UPDATE = function(self, bagID) -- Change occured to items in player inventory
-			local count
-			local itemlink
-
-			for i,v in pairs(db.Bags.Tracked) do
-				count = GetItemCount(i)
-				itemlink = GetItemInfo(i)
-			end
-			if count == nil then count=0 end
-
 			local free, total, used = 0, 0, 0
 
 			for i = 0, NUM_BAG_SLOTS do
-				free, total = free + C_Container.GetContainerNumFreeSlots(i), total + C_Container.GetContainerNumSlots(i)
+				free, total = free + GetContainerNumFreeSlots(i), total + GetContainerNumSlots(i)
 			end
+
 			used = total - free
-			self.text:SetFormattedText("Bags: %d/%d (%d)", used, total, count) 
+			self.text:SetFormattedText("Bags: %d/%d", used, total)
 
 			-- Update tooltip if open.
 			UpdateTooltip(self)
@@ -320,8 +258,8 @@ function module:SetBags()
 			if CombatTips() then
 				local freeslots, totalslots = {}, {}
 				for i=0, NUM_BAG_SLOTS do
-					local free, bagType = C_Container.GetContainerNumFreeSlots(i)
-					local total = C_Container.GetContainerNumSlots(i)
+					local free, bagType = GetContainerNumFreeSlots(i)
+					local total = GetContainerNumSlots(i)
 					if bagType then
 						freeslots[bagType] = (freeslots[bagType] and freeslots[bagType] + free) or free
 						totalslots[bagType] = (totalslots[bagType] and totalslots[bagType] + total) or total
@@ -337,11 +275,7 @@ function module:SetBags()
 					GameTooltip:AddDoubleLine((bagTypes[k] or "Unknown")..":", totalslots[k]-v.."/"..totalslots[k], 1, 1, 1, 1, 1, 1)
 				end
 				GameTooltip:AddLine(" ")
-				GameTooltip:AddLine("Tracked items:", 0.4, 0.78, 1)
-				for i,v in pairs(db.Bags.Tracked) do
-					GameTooltip:AddDoubleLine((GetItemInfo(i))..":", (GetItemCount(i,(db.Bags.Inlcudebank))), 1,1,1,1,1,1)
-				end
-				GameTooltip:AddLine(" ")
+
 				GameTooltip:AddLine("Hint: Click to open Bags.", 0.0, 1.0, 0.0)
 				GameTooltip:Show()
 			end
@@ -374,19 +308,17 @@ function module:SetClock()
 		stat.Events = {"CALENDAR_UPDATE_PENDING_INVITES", "PLAYER_ENTERING_WORLD"}
 		-- , "UPDATE_24HOUR", "UPDATE_LOCALTIME"
 
-		if not LUI.isClassic then
-			stat.CALENDAR_UPDATE_PENDING_INVITES = function(self) -- A change to number of pending invites for calendar events occurred
-				invitesPending = GameTimeFrame and (GameTimeFrame.pendingCalendarInvites > 0) or false
-			end
+		stat.CALENDAR_UPDATE_PENDING_INVITES = function(self) -- A change to number of pending invites for calendar events occurred
+			invitesPending = GameTimeFrame and (GameTimeFrame.pendingCalendarInvites > 0) or false
 		end
 
 
 		stat.GUILD_PARTY_STATE_UPDATED = function(self) -- Number of guildmates in group changed
-			-- if InGuildParty() then
-			-- 	guildParty = " |cff66c7ffG"
-			-- else
+			if InGuildParty() then
+				guildParty = " |cff66c7ffG"
+			else
 				guildParty = ""
-			-- end
+			end
 		end
 
 		stat.PLAYER_DIFFICULTY_CHANGED = function(self) -- Instance difficulty changed
@@ -449,7 +381,7 @@ function module:SetClock()
 				instanceInfo, guildParty = nil, ""
 			end
 
-			if not module:IsHooked(GameTimeFrame, "OnClick") and not LUI.isClassic then
+			if not module:IsHooked(GameTimeFrame, "OnClick") then
 				module:SecureHookScript(GameTimeFrame, "OnClick", stat.CALENDAR_UPDATE_PENDING_INVITES) -- hook the OnClick function of the GameTimeFrame to update the pending invites
 			end
 			if not module:IsHooked(TimeManagerMilitaryTimeCheck, "OnClick") then
@@ -458,9 +390,8 @@ function module:SetClock()
 			if not module:IsHooked(TimeManagerLocalTimeCheck, "OnClick") then
 				module:SecureHookScript(TimeManagerLocalTimeCheck, "OnClick", stat.UPDATE_LOCALTIME)
 			end
-			if not LUI.isClassic then
-				self:CALENDAR_UPDATE_PENDING_INVITES()
-			end
+			self:CALENDAR_UPDATE_PENDING_INVITES()
+
 			self:PLAYER_ENTERING_WORLD()
 		end
 
@@ -518,7 +449,7 @@ function module:SetClock()
 				else
 					TimeManagerLocalTimeCheck:SetChecked(false)
 				end
-			elseif not LUI.isClassic then -- Toggle CalendarFrame
+			else -- Toggle CalendarFrame
 				GameTimeFrame:Click() -- using just :Click() wont fire the hook
 			end
 		end
@@ -616,16 +547,16 @@ function module:SetClock()
 				end
 
 				-- World Bosses
-				-- for i = 1, GetNumSavedWorldBosses() do
-				-- 	if not oneraid then
-				-- 		GameTooltip:AddLine(" ")
-				-- 		GameTooltip:AddLine("Saved Raid(s) :")
-				-- 		oneraid = true
-				-- 	end
+				for i = 1, GetNumSavedWorldBosses() do
+					if not oneraid then
+						GameTooltip:AddLine(" ")
+						GameTooltip:AddLine("Saved Raid(s) :")
+						oneraid = true
+					end
 
-				-- 	local name, _, reset = GetSavedWorldBossInfo(i)
-				-- 	GameTooltip:AddDoubleLine(format("%s |cffaaaaaa(%s)", name, RAID_INFO_WORLD_BOSS), formatTime(reset), 1,1,1, 1,1,1)
-				-- end
+					local name, _, reset = GetSavedWorldBossInfo(i)
+					GameTooltip:AddDoubleLine(format("%s |cffaaaaaa(%s)", name, RAID_INFO_WORLD_BOSS), formatTime(reset), 1,1,1, 1,1,1)
+				end
 
 				GameTooltip:AddLine(" ")
 				GameTooltip:AddLine("Hint:\n- Left-Click for Calendar Frame.\n- Right-Click for Time Manager Frame.", 0, 1, 0)
@@ -643,7 +574,7 @@ end
 ------------------------------------------------------
 -- / CURRENCY / --
 ------------------------------------------------------
--- Added with WoTLK
+
 function module:SetCurrency()
 	local stat = NewStat("Currency")
 
@@ -653,27 +584,27 @@ function module:SetCurrency()
 		local CurrencyList
 		stat.Currencies = function(self)
 			if CurrencyList then return CurrencyList end
-			local CurrencyList = {[0] = "None",}
-			for i=1, 1901 do
-				local n, _,_,_,_,_,d = C_CurrencyInfo.GetCurrencyInfo(i)
-				if n ~= "" and d then
-					CurrencyList[i] = n
+
+			CurrencyList = {[0] = "None",}
+			for i=1, 2048 do
+				local info = C_CurrencyInfo.GetCurrencyInfo(i)
+				if info and info.name ~= "" and info.discovered then
+					CurrencyList[i] = info.name
 				end
 			end
 			return CurrencyList
 		end
 
 		-- Events
-		-- stat.Events = {"PLAYER_ENTERING_WORLD"}
+		stat.Events = { "CURRENCY_DISPLAY_UPDATE" }
 
 		-- Script functions
 		local factionTex
 		if UnitFactionGroup("player") == "Neutral" then factionTex = LUI.blank
-		else factionTex = "Interface\\PVPFrame\\PVP-Currency-"..UnitFactionGroup("player")
+		else factionTex = [[Interface\PVPFrame\PVP-Currency-]] .. UnitFactionGroup("player")
 		end
 		stat.OnEnable = function(self)
 			local tex = factionTex
-			-- Mixin(self.icon, BackdropTemplateMixin)
 			self.icon:SetBackdrop({bgFile = tex, edgeFile = nil, tile = false, edgeSize = 0, insets = {top = 0, right = 0, bottom = 0, left = 0}})
 			self.text:SetText("Currency")
 			self:CURRENCY_DISPLAY_UPDATE()
@@ -684,19 +615,20 @@ function module:SetCurrency()
 				LUI:Open()
 				LibStub("AceConfigDialog-3.0"):SelectGroup(addonname, module:GetName(), "Currency")
 			else -- Toggle CurrencyFrame
-				ToggleCharacter("PVPFrame")
+				ToggleCharacter("TokenFrame")
 			end
 		end
 
 		stat.CURRENCY_DISPLAY_UPDATE = function (self)
 			if db.Currency.Display == 0 then
-			self.text:SetText("Currency")
-			else
-			local name, count = C_CurrencyInfo.GetCurrencyInfo(db.Currency.Display)
-			name = name:sub(1, db.Currency.DisplayLimit)
-			name = (#name > 0 and name..":") or name
-			self.text:SetFormattedText("%s %d", name, count)
+				self.text:SetText("Currency")
+				return
 			end
+
+			local info = C_CurrencyInfo.GetCurrencyInfo(db.Currency.Display)
+			local name = info.name:sub(1, db.Currency.DisplayLimit)
+			name = (#name > 0 and name..":") or name
+			self.text:SetFormattedText("%s %d", name, info and info.quantity or 0)
 		end
 
 		stat.OnEnter = function(self)
@@ -704,20 +636,20 @@ function module:SetCurrency()
 				GameTooltip:SetOwner(self, getOwnerAnchor(self))
 				GameTooltip:ClearLines()
 				GameTooltip:AddLine("Currency:", 0.4, 0.78, 1)
-
-				-- for i = 1, C_CurrencyInfo.GetCurrencyListSize() do
-				-- 	local name, isHeader, _, _, _, count = C_CurrencyInfo.GetCurrencyListInfo(i)
-				-- 	if isHeader then
-				-- 		GameTooltip:AddLine(" ")
-				-- 		GameTooltip:AddLine(name)
-				-- 	elseif name then
-						-- if count and count ~= 0 then
-						-- 	GameTooltip:AddDoubleLine(name, count, 1,1,1, 1,1,1)
-						-- else
-						-- 	GameTooltip:AddDoubleLine(name, "--", 1,1,1, 1,1,1)
-						-- end
-				-- 	end
-				-- end
+				
+				for i = 1, C_CurrencyInfo.GetCurrencyListSize()  do
+					local info = C_CurrencyInfo.GetCurrencyListInfo(i) 
+					if info and info.isHeader then
+						GameTooltip:AddLine(" ")
+						GameTooltip:AddLine(info.name)
+					elseif info and info.name then
+						if info.quantity and info.quantity ~= 0 then
+							GameTooltip:AddDoubleLine(info.name, info.quantity, 1,1,1, 1,1,1)
+						else
+							GameTooltip:AddDoubleLine(info.name, "--", 1,1,1, 1,1,1)
+						end
+					end
+				end
 
 				GameTooltip:AddLine(" ")
 				GameTooltip:AddLine("Hint:", 0, 1, 0)
@@ -742,22 +674,6 @@ function module:SetDualSpec()
 	local stat = NewStat("DualSpec")
 
 	if db.DualSpec.Enable and not stat.Created then
-		
-		local iconTexture = {
-			["DEATHKNIGHT"] = 135771,
-			["DEMONHUNTER"] = 236415,
-			["DRUID"] = 625999,
-			["HUNTER"] = 626000,
-			["MAGE"] = 626001,
-			["MONK"] = 626002,
-			["PALADIN"] = 626003,
-			["PRIEST"] = 626004,
-			["ROGUE"] = 626005,
-			["SHAMAN"] = 626006,
-			["WARLOCK"] = 626007,
-			["WARRIOR"] = 626008
-		}
-		
 		NewIcon(stat)
 		stat.icon:SetScript("OnMouseDown", function(self, button) -- Toggle Specialization
 			if not PlayerTalentFrame then
@@ -774,30 +690,27 @@ function module:SetDualSpec()
 		end)
 
 		-- Localized functions
-		local GetActiveTalentGroup, GetTalentTabInfo, GetPrimaryTalentTree = GetActiveTalentGroup, GetTalentTabInfo, GetPrimaryTalentTree
+		local GetActiveSpecGroup, GetSpecializationInfo, GetSpecialization = GetActiveSpecGroup, GetSpecializationInfo, GetSpecialization
 		local tonumber, tostring = tonumber, tostring
 
 		-- Local variables
-        local numSpecs = GetNumTalentGroups() -- num of specs available
-		
-		local function GetTalentText(group)
-			local maxPoints, finalIcon, text = 0, DEFAULT_ICON, ""
-			if LUI.isClassic then
-				for tab = 1, 3 do
-					local name, icon, points = GetTalentTabInfo(tab,nil,nil,group)
-					if points > maxPoints then
-						maxPoints = points
-						finalIcon = icon
-						text = name
-					end
+
+        local numSpecs = GetNumSpecializations() -- num of specs available
+		local specCache = {}
+		for i = 1, numSpecs do -- for each spec choice
+			if not specCache[i] then
+				specCache[i] = {}
+				local _, name, _, icon = GetSpecializationInfo(i)
+				specCache[i].name = name
+				specCache[i].icon = icon
+
+				if not specCache[i].name then
+					specCache[i].name = "|cffff0000Talents undefined!|r"
+					specCache[i].icon = [[Interface\Icons\Spell_Nature_MoonKey]]
 				end
-			elseif GetPrimaryTalentTree() ~= nill then
-				local _, name, _, icon, points = GetTalentTabInfo(GetPrimaryTalentTree())
-				text = name
-				finalIcon = icon
 			end
-			return text, finalIcon
 		end
+        local switch1, switch2, switch3 = nil, nil, nil -- specs to switch to
 
 		-- Event functions
 		stat.Events = (UnitLevel("player") < 10) and {"PLAYER_LEVEL_UP"} or {"PLAYER_TALENT_UPDATE"}
@@ -816,17 +729,18 @@ function module:SetDualSpec()
 		end
 
 		stat.PLAYER_TALENT_UPDATE = function(self)
-			local activeSpec = GetActiveTalentGroup()
-			local specName, specIcon = GetTalentText(activeSpec)
-
-			if specIcon == nil then -- specIcon returns nil when reseting talents
-				local className, class = UnitClass("player")
-				specIcon = iconTexture[class]
-				specName = className
+			--local activeTalentGroup = GetActiveSpecGroup()
+			local activeSpec = GetSpecialization()
+			local curCache = specCache[activeSpec]
+			if not curCache then
+				self.text:SetText("|cffff0000Talents unavailable!|r")
+				return
 			end
+			local text = " "..curCache.name
 
-			self.icon:SetNormalTexture(specIcon)
-			self.text:SetText(" "..specName)
+			self.text:SetText(text)
+			self.icon:SetNormalTexture(curCache.icon)
+			--self.icon:SetBackdrop({bgFile = tostring(curCache.icon), edgeFile = nil, tile = false, edgeSize = 0, insets = {top = 0, right = 0, bottom = 0, left = 0}})
 
 			-- Update tooltip if open
 			UpdateTooltip(self)
@@ -844,12 +758,25 @@ function module:SetDualSpec()
 		end
 
 		stat.OnClick = function(self, button)
-			if button == "LeftButton" then
-            	SetActiveTalentGroup(1)
-            elseif button == "RightButton" then
-                SetActiveTalentGroup(2)
+            --[[
+            if IsShiftKeyDown() then -- on shift toggle talent frame, function copied from original
+                if PlayerTalentFrame:IsVisible() and (PanelTemplates_GetSelectedTab(PlayerTalentFrame) == 1) then
+    				HideUIPanel(PlayerTalentFrame)
+    			else
+    				PanelTemplates_SetTab(PlayerTalentFrame, 1)
+    				PlayerTalentFrame_Refresh()
+    				ShowUIPanel(PlayerTalentFrame)
+    			end
+            ]]-- comment block is original functionality supported via shift click
+			if button == "LeftButton" and switch1 then -- switch 1 if valid
+                SetSpecialization( switch1 )
+            elseif button == "RightButton" and switch2 then -- switch 2
+                SetSpecialization( switch2 )
+            elseif button == "MiddleButton" and switch3 then -- switch 3
+                SetSpecialization( switch3 )
             end
 		end
+
 		stat.OnEnter = function(self)
 			if CombatTips() then
 				GameTooltip:SetOwner(self, getOwnerAnchor(self))
@@ -857,23 +784,33 @@ function module:SetDualSpec()
 				GameTooltip:AddLine("Specialization", 0.4, 0.78, 1)
 				GameTooltip:AddLine(" ")
 
-				local activeSpecGroup = GetActiveTalentGroup() -- get current spec ID
+				local activeSpecGroup = GetSpecialization() -- get current spec ID
+                switch1, switch2, switch3 = nil, nil, nil -- reset switch vars
 
 				for i = 1, numSpecs do -- loop through all specs
-					if i == 1 then spec = "Primary" elseif i == 2 then spec = "Secondary" end
-					if activeSpecGroup == i then specActive = "Active" else specActive = "Inactive" end
+                    if i ~= activeSpecGroup then -- not the active spec, is a switch option
+                        if not switch1 then -- switch1 not set yet, use it
+                            switch1 = i
+                        elseif not switch2 then -- use switch2
+                            switch2 = i
+                        elseif not switch3 then -- use switch3
+                            switch3 = i
+                        end
+                    end
 
                     local colorY, colorW = "|cFFFFFF00", "|r" -- text color flags
-                    local text = ((( i == activeSpecGroup ) and colorY  or "" ) .. spec .. ":" .. colorW ) -- numerate specs, coloring active
-                    local text2 = ((( i == activeSpecGroup ) and colorY  or "" ) .. specActive .. colorW ) -- list spec names, coloring active
+                    local text = ((( i == activeSpecGroup ) and colorY  or "" ) .. "Spec " .. i .. ":" .. colorW ) -- numerate specs, coloring active
+                    local text2 = ((( i == activeSpecGroup ) and colorY  or "" ) .. ( specCache[ i ].name or "None" ) .. colorW ) -- list spec names, coloring active
 
 					GameTooltip:AddDoubleLine(text, text2, 1,1,1, 1,1,1)
 				end
 
 				GameTooltip:AddLine(" \nHint:", 0, 1, 0 ) -- hint shows what spec a click will switch to
                 GameTooltip:AddLine(
-					("- Left-Click to switch to primary spec") ..
-					(".\n- Right-Click to switch to secondary spec") .. ".", 0, 1, 0 )
+                ( switch1 and "- Left-Click to switch to " .. ( specCache[ switch1 ].name or "Error" ) or "" ) ..
+                ( switch2 and ".\n- Right-Click to switch to " .. ( specCache[ switch2 ].name or "Error" ) or "" ) ..
+                ( switch3 and ".\n- Middle-Click to switch to " .. ( specCache[ switch3 ].name or "Error" ) or "" ) ..
+                --[[ ".\n- Shift-Click to toggle talent frame" .. ]] ".", 0, 1, 0 ) -- original functionality hint commented out
 				GameTooltip:Show()
 			end
 		end
@@ -971,139 +908,6 @@ function module:SetDurability()
 		end
 
 		stat.Created = true
-	end
-end
-------------------------------------------------------
--- / EXP / --
-------------------------------------------------------
-function module:setEXP()
-	local stat = NewStat("EXP")
-	if db.EXP.Enable and not stat.Created then
-		-- Localized functions
-		local GetMoney, GetItemQualityColor, GetItemInfo = GetMoney, GetItemQualityColor, GetItemInfo
-		local format, floor, abs, mod, select = format, floor, abs, mod, select
-
-		-- Local variables
-
-		-- Local functions
-
-		-- Stat functions
-		stat.RefreshServerTotal = function(self)
-			-- serverGold = 0
-		end
-		stat.ResetEXP = function(self, player, faction)
-			if not player then return end
-
-			-- if player == "ALL" then
-			-- 	db.realm.Gold = {
-			-- 		[myPlayerFaction] = {
-			-- 			[myPlayerName] = GetMoney(),
-			-- 		},
-			-- 		[otherFaction] = {},
-			-- 	}
-			-- 	goldPlayerArray = {["ALL"] = "ALL", [myPlayerName] = myPlayerName,}
-			-- elseif faction then
-			-- 	if player == myPlayerName then
-			-- 		db.realm.Gold[faction][player] = GetMoney()
-			-- 	else
-			-- 		db.realm.Gold[faction][player] = nil
-			-- 		goldPlayerArray[player] = nil
-			-- 	end
-			-- end
-
-			-- oldMoney = GetMoney()
-			self:RefreshServerTotal()
-			self:PLAYER_XP_UPDATE()
-		end
-
-		-- Event functions
-		stat.Events = {"PLAYER_XP_UPDATE"}
-		stat.PLAYER_XP_UPDATE = function(self)
-
-			local currXP = UnitXP("player")
-			local maxXP = UnitXPMax("player")
-
-			-- Set value
-			-- self.text:SetText(formatMoney(db.Gold.ServerTotal and serverGold or newMoney))
-
-			-- Update gold db
-			-- db.realm.Gold[myPlayerFaction][myPlayerName] = newMoney
-
-			-- Update gold count
-			-- oldMoney = newMoney
-
-			-- Update tooltip if open
-			UpdateTooltip(self)
-		end
-
-		-- Script functions
-		stat.OnEnable = function(self)
-			-- oldMoney = GetMoney()
-			self:RefreshServerTotal()
-			self:PLAYER_XP_UPDATE()
-		end
-
-		stat.OnReset = stat.PLAYER_XP_UPDATE
-
-		stat.OnClick = function(self, button)
-			local profit
-			local spent
-			if button == "RightButton" then -- reset session
-				profit = 0
-				spent = 0
-				-- oldMoney = GetMoney()
-				UpdateTooltip(self)
-			else -- toggle server/toon gold
-				-- db.Gold.ServerTotal = not db.Gold.ServerTotal
-				self:PLAYER_XP_UPDATE()
-			end
-		end
-
-		stat.OnEnter = function(self)
-			if CombatTips() then
-				GameTooltip:SetOwner(self, getOwnerAnchor(self))
-				GameTooltip:ClearLines()
-				GameTooltip:AddLine("Money:", 0.4, 0.78, 1)
-				GameTooltip:AddLine(" ")
-
-				GameTooltip:AddLine("Session:")
-				-- GameTooltip:AddDoubleLine("Earned:", formatMoney(profit), 1,1,1, 1,1,1)
-				-- GameTooltip:AddDoubleLine("Spent:", formatMoney(spent), 1,1,1, 1,1,1)
-
-				-- if profit < spent then
-				-- 	GameTooltip:AddDoubleLine("Deficit:", formatMoney(profit-spent), 1,0,0, 1,1,1)
-				-- elseif profit > spent then
-				-- 	GameTooltip:AddDoubleLine("Profit:", formatMoney(profit-spent), 0,1,0, 1,1,1)
-				-- end
-
-
-				GameTooltip:AddLine(" ")
-				GameTooltip:AddLine("Character:")
-				-- for player, gold in pairs(db.realm.Gold[myPlayerFaction]) do
-				-- 	GameTooltip:AddDoubleLine(player, formatTooltipMoney(gold), colors[myPlayerFaction].r, colors[myPlayerFaction].g, colors[myPlayerFaction].b, 1,1,1)
-				-- 	factionGold[myPlayerFaction] = factionGold[myPlayerFaction] + gold
-				-- end
-				-- for player, gold in pairs(db.realm.Gold[otherFaction]) do
-				-- 	GameTooltip:AddDoubleLine(player, formatTooltipMoney(gold), colors[otherFaction].r, colors[otherFaction].g, colors[otherFaction].b, 1,1,1)
-				-- 	factionGold[otherFaction] = factionGold[otherFaction] + gold
-				-- end
-
-				GameTooltip:AddLine(" ")
-				GameTooltip:AddLine("Server:")
-				-- if factionGold[otherFaction] > 0 then
-				-- 	GameTooltip:AddDoubleLine(myPlayerFaction..":", formatTooltipMoney(factionGold[myPlayerFaction]), colors[myPlayerFaction].r, colors[myPlayerFaction].g, colors[myPlayerFaction].b, 1,1,1)
-				-- 	GameTooltip:AddDoubleLine(otherFaction..":", formatTooltipMoney(factionGold[otherFaction]), colors[otherFaction].r, colors[otherFaction].g, colors[otherFaction].b, 1,1,1)
-				-- end
-				-- GameTooltip:AddDoubleLine("Total:", formatTooltipMoney(factionGold[myPlayerFaction] + factionGold[otherFaction]), 1,1,1, 1,1,1)
-
-				GameTooltip:AddLine(" ")
-				GameTooltip:AddLine("Hint:\n- Left-Click to toggle server/toon gold.\n- Right-Click to reset Session.", 0, 1, 0)
-				GameTooltip:Show()
-			end
-		end
-		stat.OnLeave = function()
-			GameTooltip:Hide()
-		end
 	end
 end
 
@@ -1384,6 +1188,19 @@ function module:SetGold()
 				end
 				GameTooltip:AddDoubleLine("Total:", formatTooltipMoney(factionGold[myPlayerFaction] + factionGold[otherFaction]), 1,1,1, 1,1,1)
 
+				for i = 1, MAX_WATCHED_TOKENS do
+					local info = C_CurrencyInfo.GetBackpackCurrencyInfo(i)
+
+					if info and info.name and i == 1 then
+						GameTooltip:AddLine(" ")
+						GameTooltip:AddLine("Currency:")
+					end
+
+					if info and info.name and info.quantity then
+						GameTooltip:AddDoubleLine(info.name, info.quantity, 1,1,1, 1,1,1)
+					end
+				end
+
 				GameTooltip:AddLine(" ")
 				GameTooltip:AddLine("Hint:\n- Left-Click to toggle server/toon gold.\n- Right-Click to reset Session.", 0, 1, 0)
 				GameTooltip:Show()
@@ -1401,21 +1218,21 @@ end
 -- /GUILD and FRIENDS/ --
 --------------------------------------------------------------------
 
-	local GF_Colors = {
-		Note = {0.14, 0.76, 0.15},
-		OfficerNote = {1, 0.56, 0.25},
-		MotD = {1, 0.8, 0},
-		Broadcast = {1, 0.1, 0.1},
-		Title = {1, 1, 1},
-		Rank = {0.1, 0.9, 1},
-		Realm = {1, 0.8, 0},
-		Status = {0.7, 0.7, 0.7},
-		OrderA = {1, 1, 1, 0.1},
-		ContestedZone = {1, 1, 0},
-		SanctuaryZone = {0, 1, 1},
-		FriendlyZone = {0, 1, 0},
-		EnemyZone = {1, 0, 0},
-		RemoteChatZone = {0, 1, 1},
+local GF_Colors = {
+	Note = {0.14, 0.76, 0.15},
+	OfficerNote = {1, 0.56, 0.25},
+	MotD = {1, 0.8, 0},
+	Broadcast = {1, 0.1, 0.1},
+	Title = {1, 1, 1},
+	Rank = {0.1, 0.9, 1},
+	Realm = {1, 0.8, 0},
+	Status = {0.7, 0.7, 0.7},
+	OrderA = {1, 1, 1, 0.1},
+	ContestedZone = {1, 1, 0},
+	SanctuaryZone = {0, 1, 1},
+	FriendlyZone = {0, 1, 0},
+	EnemyZone = {1, 0, 0},
+	RemoteChatZone = {0, 1, 1},
 }
 
 -- Localized functions
@@ -1452,7 +1269,7 @@ function module:SetGF()
 
 		local hordeZones = "Orgrimmar,Undercity,Thunder Bluff,Silvermoon City,Durotar,Tirisfal Glades,Mulgore,Eversong Woods,Northern Barrens,Silverpine Forest,Ghostlands,Azshara,"
 		local allianceZones = "Ironforge,Stormwind City,Darnassus,The Exodar,Azuremyst Isle,Bloodmyst Isle,Darkshore,Deeprun Tram,Dun Morogh,Elwynn Forest,Loch Modan,Teldrassil,Westfall,"
-		local sanctuaryZones = "Dalaran,Shattrath City,The Maelstrom,"
+		local sanctuaryZones = "Dalaran,Shattrath,The Maelstrom,"
 		local mobileZones = "Remote Chat,ed"
 
 		local statuses = { -- values inherited from the chat frame
@@ -1552,7 +1369,7 @@ function module:SetGF()
 		end
 
 		local function SetClassIcon(tex, class)
-			tex:SetTexture("Interface\\GLUES\\CHARACTERCREATE\\UI-CHARACTERCREATE-CLASSES"); -- this is the image containing all class icons
+			tex:SetTexture([[Interface\Glues\CharacterCreate\UI-CharacterCreate-Classes]])
 			local offset, left, right, bottom, top = 0.025, unpack(CLASS_BUTTONS[class])
 			tex:SetTexCoord(left+offset, right-offset, bottom+offset, top-offset)
 		end
@@ -1576,20 +1393,12 @@ function module:SetGF()
 			button.name:SetText(formatedStatusText(status, name, isMobile))
 			if name and class and RAID_CLASS_COLORS[class] then
 				local color = RAID_CLASS_COLORS[class]
-				if db.Guild.ShowClassColor then
 				button.name:SetTextColor(color.r, color.g, color.b)
-				end
-				-- if db.Guild.ShowClassIcon then
 				SetClassIcon(button.class, class)
-				-- end
 				SetStatusLayout(button.status, button.name)
-				if db.Guild.ShowLevelColor then
 				color = GetQuestDifficultyColor(level)
 				button.level:SetTextColor(color.r, color.g, color.b)
-				end
-				if db.Guild.ShowZoneColor then
 				button.zone:SetTextColor(GetZoneColor(zone))
-				end
 			end
 
 			button.level:SetText(level)
@@ -1606,12 +1415,16 @@ function module:SetGF()
 		end
 
 		local function SetToastData(index, inGroup, offset)
-			if db.Friends.hideApp == false then
-
 			local toast, bc, color = toasts[index], nil, nil
 
-			local presenceID, givenName, battletag, isBattletag, characterName, toonID, client, isOnline, lastOnline, isAFK, isDND, broadcast, notes = BNGetFriendInfo(index + offset)
-			local realm, faction, race, class, zone, level, gameText = BNGetGameAccountInfo(toonID or 0)
+			local accountInfo = C_BattleNet.GetFriendAccountInfo(index + offset)
+			local gameInfo = accountInfo.gameAccountInfo
+			local presenceID, givenName, battleTag = accountInfo.bnetAccountID, accountInfo.accountName, accountInfo.battleTag
+			local client, wowProjectID = gameInfo.clientProgram, gameInfo.wowProjectID or 0
+			local isOnline, isAFK, isDND = gameInfo.isOnline, accountInfo.isAFK, accountInfo.isDND
+			local broadcast, notes = accountInfo.customMessage, accountInfo.note
+			local toonName, faction, race, class = gameInfo.characterName or "", gameInfo.factionName or "", gameInfo.raceName or "", gameInfo.className or ""
+			local realm, zone, level, gameText = gameInfo.realmName or "", gameInfo.areaName or "", gameInfo.characterLevel or "", gameInfo.richPresence or ""
 
 			if faction == 'Alliance' then faction = 1
 			else faction = 0
@@ -1637,17 +1450,18 @@ function module:SetGF()
 			SetStatusLayout(toast.status, toast.name)
 
 			toast.client = client
+
 			if client == BNET_CLIENT_WOW then
 				toast.faction:SetTexture([[Interface\Glues\CharacterCreate\UI-CharacterCreate-Factions]])
 				toast.faction:SetTexCoord(faction == 1 and 0.03 or 0.53, faction == 1 and 0.47 or 0.97, 0.03, 0.97)
 				zone = (zone == nil or zone == "") and UNKNOWN or zone
 				toast.zone:SetPoint("LEFT", toast.faction, "RIGHT", textOffset, 0)
 				toast.zone:SetTextColor(GetZoneColor(zone))
-				-- toast.sameRealm = (realm == myPlayerRealm)
-				-- if not toast.sameRealm then
-				-- 	local r,g,b = unpack(GF_Colors.Realm)
-				-- 	zone = ("%1$s |cff%3$.2x%4$.2x%5$.2x- %2$s"):format(zone, realm, r*255, g*255, b*255)
-				-- end
+				toast.sameRealm = (realm == myPlayerRealm)
+				if not toast.sameRealm then
+					local r,g,b = unpack(GF_Colors.Realm)
+					zone = ("%1$s |cff%3$.2x%4$.2x%5$.2x- %2$s"):format(zone, realm, r*255, g*255, b*255)
+				end
 				class = stat.LocClassNames[class]
 				if class then
 					SetClassIcon(toast.class, class)
@@ -1657,7 +1471,7 @@ function module:SetGF()
 					toast.class:SetTexture("")
 				end
 			else
-				toast.class:SetTexture(BNet_GetClientEmbeddedAtlas(client))
+				toast.class:SetTexture(BNet_GetClientTexture(client))
 				toast.class:SetTexCoord(0.2, 0.8, 0.2, 0.8)
 				toast.name:SetTextColor(0.8, 0.8, 0.8)
 				toast.faction:SetTexture("")
@@ -1668,13 +1482,13 @@ function module:SetGF()
 
 			toast.name:SetText(formatedStatusText(isAFK and 1 or isDND and 2, format("|cff00b2f0%s|r%s", toast.realID, (toonName and format(" - %s", toonName) or ""))))
 
-			-- if level and level ~= "" then
-			-- 	toast.level:SetText(level)
-			-- 	color = GetDifficultyColor(tonumber(level))
-			-- 	toast.level:SetTextColor(color.r, color.g, color.b)
-			-- else
+			if level and level ~= "" then
+				toast.level:SetText(level)
+				color = GetQuestDifficultyColor(tonumber(level))
+				toast.level:SetTextColor(color.r, color.g, color.b)
+			else
 				toast.level:SetText()
-			-- end
+			end
 
 			toast.zone:SetText(zone)
 			toast.note:SetText(notes)
@@ -1685,7 +1499,7 @@ function module:SetGF()
 			toast.zone:GetStringWidth(),
 			toast.note:GetStringWidth()
 		end
-	end
+
 		local function UpdateScrollButtons(nbEntries)
 			for i=1, #buttons do buttons[i]:Hide() end
 			local baseOffset = -realFriendsHeight
@@ -1736,7 +1550,7 @@ function module:SetGF()
 
 		broadcasts = setmetatable({}, {
 			__index = function(t, k)
-				local bc = CreateFrame("Button", nil, stat, "BackdropTemplate")
+				local bc = CreateFrame("Button", nil, stat)
 				t[k] = bc
 				bc:SetHeight(btnHeight)
 				bc:SetNormalFontObject(GameFontNormal)
@@ -1750,11 +1564,10 @@ function module:SetGF()
 				return bc
 			end
 		})
-		-- if db.Friends.hideApp == false then
 
 		toasts = setmetatable({}, {
 			__index = function(t, k)
-				local btn = CreateFrame("Button", nil, stat, "BackdropTemplate")
+				local btn = CreateFrame("Button", nil, stat)
 				t[k] = btn
 				btn.index = k
 				btn:SetNormalFontObject(GameFontNormal)
@@ -1779,7 +1592,7 @@ function module:SetGF()
 				return btn
 			end
 		})
-	-- end
+
 		buttons = setmetatable({}, {
 			__index = function(t, k)
 				local btn = CreateFrame("Button", nil, stat)
@@ -1889,43 +1702,41 @@ function module:SetGF()
 			local tnC, lC, zC, nC = 0, -gap, -gap, 0
 			local spanZoneC = 0
 
-			if db.Friends.hideApp == false then
-				if nbRealFriends > 0 then
-					nbBroadcast = 0
-					local i = 1
-					local indexOffset = 0
-					while i <= nbRealFriends do
-						local button, client, isOnline, tnW, lW, zW, nW, spanZoneW = SetToastData(i, inGroup, indexOffset)
+			if nbRealFriends > 0 then
+				nbBroadcast = 0
+				local i = 1
+				local indexOffset = 0
+				while i <= nbRealFriends do
+					local button, client, isOnline, tnW, lW, zW, nW, spanZoneW = SetToastData(i, inGroup, indexOffset)
 
-						if tnW > tnC then tnC = tnW end
-						if client == BNET_CLIENT_WOW then
-							if lW > lC then lC = lW end
-							if zW > zC then zC = zW end
-						else
-							if zW > spanZoneC then spanZoneC = zW end
-						end
-						if nW > nC then nC = nW end
-
-						if isOnline then
-							i = i + 1
-						else indexOffset = indexOffset + 1
-						end
+					if tnW > tnC then tnC = tnW end
+					if client == BNET_CLIENT_WOW then
+						if lW > lC then lC = lW end
+						if zW > zC then zC = zW end
+					else
+						if zW > spanZoneC then spanZoneC = zW end
 					end
-					sort(toasts, sortClients)
+					if nW > nC then nC = nW end
 
-					realFriendsHeight = (nbRealFriends + nbBroadcast) * btnHeight + (#entries>0 and gap or 0)
-					if hideNotes then nC = -gap end
-
-					spanZoneC = max(spanZoneC, lC + gap + iconSize + textOffset + zC)
-					rid_width = iconSize + textOffset + tnC + spanZoneC + nC + 2*gap
-
-					if #entries>0 then
-						local t = toasts[nbRealFriends]
-						local offsetY = t.bcIndex and btnHeight or 0
-						sep2:SetPoint("TOPLEFT", t, "BOTTOMLEFT", 0, 2-offsetY)
-						sep2:SetPoint("BOTTOMRIGHT", t, "BOTTOMRIGHT", 0, 2-offsetY-btnHeight)
-						sep2:Show()
+					if isOnline then
+						i = i + 1
+					else indexOffset = indexOffset + 1
 					end
+				end
+				sort(toasts, sortClients)
+
+				realFriendsHeight = (nbRealFriends + nbBroadcast) * btnHeight + (#entries>0 and gap or 0)
+				if hideNotes then nC = -gap end
+
+				spanZoneC = max(spanZoneC, lC + gap + iconSize + textOffset + zC)
+				rid_width = iconSize + textOffset + tnC + spanZoneC + nC + 2*gap
+
+				if #entries>0 then
+					local t = toasts[nbRealFriends]
+					local offsetY = t.bcIndex and btnHeight or 0
+					sep2:SetPoint("TOPLEFT", t, "BOTTOMLEFT", 0, 2-offsetY)
+					sep2:SetPoint("BOTTOMRIGHT", t, "BOTTOMRIGHT", 0, 2-offsetY-btnHeight)
+					sep2:Show()
 				end
 			end
 			if self.IsGuild or #entries==0 then sep2:Hide() end
@@ -2024,7 +1835,7 @@ function module:SetGF()
 				slider:SetMinMaxValues(0, #entries - maxEntries)
 				slider:SetValue(sliderValue)
 				slider:Show()
-				else
+			else
 				slider:Hide()
 			end
 			nbEntries = min(maxEntries, #entries)
@@ -2053,6 +1864,7 @@ function module:SetGF()
 				button.note:SetWidth(notesC)
 				button.rank:SetWidth(rankC)
 			end
+
 			if nbEntries>0 then
 				local col = db[GorF()].sortCols[1]
 				local obj = buttons[1][col]
@@ -2060,11 +1872,11 @@ function module:SetGF()
 					texOrder1:SetPoint("TOPLEFT", obj, "TOPLEFT", -.25*gap, 2 )
 					texOrder1:SetWidth(obj:GetWidth() + gap*.5)
 					texOrder1:SetHeight(nbEntries * btnHeight + 1)
-					local asc = db[GorF()].sortASC[1]
-					if col == "level" then asc = not asc end
-					local a1, r1, g1, b1 = GF_Colors.OrderA[4], unpack(GF_Colors.OrderA)
-					local a2, r2, g2, b2 = 0, GameTooltip:GetBackdropColor()
-					if asc then r1,g1,b1,a1, r2,g2,b2,a2 = r2,g2,b2,a2, r1,g1,b1,a1 end
+					-- local asc = db[GorF()].sortASC[1]
+					-- if col == "level" then asc = not asc end
+					-- local a1, r1, g1, b1 = GF_Colors.OrderA[4], unpack(GF_Colors.OrderA)
+					-- local a2, r2, g2, b2 = 0, GameTooltip:GetBackdropColor()
+					-- if asc then r1,g1,b1,a1, r2,g2,b2,a2 = r2,g2,b2,a2, r1,g1,b1,a1 end
 					-- texOrder1:SetGradientAlpha("VERTICAL", r1,g1,b1,a1, r2,g2,b2,a2)
 					texOrder1:SetAlpha(0)
 				else
@@ -2116,9 +1928,11 @@ function module:SetGF()
 				self:SetBackdropColor(bgColor.r, bgColor.g, bgColor.b, bgColor.a)
 				self:SetBackdropBorderColor(borderColor.r, borderColor.g, borderColor.b, borderColor.a)
 			else
-				self:SetBackdrop(GameTooltip:GetBackdrop())
-				self:SetBackdropColor(GameTooltip:GetBackdropColor())
-				self:SetBackdropBorderColor(GameTooltip:GetBackdropBorderColor())
+				if not self.GetCenterColor then Mixin(self, NineSlicePanelMixin) end
+				local layout = NineSliceUtil.GetLayout(GameTooltip.layoutType)
+				NineSliceUtil.ApplyLayout(self, layout or "TooltipDefaultLayout")
+				self:SetCenterColor(GameTooltip.NineSlice:GetCenterColor())
+				self:SetBorderColor(GameTooltip.NineSlice:GetBorderColor())
 			end
 
 			self:Update()
@@ -2183,7 +1997,7 @@ function module:SetGF()
 					--function FriendsFrame_InviteOrRequestToJoin(guid, gameAccountID)
 					FriendsFrame_InviteOrRequestToJoin(b.gameInfo.playerGuid, b.gameInfo.gameAccountID)
 				else
-					InviteUnit(b.unit)
+					C_PartyInfo.InviteUnit(b.unit)
 				end
 			elseif IsControlKeyDown() then -- edit note
 				if not stat.IsGuild then
@@ -2300,9 +2114,9 @@ function module:SetGuild()
 					end
 					GameTooltip:AddLine("Hints:")
 					GameTooltip:AddLine("|cffff8020Click|r to open Guild Roster.", 0.2, 1, 0.2)
-					GameTooltip:AddLine("|cffff8020RightClick|r to toggle notes.", 0.2, 1, 0.2)
-					-- GameTooltip:AddLine("|cffff8020Button4|r to toggle notes.", 0.2, 1, 0.2)
-					-- GameTooltip:AddLine("|cffff8020Button5|r to toggle hints.", 0.2, 1, 0.2)
+					GameTooltip:AddLine("|cffff8020RightClick|r to display Guild Information.", 0.2, 1, 0.2)
+					GameTooltip:AddLine("|cffff8020Button4|r to toggle notes.", 0.2, 1, 0.2)
+					GameTooltip:AddLine("|cffff8020Button5|r to toggle hints.", 0.2, 1, 0.2)
 					GameTooltip:SetFrameLevel(2) -- keep tooltip above friends/guild list
 					GameTooltip:Show()
 				else
@@ -2361,11 +2175,26 @@ function module:SetGuild()
 		end
 
 		stat.OnClick = function(self, button)
+			if not GuildFrame then GuildFrame_LoadUI() end
 			if button == "LeftButton" then -- toggle Guild Roster
-					ToggleFriendsFrame(3)
-			elseif button == "RightButton" then -- toggle guild and officer notes
+				if not GuildFrame or not GuildFrame:IsShown() or (GuildRosterFrame and GuildRosterFrame:IsShown()) then
+					ToggleGuildFrame()
+				end
+				if GuildFrame and GuildFrame:IsShown() then
+					GuildFrameTab2:Click()
+				end
+			elseif button == "RightButton" then -- toggle Guild Info
+				if not GuildFrame or not GuildFrame:IsShown() or (GuildMainFrame and GuildMainFrame:IsShown()) then
+					ToggleGuildFrame()
+				end
+				if GuildFrame and GuildFrame:IsShown() then
+					GuildFrameTab1:Click()
+				end
+			elseif button == "Button4" then -- toggle guild and officer notes
 				db.Guild.ShowNotes = not db.Guild.ShowNotes
 				tooltip:Update()
+			elseif button == "Button5" then -- toggle mouseclick hints
+				db.Guild.ShowHints = not db.Guild.ShowHints
 				self:UpdateHints()
 			end
 		end
@@ -2385,7 +2214,6 @@ function module:SetGuild()
 end
 
 -- Localized functions
--- local GetNumFriends, BNGetNumFriends, GetFriendInfo, BNSetCustomMessage = C_FriendList.GetNumFriends, BNGetNumFriends, C_FriendList.GetFriendInfo, BNSetCustomMessage
 local BNGetNumFriends, BNSetCustomMessage = BNGetNumFriends, BNSetCustomMessage
 local gsub, format = gsub, format
 
@@ -2404,11 +2232,7 @@ function module:SetFriends()
 		-- Stat functions
 		stat.UpdateText = function(self, updatePanel)
 			local totalRF, onlineRF = BNGetNumFriends()
-			if db.Friends.hideApp == false then
-				self.text:SetText((db.Friends.ShowTotal and "Friends: %d/%d" or "Friends: %d"):format(onlineFriends + onlineRF, totalFriends + totalRF))
-			else
-				self.text:SetText((db.Friends.ShowTotal and "Friends: %d/%d" or "Friends: %d"):format(onlineFriends, totalFriends))
-			end
+			self.text:SetText((db.Friends.ShowTotal and "Friends: %d/%d" or "Friends: %d"):format(onlineFriends + onlineRF, totalFriends + totalRF))
 			if updatePanel then self:BN_FRIEND_INFO_CHANGED() end
 		end
 
@@ -2597,7 +2421,7 @@ function module:SetInstance()
 			end)
 
 			-- Set value
-			self.text:SetFormattedText("Saved Instances [%d]", #instances)
+			self.text:SetFormattedText("Instance [%d]", #instances)
 
 			-- Update tooltip if open
 			UpdateTooltip(self)
@@ -2608,7 +2432,7 @@ function module:SetInstance()
 
 		-- Script functions
 		stat.OnEnable = function(self)
-			self.text:SetText("Saved Instances [0]")
+			self.text:SetText("Instance [0]")
 			self:PLAYER_ENTERING_WORLD()
 		end
 
@@ -2619,7 +2443,7 @@ function module:SetInstance()
 					FriendsFrame:Hide()
 				end
 			else
-				ToggleFriendsFrame(4)
+				ToggleFriendsFrame(3)
 				RaidInfoFrame:Show()
 			end
 		end
@@ -2666,7 +2490,6 @@ end
 
 function module:SetMemory()
 	local stat = NewStat("Memory")
-	do return end
 
 	if db.Memory.Enable and not stat.Created then
 		-- Localized functions
@@ -2757,70 +2580,6 @@ function module:SetMemory()
 	end
 end
 
-------------------------------------------------------
--- / PET HAPPYNESS && HUNGER / --
-------------------------------------------------------
-
-function module:SetPetHappiness()
-	local stat = NewStat("PetHappiness")
-	if db.PetHappiness.Enable and not stat.Created then
-		NewIcon(stat)
-		local dmgPercent, loyalLevel, loyalRate = "nil","nil","nil"
-		local icon = ("Interface\\AddOns\\LUI\\media\\textures\\icons\\pet1.tga")
-		stat.Events = {"PLAYER_ENTERING_WORLD", "UNIT_HAPPINESS", "UNIT_AURA", "UNIT_PET"}
-
-		stat.UNIT_AURA = function(self, unit)
-			if UnitExists("pet") then
-				local petName = UnitName("pet")
-				local happiness, damagePercentage, loyaltyRate = GetPetHappiness()
-				local petLoyaltyText = GetPetLoyalty()
-				if happiness == nil then happiness = 1 end
-				icon =  ("Interface\\AddOns\\LUI\\media\\textures\\icons\\pet"..happiness..".tga")
-				dmgPercent = damagePercentage
-				loyalRate = loyaltyRate
-				
-				text = string.format(petName)
-			else
-				text = "No Pet"
-			end
-			self.text:SetFormattedText(" "..text)
-			self.icon:SetBackdrop({bgFile = icon, edgeFile = nil, tile = false, edgeSize = 0, insets = {top = 0, right = 0, bottom = 0, left = 0}})
-			UpdateTooltip(self)
-
-		end
-
-		stat.UNIT_HAPPINESS = stat.UNIT_AURA
-		stat.UNIT_PET = stat.UNIT_AURA
-		stat.PLAYER_ENTERING_WORLD = stat.UNIT_AURA
-
-		stat.OnEnable = function(self)
-			self:UNIT_AURA(self, "pet")
-		end
-
-		-- Local variables
-		stat.UpdateText = function(self)
-			self.text:SetText("Test")
-			UpdateTooltip(self)
-		end
-
-		stat.OnEnter = function(self)
-			if CombatTips() then
-				GameTooltip:SetOwner(self, getOwnerAnchor(self))
-				GameTooltip:ClearLines()
-				GameTooltip:AddLine("Pet Happiness and Loyalty:", 0.4, 0.78, 1)
-				GameTooltip:AddLine("Damage Percentage: ".. (dmgPercent), 0.4, 0.78, 1)
-				GameTooltip:AddLine("Loyalty Rate: ".. (loyalRate), 0.4, 0.78, 1)
-				GameTooltip:Show()
-			end
-		end
-
-		stat.OnLeave = function()
-			GameTooltip:Hide()
-		end
-
-		stat.Created = true
-	end
-end
 
 ------------------------------------------------------
 -- / WEAPON INFO USAGE / --
@@ -2863,16 +2622,11 @@ function module:SetWeaponInfo()
 		stat.OnEnter = function(self)
 			if CombatTips() then
 				local mspeed, ospeed = UnitAttackSpeed("player")
-				local mtext = string.format("%.2fs", tonumber(mspeed))
-				if ospeed ~= nil and ospeed ~= 0 then
-					local otext = string.format(" %.2fs", tonumber(ospeed))
-				else local otext = "0"
-				end
 				GameTooltip:SetOwner(self, getOwnerAnchor(self))
 				GameTooltip:ClearLines()
 				GameTooltip:AddLine("Weapon Speed:", 0.4, 0.78, 1)
-				GameTooltip:AddLine("Main Hand Weapon: ".. (mtext), 0.4, 0.78, 1)
-				-- GameTooltip:AddLine("Offhand Weapon: ".. (otext), 0.4, 0.78, 1)
+				GameTooltip:AddLine("Main Hand Weapon: ", 0.4, 0.78, 1)
+				GameTooltip:AddLine("Offhand Weapon: ", 0.4, 0.78, 1)
 				GameTooltip:AddLine(" ")
 				GameTooltip:Show()
 			end
@@ -2974,7 +2728,7 @@ end
 ------------------------------------------------------
 -- / Loot Specialization / --
 ------------------------------------------------------
--- added with 5.3 MoP
+
 function module:SetLootSpec()
 
 	local stat = NewStat("LootSpec")
@@ -2986,10 +2740,9 @@ function module:SetLootSpec()
 		stat.PLAYER_LOOT_SPEC_UPDATED = function(self, unit)
 			local name = ""
 			local lootspec = GetLootSpecialization()
-			local text
 			if lootspec == 0 then
-			   local curspec = GetPrimaryTalentTree()
-			   _, name, _, _, _, _ = GetTalentTabInfo(curspec)
+			   local curspec = GetSpecialization()
+			   _, name, _, _, _, _ = GetSpecializationInfo(curspec)
 			else
 			   _, name, _, _, _, _ = GetSpecializationInfoByID(lootspec)
 			end
@@ -3010,9 +2763,8 @@ function module:SetLootSpec()
 end
 
 ------------------------------------------------------
--- / Movement Speed / -- 
+-- / Movement Speed / --
 ------------------------------------------------------
-	-- added with 3.0 WOTLK
 
 function module:SetMoveSpeed()
 
@@ -3104,7 +2856,7 @@ module.defaults = {
 		CombatLock = false,
 		Bags = {
 			Enable = true,
-			X = 160,
+			X = 200,
 			Y = 0,
 			InfoPanel = {
 				Horizontal = "Left",
@@ -3119,8 +2871,6 @@ module.defaults = {
 				b = 1,
 				a = 1,
 			},
-			Tracked = {},
-			Inlcudebank = false,
 		},
 		Clock = {
 			Enable = true,
@@ -3163,7 +2913,7 @@ module.defaults = {
 				a = 1,
 			},
 		},
---[[ 		MoveSpeed = {  
+		MoveSpeed = {
 			Enable = true,
 			X = -590,
 			Y = 0,
@@ -3180,15 +2930,15 @@ module.defaults = {
 				b = 1,
 				a = 1,
 			},
-		}, ]]  -- added with 3.0 WOTLK
+		},
 		DualSpec = {
 			Enable = false,
 			ShowSpentPoints = true,
-			X = -650,
+			X = 320,
 			Y = 0,
 			InfoPanel = {
-				Horizontal = "Right",
-				Vertical = "Top",
+				Horizontal = "Left",
+				Vertical = "Bottom",
 			},
 			Font = "vibroceb",
 			FontSize = 12,
@@ -3202,25 +2952,7 @@ module.defaults = {
 		},
 		Durability = {
 			Enable = true,
-			X = 365,
-			Y = 0,
-			InfoPanel = {
-				Horizontal = "Left",
-				Vertical = "Top",
-			},
-			Font = "vibroceb",
-			FontSize = 12,
-			Outline = "NONE",
-			Color = {
-				r = 1,
-				g = 1,
-				b = 1,
-				a = 1,
-			},
-		},
-		EXP = {
-			Enable = true,
-			X = 700,
+			X = 350,
 			Y = 0,
 			InfoPanel = {
 				Horizontal = "Left",
@@ -3275,8 +3007,6 @@ module.defaults = {
 			ShowTotal = false,
 			ShowHints = true,
 			ShowNotes = true,
-			hideApp = false,
-			-- ShowClassColor = true,
 			sortCols = {"name", "name", "name"},
 			sortASC = {true, true, true},
 		},
@@ -3323,16 +3053,12 @@ module.defaults = {
 			hideRealm = true,
 			ShowHints = true,
 			ShowNotes = true,
-			ShowClassColor = true,
-			ShowClassIcon = true,
-			ShowLevelColor = true,
-			ShowZoneColor = true,
 			sortCols = {"class", "name", "name"},
 			sortASC = {true, true, true},
 		},
 		Instance = {
 			Enable = false,
-			X = 80,
+			X = 60,
 			Y = 0,
 			InfoPanel = {
 				Horizontal = "Left",
@@ -3349,30 +3075,12 @@ module.defaults = {
 			},
 		},
 		Memory = {
-			Enable = false,
+			Enable = true,
 			X = 610,
 			Y = 0,
 			InfoPanel = {
 				Horizontal = "Left",
 				Vertical = "Top",
-			},
-			Font = "vibroceb",
-			FontSize = 12,
-			Outline = "NONE",
-			Color = {
-				r = 1,
-				g = 1,
-				b = 1,
-				a = 1,
-			},
-		},
-		PetHappiness = {
-			Enable = false,
-			X = 350,
-			Y = 0,
-			InfoPanel = {
-				Horizontal = "Left",
-				Vertical = "Bottom",
 			},
 			Font = "vibroceb",
 			FontSize = 12,
@@ -3402,27 +3110,27 @@ module.defaults = {
 				a = 1,
 			},
 		},
-		-- EquipmentSets = {
-		-- 	Enable = false,
-		-- 	Text = "Equipped Set: ",
-		-- 	X = -225,
-		-- 	Y = 0,
-		-- 	InfoPanel = {
-		-- 		Horizontal = "Right",
-		-- 		Vertical = "Bottom",
-		-- 	},
-		-- 	Font = "vibroceb",
-		-- 	FontSize = 12,
-		-- 	Outline = "NONE",
-		-- 	Color = {
-		-- 		r = 1,
-		-- 		g = 1,
-		-- 		b = 1,
-		-- 		a = 1,
-		-- 	},
-		-- },
+		EquipmentSets = {
+			Enable = false,
+			Text = "Equipped Set: ",
+			X = -225,
+			Y = 0,
+			InfoPanel = {
+				Horizontal = "Right",
+				Vertical = "Bottom",
+			},
+			Font = "vibroceb",
+			FontSize = 12,
+			Outline = "NONE",
+			Color = {
+				r = 1,
+				g = 1,
+				b = 1,
+				a = 1,
+			},
+		},
 		LootSpec = {
-			Enable = true,
+			Enable = false,
 			Text = "Loot Spec: ",
 			X = -75,
 			Y = 0,
@@ -3441,9 +3149,9 @@ module.defaults = {
 			},
 		},
 		Mail = {
-			Enable = true,
+			Enable = false,
 			NewIndic = " *",
-			X = 265,
+			X = 275,
 			Y = 0,
 			InfoPanel = {
 				Horizontal = "Left",
@@ -3474,35 +3182,8 @@ module.defaults = {
 function module:LoadOptions()
 	-- Local variables
 	local msvalues = {"Both", "Home", "World"}
-	local fontflags = {"NONE", "OUTLINE", "THICK", "MONOCHROME"}
-	local removeTrackedKey
-	local TrackedList = {}
-	
-	local disabled = {
-		NoTrackedSelected = function() return not removeTrackedKey end,
-		NoTracked = function() return not next(TrackedList) end,
-	}
-	
-	-- get/set functions for bag Tracked items
-	local function TrackedGet(info) return removeTrackedKey end
-	local function TrackedSet(info, value) removeTrackedKey = value end
-	local function removeTracked(info)
-		if removeTrackedKey then
-			self:ItemTracked(true, removeTrackedKey)
-			removeTrackedKey = nil
-		end
-	end
-	
-	local function tracked()
-		wipe(TrackedList)
-		for itemID in pairs(db.Bags.Tracked) do
-			local _, itemLink = GetItemInfo(itemID)
-			TrackedList[itemID] = itemLink
-		end
-		return TrackedList
-		-- print((TrackedList))
-	end
-	
+	local fontflags = {"NONE", "OUTLINE", "THICKOUTLINE", "MONOCHROME"}
+
 	db.Gold.PlayerReset = dbd.Gold.PlayerReset
 	for _, faction in pairs(db.realm.Gold) do
 		for player, gold in pairs(faction) do
@@ -3802,20 +3483,7 @@ function module:LoadOptions()
 				},
 				Position = PositionOptions(3),
 				Font = FontOptions(4),
-				
-				AddTracked = self:NewGroup("Add Item to be Tracked", 5, LUI.dummy, "ItemTracked", true, disabled.Bags, {
-					Description = self:NewDesc("To add an item to the Tracked list, do one of the following:\n" ..
-							"Drag and drop (leftclick) an item into the box.\nEnter an item ID, Name or Link in the input box.\n (You can provide a link by Shift + Leftclicking on an item or link.)", 1),
-					DropItem = self:NewExecute("Drop an item here!", "Select an item and drop it on this slot. (Leftclick)", 2, "ItemTracked"),
-					InputItem = self:NewInput("Enter Item ID, Name or Link", "Enter an Item ID, Name or Link (Shift + Leftclick an item)", 3, false)
-				}),
-				Inlcudebank = self:NewToggle("Include Bank Items", nil, 6, true),
-				RemoveTracked = self:NewGroup("Remove Item from Tracked List", 7, TrackedGet, TrackedSet, true, disabled.Bags, {
-					Select = self:NewSelect("Select Item", "Select the item which you want to remove from the Tracked list.", 1, tracked, nil, false, "double"),
-					Remove = self:NewExecute("Remove selected item", "Removes the selected item from the Tracked list.", 2, removeTracked, nil, nil, disabled.NoTrackedSelected),
-					Clear = self:NewExecute("Clear tracked items", "Removes the selected item from the Tracked list.", 3, "ClearTracked", "Do you really want to clear all tracked items?", nil, disabled.NoTracked),
-				}),
-				Reset = ResetOption(7),
+				Reset = ResetOption(5),
 			},
 		},
 		Clock = {
@@ -3876,7 +3544,7 @@ function module:LoadOptions()
 				Reset = ResetOption(8),
 			},
 		},
-		Currency = {  -- Added in 4.0 Cata
+		Currency = {
 			name = NameLabel,
 			type = "group",
 			order = 4,
@@ -3903,7 +3571,14 @@ function module:LoadOptions()
 					desc = "Select the currency to display",
 					type = "select",
 					order = 3,
-					values = function() return (InfoStats.Currency and InfoStats.Currency.Created and InfoStats.Currency:Currencies()) or {"None"} end,
+					values = function()
+						if InfoStats.Currency and InfoStats.Currency.Created then
+							local currencyList = InfoStats.Currency:Currencies()
+							return currencyList or {"None"}
+						else
+							return {"None"}
+						end
+					end,
 					get = function(info)
 						return db.Currency.Display
 					end,
@@ -3921,7 +3596,7 @@ function module:LoadOptions()
 				Reset = ResetOption(7),
 			},
 		},
---[[ 		MoveSpeed = {  -- added with 3.0 WOTLK
+		MoveSpeed = {
 			name = NameLabel,
 			type = "group",
 			order = 4,
@@ -3947,8 +3622,8 @@ function module:LoadOptions()
 				Font = FontOptions(6),
 				Reset = ResetOption(7),
 			},
-		}, ]]
-		DualSpec = { -- Added in 3.1.0 WOTLK
+		},
+		DualSpec = {
 			name = function(info) return NameLabel(info, "Dual Spec") end,
 			type = "group",
 			order = 6,
@@ -3985,7 +3660,7 @@ function module:LoadOptions()
 				Position = PositionOptions(4, "Dual Spec"),
 				Font = FontOptions(5, "Dual Spec"),
 				Reset = ResetOption(6),
-			}, 
+			},
 		},
 		Durability = {
 			name = NameLabel,
@@ -4011,33 +3686,6 @@ function module:LoadOptions()
 				},
 				Position = PositionOptions(3),
 				Font = FontOptions(4),
-				Reset = ResetOption(5),
-			},
-		},
-		EXP = {
-			name = NameLabel,
-			type = "group",
-			order = 8,
-			args = {
-				Header = {
-					name = "EXP",
-					type = "header",
-					order = 1,
-				},
-				Enable = {
-					name = "Enable",
-					desc = "Whether you want to show your EXP or not.",
-					type = "toggle",
-					width = "full",
-					get = function() return db.EXP.Enable end,
-					set = function(info, value)
-						db.EXP.Enable = value
-						ToggleStat("EXP")
-					end,
-					order = 2,
-				},
-				Position = PositionOptions(3, "EXP"),
-				Font = FontOptions(4, "EXP"),
 				Reset = ResetOption(5),
 			},
 		},
@@ -4114,7 +3762,7 @@ function module:LoadOptions()
 					set = function(info, value)
 						db.Friends.ShowTotal = value
 						InfoStats.Friends:UpdateText()
-						-- ShowFriends()
+						C_FriendList.ShowFriends()
 					end,
 					order = 3,
 				},
@@ -4136,21 +3784,9 @@ function module:LoadOptions()
 					set = function(info, value) db.Friends.ShowNotes = value end,
 					order = 5,
 				},
-				hideApp = {
-					name = "Hide B.Net-Clients",
-					desc = "Whether you want to show friends connected to the Battle.Net Desktop Client.",
-					type = "toggle",
-					disabled = StatDisabled,
-					get = function() return db.Friends.hideApp end,
-					set = function(info, value) 
-						db.Friends.hideApp = value 
-						StaticPopup_Show("RELOAD_UI")
-					end,
-					order = 8,
-				},
-				Position = PositionOptions(10),
-				Font = FontOptions(11),
-				Reset = ResetOption(12),
+				Position = PositionOptions(6),
+				Font = FontOptions(7),
+				Reset = ResetOption(8),
 			},
 		},
 		Gold = {
@@ -4269,7 +3905,7 @@ function module:LoadOptions()
 					set = function(info, value)
 						db.Guild.ShowTotal = value
 						InfoStats.Guild:UpdateText()
-						GuildRoster()
+						C_GuildInfo.GuildRoster()
 					end,
 					order = 3,
 				},
@@ -4284,9 +3920,9 @@ function module:LoadOptions()
 						db.Guild.hideRealm = value
 						InfoStats.Guild:GUILD_ROSTER_UPDATE()
 						InfoStats.Guild:UpdateText()
-						GuildRoster()
+						C_GuildInfo.GuildRoster()
 					end,
-					order = 3,
+					order = 4,
 				},
 				ShowHints = {
 					name = "Show Hints",
@@ -4304,42 +3940,6 @@ function module:LoadOptions()
 					disabled = StatDisabled,
 					get = function() return db.Guild.ShowNotes end,
 					set = function(info, value) db.Guild.ShowNotes = value end,
-					order = 4,
-				},
-				ShowClassColor = {
-					name = "Show Class Colors",
-					desc = "Whether you want to have names colored by class.",
-					type = "toggle",
-					disabled = StatDisabled,
-					get = function() return db.Guild.ShowClassColor end,
-					set = function(info, value) db.Guild.ShowClassColor = value end,
-					order = 5,
-				},
-				ShowClassIcon = {
-					name = "Show Class Icons",
-					desc = "Whether you want to have class displayed.",
-					type = "toggle",
-					disabled = StatDisabled,
-					get = function() return db.Guild.ShowClassIcon end,
-					set = function(info, value) db.Guild.ShowClassIcon = value end,
-					order = 5,
-				},
-				ShowLevelColor = {
-					name = "Show Level Colors",
-					desc = "Whether you want to have levels colored by level difference.",
-					type = "toggle",
-					disabled = StatDisabled,
-					get = function() return db.Guild.ShowLevelColor end,
-					set = function(info, value) db.Guild.ShowLevelColor = value end,
-					order = 5,
-				},
-				ShowZoneColor = {
-					name = "Show Zone Colors",
-					desc = "Whether you want to have zones colored by hostility.",
-					type = "toggle",
-					disabled = StatDisabled,
-					get = function() return db.Guild.ShowZoneColor end,
-					set = function(info, value) db.Guild.ShowZoneColor = value end,
 					order = 5,
 				},
 				Position = PositionOptions(6),
@@ -4348,7 +3948,7 @@ function module:LoadOptions()
 			},
 		},
 		Instance = {
-			name = function(info) return NameLabel(info, "Saved Instance Info") end,
+			name = function(info) return NameLabel(info, "Instance Info") end,
 			type = "group",
 			order = 12,
 			args = {
@@ -4359,7 +3959,7 @@ function module:LoadOptions()
 				},
 				Enable = {
 					name = "Enable",
-					desc = "Whether you want to show your Saved Instance Info or not.",
+					desc = "Whether you want to show your Instance Info or not.",
 					type = "toggle",
 					width = "full",
 					get = function() return db.Instance.Enable end,
@@ -4374,57 +3974,30 @@ function module:LoadOptions()
 				Reset = ResetOption(5),
 			},
 		},
-		-- Memory = {
-		-- 	name = function(info) return NameLabel(info, "Memory Usage") end,
-		-- 	type = "group",
-		-- 	order = 13,
-		-- 	args = {
-		-- 		Header = {
-		-- 			name = "Memory Usage",
-		-- 			type = "header",
-		-- 			order = 1,
-		-- 		},
-		-- 		Enable = {
-		-- 			name = "Enable",
-		-- 			desc = "Whether you want to show your Memory Usage or not.",
-		-- 			type = "toggle",
-		-- 			width = "full",
-		-- 			get = function() return db.Memory.Enable end,
-		-- 			set = function(info, value)
-		-- 				db.Memory.Enable = value
-		-- 				ToggleStat("Memory")
-		-- 			end,
-		-- 			order = 2,
-		-- 		},
-		-- 		Position = PositionOptions(3, "Memory Usage"),
-		-- 		Font = FontOptions(4, "Memory Usage"),
-		-- 		Reset = ResetOption(5),
-		-- 	},
-		-- },
-		PetHappiness = {
-			name = function(info) return NameLabel(info, "Pet Happiness/Loyalty") end,
+		Memory = {
+			name = function(info) return NameLabel(info, "Memory Usage") end,
 			type = "group",
-			order = 14,
+			order = 13,
 			args = {
 				Header = {
-					name = "Pet Happiness and Loyalty",
+					name = "Memory Usage",
 					type = "header",
 					order = 1,
 				},
 				Enable = {
 					name = "Enable",
-					desc = "Whether you want to show your pet's happiness and loyalty or not.",
+					desc = "Whether you want to show your Memory Usage or not.",
 					type = "toggle",
 					width = "full",
-					get = function() return db.PetHappiness.Enable end,
+					get = function() return db.Memory.Enable end,
 					set = function(info, value)
-						db.PetHappiness.Enable = value
-						ToggleStat("PetHappiness")
+						db.Memory.Enable = value
+						ToggleStat("Memory")
 					end,
 					order = 2,
 				},
-				Position = PositionOptions(3, "Pet happiness/Loyalty"),
-				Font = FontOptions(4, "Pet happiness/Loyalty"),
+				Position = PositionOptions(3, "Memory Usage"),
+				Font = FontOptions(4, "Memory Usage"),
 				Reset = ResetOption(5),
 			},
 		},
@@ -4455,7 +4028,7 @@ function module:LoadOptions()
 				Reset = ResetOption(5),
 			},
 		},
-		--[[ EquipmentSets = {  -- Added in 3.1.0 WOTLK
+		EquipmentSets = {
 			name = function(info) return NameLabel(info, "Equipment Sets") end,
 			type = "group",
 			order = 15,
@@ -4494,8 +4067,8 @@ function module:LoadOptions()
 				Font = FontOptions(5, "Equipment Information"),
 				Reset = ResetOption(6),
 			},
-		}, ]]
---[[ 		LootSpec = { -- Added with 5.0 MoP
+		},
+		LootSpec = {
 			name = function(info) return NameLabel(info, "Loot Spec") end,
 			type = "group",
 			order = 16,
@@ -4534,7 +4107,7 @@ function module:LoadOptions()
 				Font = FontOptions(5, "Loot Spec"),
 				Reset = ResetOption(6),
 			},
-		}, ]]
+		},
 		Mail = {
 			name = NameLabel,
 			type = "group",
@@ -4577,12 +4150,6 @@ function module:LoadOptions()
 		},
 	}
 
-	local dropitem = options.Bags.args.AddTracked.args.DropItem
-	dropitem.imageWidth = 64
-	dropitem.imageHeight = 64
-	dropitem.imageCoords = {0.15, 0.8, 0.15, 0.8}
-	dropitem.image = "Interface\\Buttons\\UI-Quickslot2"
-
 	return options
 end
 
@@ -4603,10 +4170,9 @@ function module:OnEnable()
 	SetInfoTextFrames()
 	EnableStat("Bags")
 	EnableStat("Clock")
- 	EnableStat("Currency")
- 	EnableStat("DualSpec")
+	EnableStat("Currency")
+	EnableStat("DualSpec")
 	EnableStat("Durability")
-	-- EnableStat("EXP")
 	EnableStat("FPS")
 	EnableStat("Gold")
 	EnableStat("GF")
@@ -4614,11 +4180,10 @@ function module:OnEnable()
 	EnableStat("Friends")
 	EnableStat("Instance")
 	EnableStat("Memory")
-	if UnitClass("player") == "Hunter" then EnableStat("PetHappiness") end
 	EnableStat("WeaponInfo")
---[[  	EnableStat("EquipmentSets") ]]
---[[ 	EnableStat("LootSpec") ]]
---[[ 	EnableStat("MoveSpeed") ]]
+	EnableStat("EquipmentSets")
+	EnableStat("LootSpec")
+	EnableStat("MoveSpeed")
 	EnableStat("Mail")
 end
 
@@ -4626,15 +4191,12 @@ function module:OnDisable()
 	DisableStat("FPS")
 	DisableStat("Memory")
 	DisableStat("Bags")
-	DisableStat("DualSpec")
 	DisableStat("Durability")
 	DisableStat("Gold")
-	DisableStat("EXP")
 	DisableStat("Clock")
 	DisableStat("Guild")
 	DisableStat("Friends")
 	DisableStat("GF")
-	DisableStat("PetHappiness")
 	DisableStat("WeaponInfo")
 	DisableStat("EquipmentSet")
 	DisableStat("LootSpec")

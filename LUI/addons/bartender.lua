@@ -10,10 +10,9 @@ local addonname, LUI = ...
 LUI.Versions.bartender = 3300
 
 function LUI:InstallBartender()
-	if not C_AddOns.IsAddOnLoaded("Bartender4") then return end
+	if not IsAddOnLoaded("Bartender4") then return end
 
 	local CharName = UnitName("player")
-	local _, CharClass = UnitClass("player")
 	local ServerName = GetRealmName()
 	local ProfileName = CharName.." - "..ServerName
 
@@ -469,10 +468,10 @@ function LUI:InstallBartender()
 	local StanceBarDefaults = {
 		[CharName] = {
 			["position"] = {
-				["y"] = 267.5,
-				["x"] = 20,
-				["point"] = "BOTTOMLEFT",
-				["scale"] = 0.85,
+				["y"] = -16.50000411188517,
+				["x"] = -82.49990584837293,
+				["point"] = "CENTER",
+				["scale"] = 1,
 			},
 			["skin"] = {
 				["Colors"] = {
@@ -489,7 +488,7 @@ function LUI:InstallBartender()
 				["Gloss"] = 0.3,
 				["ID"] = "Darion",
 			},
-			["enabled"] = true,
+			["enabled"] = false,
 			["padding"] = 1,
 			["visibility"] = {
 				["possess"] = false,
@@ -505,60 +504,17 @@ function LUI:InstallBartender()
 	for k,v in pairs(StanceBarDefaults) do
 		Bartender4DB.namespaces.StanceBar.profiles[k] = v
 	end
-		--Totembar Defaults
-	if CharClass == "SHAMAN" and not LUI.isClassic then
-		local MultiCastDefaults = {
-			[CharName] = {
-				["position"] = {
-					["y"] = 267.5,
-					["x"] = 20,
-					["point"] = "BOTTOMLEFT",
-					["scale"] = 0.85,
-				},
-				["skin"] = {
-					["Colors"] = {
-						["Normal"] = {0.133, 0.133, 0.133, 0.950},
-						["Pushed"] = {0.321, 0.321, 0.321, 1},
-						["Highlight"] = {0.403, 0.403, 0.403, 1},
-						["Gloss"] = {1, 1, 1, 1},
-						["Backdrop"] = {0.109, 0.109, 0.109, 1},
-						["Flash"] = {1, 0, 0, 1},
-						["Border"] = {0.407, 0.403, 0.411, 1},
-						["Checked"] = {0.011, 0.011, 0.011, 0},
-						["Disabled"] = {0.988, 1, 0.949, 1},
-					},
-					["Gloss"] = 0.3,
-					["ID"] = "Darion",
-				},
-				["enabled"] = true,
-				["padding"] = 1,
-				["visibility"] = {
-					["possess"] = false,
-					["always"] = false,
-					["stance"] = {
-						false, -- [1]
-					},
-				},
-				["version"] = 3,
-			},
-		}
-
-		for k,v in pairs(MultiCastDefaults) do
-			Bartender4DB.namespaces.MultiCast.profiles[k] = v
-		end
-	end
 
 	local PetBarDefaults = {
 		[CharName] = {
-			["rows"] = 1,
+			["rows"] = 2,
 			["hidemacrotext"] = true,
 			["position"] = {
-				["y"] = 267.8,
-				["x"] = -315,
+				["y"] = 295,
+				["x"] = -195,
 				["point"] = "BOTTOMRIGHT",
 				["scale"] = 0.8999999761581421,
 			},
-			["HGrowth"] = LEFT,
 			["version"] = 3,
 			["visibility"] = {
 				["always"] = false,

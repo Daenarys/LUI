@@ -9,7 +9,8 @@ local silent = false
 silent = true
 --@end-debug@]===]
 
-local L = _G.LibStub("AceLocale-3.0"):NewLocale(addonname, "enUS", true)
+local L = _G.LibStub("AceLocale-3.0"):NewLocale(addonname, "enUS", true, silent)
+
 
 -- Core
 L["Adjust the bottom inset of the background"] = true
@@ -73,7 +74,8 @@ L["Top Right"] = true
 L["Version: "] = true
 L["Version %s available for download."] = true
 L["Vertical Position"] = true
-L["Welcome to LUI v3 for World of Warcraft Classic"] = [=[Welcome to |c0090ffffLUI v3|r, a complete World of Warcraft User Interface overhaul for World of Warcraft Classic.]=]
+L["Welcome to LUI v3"] = [=[Welcome to |c0090ffffLUI v3|r, a complete
+World of Warcraft User Interface overhaul.]=]
 L["Width"] = true
 
 
@@ -161,7 +163,7 @@ Links: items, spells, enchants, talents, glyphs, quests, achievements, and insta
 L["Stop the chat from fading out over time"] = true
 L["To (|HBNplayer.-|h):"] = true
 L["To (|Hplayer.-|h):"] = true
-L["Trade - City"] = true
+L["Trade"] = true
 L["[Trade]"] = true
 L["Use abreviated channel names"] = true
 L["Use Alt key"] = true

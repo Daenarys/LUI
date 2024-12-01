@@ -205,10 +205,11 @@ function Fader.Hover_OnLeave(frame)
 	Fader:FadeHandler(frame)
 end
 
-
+--[=[
 -- Fader.SpecialHover_OnEnter(frame) -- not being used
-
---	Notes.....: Fades the frame when the mouse enters the frame or any child of the frame.
+--[[
+	Notes.....: Fades the frame when the mouse enters the frame or any child of the frame.
+]]
 function Fader.SpecialHover_OnEnter(frame)
 	frame = frame.Fader and frame or frame:GetParent()
 
@@ -218,9 +219,9 @@ function Fader.SpecialHover_OnEnter(frame)
 end
 
 -- Fader.SpecialHover_OnLeave(frame) -- not being used
-
---	Notes.....: Fades out the frame when the mouse leaves the frame or any child of the frame.
-
+--[[
+	Notes.....: Fades out the frame when the mouse leaves the frame or any child of the frame.
+]]
 function Fader.SpecialHover_OnLeave(frame)
 	frame = frame.Fader and frame or frame:GetParent()
 
@@ -228,12 +229,12 @@ function Fader.SpecialHover_OnLeave(frame)
 		Fader.Hover_OnLeave(frame)
 	end
 end
-
+--]=]
 
 -- Fader:CheckMouseHover()
-
---	Notes.....: Checks special frames to see if the mouseover of that frame has changed.
-
+--[[
+	Notes.....: Checks special frames to see if the mouseover of that frame has changed.
+]]
 function Fader:CheckMouseHover()
 	for frame, mouseHover in pairs(self.specialHoverFrames) do
 		local isMouseOver = frame:IsMouseOver()
@@ -436,7 +437,7 @@ function Fader:EventsRegister()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", "EventHandler")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", "EventHandler")
 	self:RegisterEvent("PLAYER_TARGET_CHANGED", "EventHandler")
-	self:RegisterEvent("UNIT_HEALTH_FREQUENT", "UnitEventHandler")
+	self:RegisterEvent("UNIT_HEALTH", "UnitEventHandler")
 	self:RegisterEvent("UNIT_POWER_UPDATE", "UnitEventHandler")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_START", "UnitEventHandler")
 	self:RegisterEvent("UNIT_SPELLCAST_CHANNEL_STOP", "UnitEventHandler")
@@ -453,7 +454,7 @@ function Fader:EventsUnregister()
 	self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	self:UnregisterEvent("PLAYER_REGEN_ENABLED")
 	self:UnregisterEvent("PLAYER_TARGET_CHANGED")
-	self:UnregisterEvent("UNIT_HEALTH_FREQUENT")
+	self:UnregisterEvent("UNIT_HEALTH")
 	self:UnregisterEvent("UNIT_POWER_UPDATE")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_START")
 	self:UnregisterEvent("UNIT_SPELLCAST_CHANNEL_STOP")
@@ -493,10 +494,10 @@ function Fader:UnitEventHandler(event, unit)
 	if unit ~= "player" then return end
 
 	-- Collect info on states.
-	if event == "UNIT_HEALTH_FREQUENT" then
+	if event == "UNIT_HEALTH" then
 		local curHealth, maxHeatlh = UnitHealth("player"), UnitHealthMax("player")
 		self.Status.health = (curHealth < maxHeatlh) and (curHealth / maxHeatlh)
-	elseif event == "UNIT_MANA" or "UNIT_ENERGY" or "UNIT_RAGE" then
+	elseif event == "UNIT_POWER" then
 		local powerType, curPower, maxPower = UnitPowerType("player"), UnitPower("player"), UnitPowerMax("player")
 		if (powerType == 0) or (powerType == 3) then
 			self.Status.power = (curPower < maxPower) and (curPower / maxPower)

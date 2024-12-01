@@ -193,7 +193,7 @@ local SizeRaidMenu = function(compact)
 		local x_spacing = db.Spacing
 		local y_spacing = -db.Spacing
 		local frameWidth =  190 + db.Spacing * 6
-		local frameHeight = 180 + db.Spacing * 6
+		local frameHeight = 210 + db.Spacing * 6
 		RaidMenu_Parent:SetWidth(frameWidth)
 		RaidMenu_Parent:SetHeight(frameHeight)
 		RaidMenu_BG:SetWidth(frameWidth)
@@ -202,35 +202,35 @@ local SizeRaidMenu = function(compact)
 		RaidMenu:SetHeight(frameHeight)
 		RaidMenu_Border:SetWidth(frameWidth)
 		RaidMenu_Border:SetHeight(frameHeight)
-		RaidMenu_Header:Show()
+		RaidMenu_Header:Hide()
 
 	--	FormatMarker(frame,             x,                    y,                     r,   g,   b,  id, t1,   t2,   t3,   t4)
 		-- Raid Icons
-		FormatMarker(SkullRaidIcon,     15,                   -40  + y_spacing * 2,  0,   0,   0,   8, 0.75, 1,    0.25, 0.5)
-		FormatMarker(CrossRaidIcon,     15,                   -65 + y_spacing * 3,  0,   0,   0,   7, 0.5,  0.75, 0.25, 0.5)
-		FormatMarker(SquareRaidIcon,    15,                   -90 + y_spacing * 4,  0,   0,   0,   6, 0.25, 0.5,  0.25, 0.5)
-		FormatMarker(MoonRaidIcon,      15,                   -115 + y_spacing * 5,  0,   0,   0,   5, 0,    0.25, 0.25, 0.5)
-		FormatMarker(TriangleRaidIcon,  40   + x_spacing,     -40  + y_spacing * 2,  0,   0,   0,   4, 0.75, 1,    0,    0.25)
-		FormatMarker(DiamondRaidIcon,   40   + x_spacing,     -65 + y_spacing * 3,  0,   0,   0,   3, 0.5,  0.75, 0,    0.25)
-		FormatMarker(CircleRaidIcon,    40   + x_spacing,     -90 + y_spacing * 4,  0,   0,   0,   2, 0.25, 0.5,  0,    0.25)
-		FormatMarker(StarRaidIcon,      40   + x_spacing,     -115 + y_spacing * 5,  0,   0,   0,   1, 0,    0.25, 0,    0.25)
-		FormatMarker(ClearRaidIcon,     27.5 + x_spacing / 2, -140 + y_spacing * 6,  0,   0,   0,   0, 0,    1,    0,    1)
+		FormatMarker(SkullRaidIcon,     15,                   -75  + y_spacing * 2,  0,   0,   0,   8, 0.75, 1,    0.25, 0.5)
+		FormatMarker(CrossRaidIcon,     15,                   -100 + y_spacing * 3,  0,   0,   0,   7, 0.5,  0.75, 0.25, 0.5)
+		FormatMarker(SquareRaidIcon,    15,                   -125 + y_spacing * 4,  0,   0,   0,   6, 0.25, 0.5,  0.25, 0.5)
+		FormatMarker(MoonRaidIcon,      15,                   -150 + y_spacing * 5,  0,   0,   0,   5, 0,    0.25, 0.25, 0.5)
+		FormatMarker(TriangleRaidIcon,  40   + x_spacing,     -75  + y_spacing * 2,  0,   0,   0,   4, 0.75, 1,    0,    0.25)
+		FormatMarker(DiamondRaidIcon,   40   + x_spacing,     -100 + y_spacing * 3,  0,   0,   0,   3, 0.5,  0.75, 0,    0.25)
+		FormatMarker(CircleRaidIcon,    40   + x_spacing,     -125 + y_spacing * 4,  0,   0,   0,   2, 0.25, 0.5,  0,    0.25)
+		FormatMarker(StarRaidIcon,      40   + x_spacing,     -150 + y_spacing * 5,  0,   0,   0,   1, 0,    0.25, 0,    0.25)
+		FormatMarker(ClearRaidIcon,     27.5 + x_spacing / 2, -175 + y_spacing * 6,  0,   0,   0,   0, 0,    1,    0,    1)
 		-- Markers
---[[ 	FormatMarker(BlueWorldMarker,   30,                   -170,                   0,   0.4, 0.9, 1) -- 0.00, 0.44, 0.87
-		FormatMarker(GreenWorldMarker,  55  + x_spacing,      -170,                   0.1, 1,   0,   2) -- 0.12, 1.00, 0.00
-		FormatMarker(PurpleWorldMarker, 80  + x_spacing * 2,  -170,                   0.6, 0.2, 0.9, 3) -- 0.64, 0.21, 0.93
-		FormatMarker(RedWorldMarker,    105 + x_spacing * 3,  -170,                   1,   0.1, 0.1, 4) -- 1.00, 0.13, 0.13
-		FormatMarker(YellowWorldMarker, 30,                   -195   + y_spacing,     1,   1,   0,   5) -- 1.00, 1.00, 0.00
-		FormatMarker(OrangeWorldMarker, 55  + x_spacing,      -195   + y_spacing,     1,   0.5, 0.2, 6) -- 1.00, 0.50, 0.25
-		FormatMarker(SilverWorldMarker, 80  + x_spacing * 2,  -195   + y_spacing,     0.7, 0.7, 0.7, 7) -- 0.67, 0.67, 0.67
-		FormatMarker(WhiteWorldMarker,  105 + x_spacing * 3,  -195   + y_spacing,     1,   1,   1,   8) -- 1.00, 1.00, 1.00
-		FormatMarker(ClearWorldMarkers, 130 + x_spacing * 4,  -182.5 + y_spacing / 2, 0,   0,   0,   9) ]]
+		FormatMarker(BlueWorldMarker,   30,                   -25,                   0,   0.4, 0.9, 1) -- 0.00, 0.44, 0.87
+		FormatMarker(GreenWorldMarker,  55  + x_spacing,      -25,                   0.1, 1,   0,   2) -- 0.12, 1.00, 0.00
+		FormatMarker(PurpleWorldMarker, 80  + x_spacing * 2,  -25,                   0.6, 0.2, 0.9, 3) -- 0.64, 0.21, 0.93
+		FormatMarker(RedWorldMarker,    105 + x_spacing * 3,  -25,                   1,   0.1, 0.1, 4) -- 1.00, 0.13, 0.13
+		FormatMarker(YellowWorldMarker, 30,                   -50   + y_spacing,     1,   1,   0,   5) -- 1.00, 1.00, 0.00
+		FormatMarker(OrangeWorldMarker, 55  + x_spacing,      -50   + y_spacing,     1,   0.5, 0.2, 6) -- 1.00, 0.50, 0.25
+		FormatMarker(SilverWorldMarker, 80  + x_spacing * 2,  -50   + y_spacing,     0.7, 0.7, 0.7, 7) -- 0.67, 0.67, 0.67
+		FormatMarker(WhiteWorldMarker,  105 + x_spacing * 3,  -50   + y_spacing,     1,   1,   1,   8) -- 1.00, 1.00, 1.00
+		FormatMarker(ClearWorldMarkers, 130 + x_spacing * 4,  -37.5 + y_spacing / 2, 0,   0,   0,   9)
 		-- Buttons
-		FormatMarker(ConvertRaid,       65 + x_spacing * 2,   -40   + y_spacing * 2)
-		FormatMarker(LootMethod,        65 + x_spacing * 2,   -65  + y_spacing * 3)
-		FormatMarker(LootThreshold,     65 + x_spacing * 2,   -90  + y_spacing * 4)
-		FormatMarker(RoleChecker,       65 + x_spacing * 2,   -115  + y_spacing * 5)
-		FormatMarker(ReadyChecker,      65 + x_spacing * 2,   -140  + y_spacing * 6)
+		FormatMarker(ConvertRaid,       65 + x_spacing * 2,   -75   + y_spacing * 2)
+		FormatMarker(LootMethod,        65 + x_spacing * 2,   -100  + y_spacing * 3)
+		FormatMarker(LootThreshold,     65 + x_spacing * 2,   -125  + y_spacing * 4)
+		FormatMarker(RoleChecker,       65 + x_spacing * 2,   -150  + y_spacing * 5)
+		FormatMarker(ReadyChecker,      65 + x_spacing * 2,   -175  + y_spacing * 6)
 
 
 	else
@@ -246,7 +246,6 @@ local SizeRaidMenu = function(compact)
 		RaidMenu_Border:SetHeight(frameHeight)
 		RaidMenu_Header:Show()
 	--	FormatMarker(frame,             x,   y,    r,   g,   b,  id, t1,   t2,   t3,   t4)
-		-- Raid Icons
 		FormatMarker(SkullRaidIcon,     20,  -50,  0,   0,   0,   8, 0.75, 1,    0.25, 0.5)
 		FormatMarker(CrossRaidIcon,     20,  -90,  0,   0,   0,   7, 0.5,  0.75, 0.25, 0.5)
 		FormatMarker(SquareRaidIcon,    20,  -130, 0,   0,   0,   6, 0.25, 0.5,  0.25, 0.5)
@@ -256,7 +255,6 @@ local SizeRaidMenu = function(compact)
 		FormatMarker(CircleRaidIcon,    60,  -130, 0,   0,   0,   2, 0.25, 0.5,  0,    0.25)
 		FormatMarker(StarRaidIcon,      60,  -170, 0,   0,   0,   1, 0,    0.25, 0,    0.25)
 		FormatMarker(ClearRaidIcon,     40,  -210, 0,   0,   0,   0, 0,    1,    0,    1)
-		-- Markers
 		FormatMarker(BlueWorldMarker,   110, -175, 0,   0.4, 0.9, 1)
 		FormatMarker(GreenWorldMarker,  145, -175, 0.1, 1,   0,   2)
 		FormatMarker(PurpleWorldMarker, 180, -175, 0.6, 0.2, 0.9, 3)
@@ -266,12 +264,11 @@ local SizeRaidMenu = function(compact)
 		FormatMarker(SilverWorldMarker, 110, -245, 0.7, 0.7, 0.7, 7)
 		FormatMarker(WhiteWorldMarker,  145, -245, 1,   1,   1,   8)
 		FormatMarker(ClearWorldMarkers, 180, -245, 0,   0,   0,   9)
-		-- Buttons
 		FormatMarker(ConvertRaid,       105, -50)
-		FormatMarker(LootMethod,        105, -90)
-		FormatMarker(LootThreshold,     105, -130)
-		FormatMarker(RoleChecker,       105, -170)
-		FormatMarker(ReadyChecker,      105, -210)
+		FormatMarker(LootMethod,        105, -75)
+		FormatMarker(LootThreshold,     105, -100)
+		FormatMarker(RoleChecker,       105, -125)
+		FormatMarker(ReadyChecker,      105, -150)
 	end
 end
 
@@ -361,7 +358,7 @@ function module:SetRaidMenu()
 	local SilverWorldMarker = CreateFrame("Button", "SilverWorldMarker", RaidMenu, "SecureMarkerTemplate")
 	local ClearWorldMarkers = CreateFrame("Button", "ClearWorldMarkers", RaidMenu, "SecureMarkerTemplate")
 
-	local ConvertRaid = CreateFrame("Button", "ConvertRaid", RaidMenu)
+	local ConvertRaid = CreateFrame("Button", "ConvertRaid", RaidMenu, "OptionsButtonTemplate")
 	if GetNumGroupMembers() > 0 then
 		ConvertRaid:SetText("Convert to Party")
 	else
@@ -410,7 +407,7 @@ function module:SetRaidMenu()
 		end
 	end)
 
-	local LootMethod = CreateFrame("Button", "LootMethod", RaidMenu --[[, "OptionsButtonTemplate" ]])
+	local LootMethod = CreateFrame("Button", "LootMethod", RaidMenu, "OptionsButtonTemplate")
 	LootMethod:SetText("Loot Method")
 	LootMethod:SetScript("OnEnter", function(self)
 		if db.ShowToolTips then
@@ -446,7 +443,7 @@ function module:SetRaidMenu()
 		EasyMenu(LootMethodList, LootMenuFrame, "cursor", 0, 0, "MENU", 1)
 	end)
 
-	local LootThreshold = CreateFrame("Button", "LootThreshold", RaidMenu --[[, "OptionsButtonTemplate" ]])
+	local LootThreshold = CreateFrame("Button", "LootThreshold", RaidMenu, "OptionsButtonTemplate")
 	LootThreshold:SetText("Loot Threshold")
 	LootThreshold:SetScript("OnEnter", function(self)
 		if db.ShowToolTips then
@@ -479,7 +476,7 @@ function module:SetRaidMenu()
 		EasyMenu(LootThresholdList, LootMenuFrame, "cursor", 0, 0, "MENU", 1)
 	end)
 
-	local RoleChecker = CreateFrame("BUTTON", "RoleChecker", RaidMenu --[[, "OptionsButtonTemplate" ]])
+	local RoleChecker = CreateFrame("BUTTON", "RoleChecker", RaidMenu, "OptionsButtonTemplate")
 	RoleChecker:SetText("Role Check")
 	RoleChecker:SetScript("OnEnter", function(self)
 		if db.ShowToolTips then
@@ -501,7 +498,7 @@ function module:SetRaidMenu()
 		end
 	end)
 
-	local ReadyChecker = CreateFrame("Button", "ReadyChecker", RaidMenu --[[, "OptionsButtonTemplate" ]])
+	local ReadyChecker = CreateFrame("Button", "ReadyChecker", RaidMenu, "OptionsButtonTemplate")
 	ReadyChecker:SetText("Ready Check")
 	ReadyChecker:SetScript("OnEnter", function(self)
 		if db.ShowToolTips then

@@ -19,7 +19,7 @@ local blizzFrames = {
 	"GuildFrame",
 	"FriendsFrame",
 	"RaidParentFrame",	-- Not sure what this frame is.
---[[ 	"PVEFrame", ]] -- classic test
+	"PVEFrame",
 	"TaxiFrame",
 	"ItemTextFrame",
 	"QuestLogPopupDetailFrame",
@@ -33,23 +33,23 @@ local blizzFrames = {
 	"HelpFrame",
 	
 	--LoadOnDemand Frames
---[[ 	"CalendarFrame",
+	"CalendarFrame",
 	"AchievementFrame",		-- Blizzard_AchievementUI
 	"InspectFrame",			-- Blizzard_InspectUI
 	"ItemSocketingFrame",	-- Blizzard_ItemSocketingUI
-	"ArchaeologyFrame",		-- Blizzard_ArchaeologyUI ]] -- classic test
+	"ArchaeologyFrame",		-- Blizzard_ArchaeologyUI
 	"TradeSkillFrame",		-- Blizzard_TradeSkillUI
---[[ 	"LookingForGuildFrame",	-- Blizzard_LookingForGuildUI ]] -- classic test
+	"LookingForGuildFrame",	-- Blizzard_LookingForGuildUI
 	"AuctionFrame",			-- Blizzard_AuctionUI
---[[ 	"EncounterJournal",		-- Blizzard_EncounterJournal -- classic test
+	"EncounterJournal",		-- Blizzard_EncounterJournal
 	"PetJournalParent",		-- Blizzard_PetJournal
 	"VoidStorageFrame",
-	"TransmogrifyFrame", ]]
+	"TransmogrifyFrame",
 	
---[[ 	--Not sure if LoD
+	--Not sure if LoD
 	"GarrisonMissionFrame",
 	"GarrisonBuildingFrame",
-	"GarrisonCapacitiveDisplayFrame", ]] -- classic test
+	"GarrisonCapacitiveDisplayFrame",
 	
 }
 
@@ -64,25 +64,25 @@ local needSecure = {
 
 local blizzEvents = {
 	"PLAYER_LOGIN",
---[[ 	"ARCHAEOLOGY_TOGGLE", ]] -- classic test
+	"ARCHAEOLOGY_TOGGLE",
 	"AUCTION_HOUSE_SHOW",
---[[ 	"BARBER_SHOP_OPEN",
+	"BARBER_SHOP_OPEN",
 	"INSPECT_READY",
- 	"VOID_STORAGE_OPEN",
-	"TRANSMOGRIFY_OPEN", ]] -- classic test
+	"VOID_STORAGE_OPEN",
+	"TRANSMOGRIFY_OPEN",
 	"TRADE_SKILL_SHOW",
---[[ 	"SOCKET_INFO_UPDATE", ]] -- classic test
+	"SOCKET_INFO_UPDATE",
 }
 
 local blizzHooks = {
---[[ 	"AchievementFrame_LoadUI",
+	"AchievementFrame_LoadUI",
 	"ArchaeologyFrame_LoadUI",
 	"Calendar_LoadUI",
 	"CollectionsJournal_LoadUI",
-	"EncounterJournal_LoadUI", ]] -- classic test
+	"EncounterJournal_LoadUI",
 	"MacroFrame_LoadUI",
 	"KeyBindingFrame_LoadUI",
---[[ 	"Garrison_LoadUI", ]] -- classic test
+	"Garrison_LoadUI",
 }
 
 function script:ApplyBlizzScaling()
@@ -103,10 +103,10 @@ function script:ApplyBlizzScaling()
 				frame:SetScale(scale)
 			end
 			
---[[ 			--HACK: Fix a bug in GarrisonUI having low frame level.
+			--HACK: Fix a bug in GarrisonUI having low frame level.
 			if frameName == "GarrisonCapacitiveDisplayFrame" then
 				frame:SetFrameLevel(70)
-			end ]] -- classic test
+			end
 		end
 	end
 end

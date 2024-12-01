@@ -137,18 +137,18 @@ function module:AutoSell()
 
 	local totalPrice = 0
 	for bag = 0, NUM_BAG_SLOTS do
-		for slot = 1, C_Container.GetContainerNumSlots(bag) do
-			local item = C_Container.GetContainerItemID(bag, slot)
+		for slot = 1, GetContainerNumSlots(bag) do
+			local item = GetContainerItemID(bag, slot)
 
 			if item then
 				local _, itemLink, itemQuality, _,_,_,_,_,_,_, itemPrice = GetItemInfo(item)
 
 				if itemQuality and (db.AutoSell.ItemQualities[itemQuality + 1] == not db.AutoSell.Exclusions[item]) then -- don't use ~= (itemQuality can be true or false, exclusion can be true or nil (false ~= nil will return true and sell the item))
-					local containerInfo = C_Container.GetContainerItemInfo(bag, slot)
-					totalPrice = totalPrice + (containerInfo.stackCount * itemPrice)
+					local _, itemCount  = GetContainerItemInfo(bag, slot)
+					totalPrice = totalPrice + (itemCount * itemPrice)
 
 					-- Sell item.
-					C_Container.UseContainerItem(bag, slot)
+					UseContainerItem(bag, slot)
 				end
 			end
 		end
@@ -201,13 +201,7 @@ function module:AutoStock()
 
 	-- Buy shopping cart.
 	for item, qty in pairs(cart) do
-		local maxItemCountThatCanBeBoughtAtOnce = 255
 		-- But item.
-		while qty > maxItemCountThatCanBeBoughtAtOnce do
-			BuyMerchantItem(item, maxItemCountThatCanBeBoughtAtOnce)
-			qty = qty - maxItemCountThatCanBeBoughtAtOnce
-		end
-
 		BuyMerchantItem(item, qty)
 	end
 
@@ -272,7 +266,7 @@ module.defaults = {
 	},
 }
 
-module.defaultState = true
+module.defaultState = false
 module.getter = "generic"
 module.setter = "generic"
 

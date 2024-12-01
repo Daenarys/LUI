@@ -10,7 +10,7 @@ local addonname, LUI = ...
 LUI.Versions.omen = 3300
 
 function LUI:InstallOmen()
-	if (not C_AddOns.IsAddOnLoaded("Omen")) and (not C_AddOns.IsAddOnLoaded("Omen3")) then return end
+	if (not IsAddOnLoaded("Omen")) and (not IsAddOnLoaded("Omen3")) then return end
 	local ProfileName = UnitName("Player").." - "..GetRealmName()
 	if LUI.db.global.luiconfig[ProfileName].Versions.omen == LUI.Versions.omen then return end
 	
@@ -51,7 +51,7 @@ function LUI:InstallOmen()
 	Omen.db.profile.Bar.MyBarColor.r = 0.592156862745098
 	Omen.db.profile.Bar.MyBarColor.g = 0.592156862745098
 	Omen.db.profile.Bar.MyBarColor.b = 0.592156862745098
-	Omen.db.profile.Bar.Texture = "LUI_Gradient"
+	Omen.db.profile.Bar.Texture = "Minimalist"
 	Omen.db.profile.Bar.ShowTPS = false
 	Omen.db.profile.Bar.AggroBarColor.r = 0.592156862745098
 	Omen.db.profile.Bar.AggroBarColor.g = 0.592156862745098
@@ -60,16 +60,16 @@ function LUI:InstallOmen()
 	Omen.db.profile.Bar.BarColor.r = 0.3686274509803922
 	Omen.db.profile.Bar.BarColor.g = 0.3686274509803922
 	Omen.db.profile.Bar.BarColor.b = 0.3686274509803922
-	Omen.db.profile.Bar.Font = "Neuropol"
+	Omen.db.profile.Bar.Font = "vibrocen"
 	Omen.db.profile.Bar.Height = 25
 	Omen.db.profile.Bar.FadeBarColor.r = 0.4666666666666667
 	Omen.db.profile.Bar.FadeBarColor.g = 0.4666666666666667
 	Omen.db.profile.Bar.FadeBarColor.b = 0.4666666666666667
 	Omen.db.profile.Bar.UseMyBarColor = true
-	Omen.db.profile.PositionX = LUI:Scale(462.61)
-	Omen.db.profile.PositionY = LUI:Scale(226.01)
-	Omen.db.profile.PositionW = 194.8860415275098
-	Omen.db.profile.PositionH = 197.9849329984127
+	Omen.db.profile.PositionX = LUI:Scale(478.61)
+	Omen.db.profile.PositionY = LUI:Scale(225.01)
+	Omen.db.profile.PositionW = 198.8860415275098
+	Omen.db.profile.PositionH = 196.9849329984127
 	
 	LUI.db.global.luiconfig[ProfileName].Versions.omen = LUI.Versions.omen
 end

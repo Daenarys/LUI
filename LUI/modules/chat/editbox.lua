@@ -75,9 +75,9 @@ local function decorate(editBox)
 		_G[name.."Right"]:Hide()
 		_G[name.."Mid"]:Hide()
 
-		-- editBox.focusLeft:SetTexture(nil)
-		-- editBox.focusRight:SetTexture(nil)
-		-- editBox.focusMid:SetTexture(nil)
+		editBox.focusLeft:SetTexture(nil)
+		editBox.focusRight:SetTexture(nil)
+		editBox.focusMid:SetTexture(nil)
 
 		editBox:SetMaxLetters(2048)
 		editBox:SetMaxBytes(2048)
@@ -163,7 +163,7 @@ function module:LibSharedMedia_Registered(mediaType, key)
 		for i, name in ipairs(CHAT_FRAMES) do
 			local editBox = _G[name].editBox
 			if editBox then
-				local font = Media:Fetch("font", db.Font.Font, db.Font.Flag)
+				local font = Media:Fetch("font", db.Font.Font)
 				editBox:SetFont(font, db.Font.Size, db.Font.Flag)
 				editBox.header:SetFont(font, db.Font.Size, db.Font.Flag)
 			end
@@ -338,7 +338,7 @@ module.defaults = {
 				end
 			end)(),
 			Size = 14,
-			Flag = "",
+			Flag = "NONE",
 		},
 		Background = {
 			Texture = "Blizzard Tooltip",
