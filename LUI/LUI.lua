@@ -378,6 +378,57 @@ function LUI:SyncAddonVersion()
 end
 
 ------------------------------------------------------
+-- / BlIZZARD HIDING / --
+------------------------------------------------------
+
+function LUI:HideBlizzard()
+	local HiddenFrame = CreateFrame("Frame", nil, UIParent)
+	HiddenFrame:SetAllPoints(UIParent)
+	HiddenFrame:Hide()
+
+	local function apply(func, ...)
+	    for i = 1, select('#', ...) do
+	        local name = (select(i, ...))
+	        local frame = _G[name]
+
+	        if frame then
+	            func(frame)
+	        else
+				self:Printf('Could not find frame %q', name)
+	        end
+	    end
+	end
+
+	local function banish(frame)
+	    (frame.HideBase or frame.Hide)(frame)
+	    frame:SetParent(HiddenFrame)
+	end
+
+	local function unregisterEvents(frame)
+	    frame:UnregisterAllEvents()
+	end
+
+	apply(banish,
+		"MicroButtonAndBagsBar",
+		"BagsBar",
+		"MicroMenu",
+		"MicroMenuContainer"
+	)
+
+	apply(unregisterEvents,
+		"BagsBar",
+		"MicroMenu",
+		"MicroMenuContainer"
+	)
+
+	hooksecurefunc(_G.HelpTip, 'Show', function(frame)
+		for frame in _G.HelpTip.framePool:EnumerateActive() do
+			frame:Acknowledge()
+		end
+	end)
+end
+
+------------------------------------------------------
 -- / SET DAMAGE FONT / --
 ------------------------------------------------------
 
@@ -1793,6 +1844,7 @@ function LUI:OnEnable()
 --	print("For more Information visit lui.maydia.org")
 
 	self:SyncAddonVersion()
+	self:HideBlizzard()
 end
 
 function LUI:MergeDefaults(target, source)

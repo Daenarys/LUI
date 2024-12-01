@@ -21,7 +21,7 @@ modules\panels.lua
 modules\frames.lua
 modules\fader.lua
 
-modules\chat\chat.xml
+modules\chat.lua
 modules\minimap.lua
 modules\datatext.lua
 modules\faq.lua

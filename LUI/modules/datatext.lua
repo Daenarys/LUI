@@ -1471,7 +1471,7 @@ function module:SetGF()
 					toast.class:SetTexture("")
 				end
 			else
-				toast.class:SetTexture(BNet_GetClientTexture(client))
+				toast.class:SetTexture("Interface\\FriendsFrame\\Battlenet-WoWicon")
 				toast.class:SetTexCoord(0.2, 0.8, 0.2, 0.8)
 				toast.name:SetTextColor(0.8, 0.8, 0.8)
 				toast.faction:SetTexture("")
