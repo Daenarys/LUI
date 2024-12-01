@@ -327,7 +327,6 @@ function module:SetMinimap()
 					x = math.floor(100 * x)
 					y = math.floor(100 * y)
 					m_coord_text:SetFormattedText("%.2d, %.2d", x, y)
-					-- LUI:Print("valid Coords:", m_coord_text:GetText())
 					return
 				end
 			end
@@ -419,7 +418,6 @@ local defaults = {
 			ShowTextures = true,
 			ShowBorder = true,
 			ShowCoord = true,
-			TrackingIcon = true,
 			MissionReport = true,
 		},
 		Font = {
@@ -429,7 +427,6 @@ local defaults = {
 		},
 		Icon = {
 			Mail = "BOTTOMLEFT", -- LFG and MAIL icon positions changed for better visibilty of the Tooltip
-			Tracking = "TOPLEFT",
 			BG = "BOTTOMRIGHT",
 			LFG = "TOPRIGHT", -- LFG and MAIL icon positions changed for better visibilty of the Tooltip
 			GMTicket = "TOP",
@@ -605,22 +602,6 @@ function module:LoadOptions()
 								end
 							end,
 							order = 4,
-						},
-						TrackingIcon = {
-							name = "Show Tracking Icon",
-							desc = "Whether you want to show the Tracking Icon or not.\n",
-							disabled = function() return not db.Minimap.Enable end,
-							type = "toggle",
-							width = "full",
-							get = function() return db.Minimap.General.TrackingIcon end,
-							set = function(_) 
-								db.Minimap.General.TrackingIcon = not db.Minimap.General.TrackingIcon
-								MiniMapTracking:Hide()
-								if db.Minimap.General.TrackingIcon then
-									MiniMapTracking:Show()
-								end
-							end,
-							order = 4.5,
 						},
 						header1 = {
 							name = "Position",

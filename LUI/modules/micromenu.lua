@@ -2,16 +2,6 @@
 	Project....: LUI NextGenWoWUserInterface
 	File.......: LUI_MM.lua
 	Description: Micromenu Module
-	Version....: 1.5
-	Rev Date...: 14/03/2012
-
-	Edits:
-		v1.0: Loui
-		v1.1: Loui/Thaly
-		v1.2: Thaly
-		v1.3: Thaly
-		v1.4: Xus
-		v1.5: Thaly
 ]]
 
 -- External references.
@@ -116,7 +106,7 @@ function module:SetMicroMenu()
 			Panels.db.profile.MicroMenu.IsShown = false
 
 			LUI.MicroMenu.Anchor:SetBackdrop({
-				bgFile = fdir..(GetMouseFocus() == LUI.MicroMenu.Clicker and "micro_anchor2" or "micro_anchor"),
+				bgFile = fdir..(GetMouseFoci() == LUI.MicroMenu.Clicker and "micro_anchor2" or "micro_anchor"),
 				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 				tile = false, tileSize = 0, edgeSize = 1,
 				insets = {left = 0, right = 0, top = 0, bottom = 0}
@@ -128,7 +118,7 @@ function module:SetMicroMenu()
 			Panels.db.profile.MicroMenu.IsShown = true
 
 			LUI.MicroMenu.Anchor:SetBackdrop({
-				bgFile = fdir..(GetMouseFocus() == LUI.MicroMenu.Clicker and "micro_anchor4" or "micro_anchor3"),
+				bgFile = fdir..(GetMouseFoci() == LUI.MicroMenu.Clicker and "micro_anchor4" or "micro_anchor3"),
 				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 				tile = false, tileSize = 0, edgeSize = 1,
 				insets = {left = 0, right = 0, top = 0, bottom = 0}
@@ -310,9 +300,7 @@ function module:SetMicroMenu()
 
 	local bagsFrame
 	local getBagsFrame = function()
-		if LUI:Module("Bags").db.profile.Enable then
-			bagsFrame = LUIBags
-		elseif C_AddOns.IsAddOnLoaded("Stuffing") then
+	if C_AddOns.IsAddOnLoaded("Stuffing") then
 			bagsFrame = StuffingFrameBags
 		elseif C_AddOns.IsAddOnLoaded("Bagnon") then
 			bagsFrame = BagnonFrameinventory

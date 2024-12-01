@@ -1188,7 +1188,7 @@ function module:SetGold()
 				end
 				GameTooltip:AddDoubleLine("Total:", formatTooltipMoney(factionGold[myPlayerFaction] + factionGold[otherFaction]), 1,1,1, 1,1,1)
 
-				for i = 1, MAX_WATCHED_TOKENS do
+				for i = 1, 3 do
 					local info = C_CurrencyInfo.GetBackpackCurrencyInfo(i)
 
 					if info and info.name and i == 1 then

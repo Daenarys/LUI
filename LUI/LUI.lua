@@ -247,7 +247,7 @@ function LUI:StyleButton(b, checked)
 	local normaltexture   = _G[name.."NormalTexture"]
 	local icontexture     = _G[name.."IconTexture"]
 
-	local hover = b:CreateTexture("frame", nil, self) -- hover
+	local hover = b:CreateTexture("frame", nil) -- hover
 	hover:SetColorTexture(1,1,1,0.2)
 	hover:SetHeight(button:GetHeight())
 	hover:SetWidth(button:GetWidth())
@@ -255,7 +255,7 @@ function LUI:StyleButton(b, checked)
 	hover:SetPoint("BOTTOMRIGHT",button,-2,2)
 	button:SetHighlightTexture(hover)
 
-	local pushed = b:CreateTexture("frame", nil, self) -- pushed
+	local pushed = b:CreateTexture("frame", nil) -- pushed
 	pushed:SetColorTexture(0.9,0.8,0.1,0.3)
 	pushed:SetHeight(button:GetHeight())
 	pushed:SetWidth(button:GetWidth())
@@ -267,7 +267,7 @@ function LUI:StyleButton(b, checked)
 	count:SetFont(Media:Fetch("font", (Infotext and Infotext.db.profile.FPS.Font or "vibroceb")), (Infotext and Infotext.db.profile.FPS.FontSize or 12), "OUTLINE")
 
 	if checked then
-		local checked = b:CreateTexture("frame", nil, self) -- checked
+		local checked = b:CreateTexture("frame", nil) -- checked
 		checked:SetColorTexture(0,1,0,0.3)
 		checked:SetHeight(button:GetHeight())
 		checked:SetWidth(button:GetWidth())
@@ -947,23 +947,6 @@ local function getOptions()
 									type = "header",
 									order = 30,
 								},
-								BlizzFrameScale = {
-									name = "Blizzard Frame Scale",
-									desc = "Set the scale of the Blizzard Frames.\nEx: CharacterFrame, SpellBookFrame, etc...",
-									type = "range",
-									min = 0.5,
-									max = 2.0,
-									step = 0.05,
-									isPercent = true,
-									width = "double",
-									get = function() return db.General.BlizzFrameScale end,
-									set = function(info, value)
-										if scale == nil or scale == "" then scale = 1 end
-										db.General.BlizzFrameScale = value
-										LUI:FetchScript("BlizzScale"):ApplyBlizzScaling()
-									end,
-									order = 32,
-								},
 								empty3 = {
 									name = " ",
 									width = "full",
@@ -981,18 +964,6 @@ local function getOptions()
 										LUI:FetchScript("ErrorHider"):ErrorMessageHandler()
 									end,
 									order = 34,
-								},
-								HideTalentSpam = {
-									name = "Hide Talent Change Spam",
-									desc = "Filters out the chat window spam that occurs when you switch specs",
-									type = "toggle",
-									width = "full",
-									get = function() return db.General.HideTalentSpam end,
-									set = function(info, value)
-										db.General.HideTalentSpam = value
-										LUI:FetchScript("TalentSpam"):SetTalentSpam()
-									end,
-									order = 35,
 								},
 								ModuleMessages = {
 									name = "Show Module Messages",
@@ -1113,23 +1084,6 @@ local function getOptions()
 									width = "full",
 									type = "description",
 									order = 51,
-								},
-								HideBlizzardRaid = {
-									name = "Hide Blizzard Raid Frames",
-									desc = "Hide Blizzard Raid Frames (only available when LUI Unitframes are disabled)",
-									type = "toggle",
-									width = "full",
-									disabled = function() return LUI:Module("Unitframes").db.Enable end,
-									get = function() return LUI:Module("Unitframes").db.Settings.HideBlizzRaid end,
-									set = function(info, value)
-										LUI:Module("Unitframes").db.Settings.HideBlizzRaid = value
-										if value then
-											LUI:Module("Unitframes"):Module("HideBlizzard"):Hide("raid", true)
-										else
-											LUI:Module("Unitframes"):Module("HideBlizzard"):Show("raid")
-										end
-									end,
-									order = 52,
 								},
 							},
 						},
