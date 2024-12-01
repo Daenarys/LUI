@@ -230,50 +230,6 @@ function LUI:CreatePanel(f, w, h, a1, p, a2, x, y)
 	f:SetBackdropBorderColor(.6,.6,.6,1)
 end
 
-function LUI:StyleButton(b, checked)
-	local name = b:GetName()
-
-	local button          = _G[name]
-	local icon            = _G[name.."Icon"]
-	local count           = _G[name.."Count"]
-	local border          = _G[name.."Border"]
-	local hotkey          = _G[name.."HotKey"]
-	local cooldown        = _G[name.."Cooldown"]
-	local nametext        = _G[name.."Name"]
-	local flash           = _G[name.."Flash"]
-	local normaltexture   = _G[name.."NormalTexture"]
-	local icontexture     = _G[name.."IconTexture"]
-
-	local hover = b:CreateTexture("frame", nil) -- hover
-	hover:SetColorTexture(1,1,1,0.2)
-	hover:SetHeight(button:GetHeight())
-	hover:SetWidth(button:GetWidth())
-	hover:SetPoint("TOPLEFT",button,2,-2)
-	hover:SetPoint("BOTTOMRIGHT",button,-2,2)
-	button:SetHighlightTexture(hover)
-
-	local pushed = b:CreateTexture("frame", nil) -- pushed
-	pushed:SetColorTexture(0.9,0.8,0.1,0.3)
-	pushed:SetHeight(button:GetHeight())
-	pushed:SetWidth(button:GetWidth())
-	pushed:SetPoint("TOPLEFT",button,2,-2)
-	pushed:SetPoint("BOTTOMRIGHT",button,-2,2)
-	button:SetPushedTexture(pushed)
-
-	local Infotext = self:Module("Infotext", true)
-	count:SetFont(Media:Fetch("font", (Infotext and Infotext.db.profile.FPS.Font or "vibroceb")), (Infotext and Infotext.db.profile.FPS.FontSize or 12), "OUTLINE")
-
-	if checked then
-		local checked = b:CreateTexture("frame", nil) -- checked
-		checked:SetColorTexture(0,1,0,0.3)
-		checked:SetHeight(button:GetHeight())
-		checked:SetWidth(button:GetWidth())
-		checked:SetPoint("TOPLEFT",button,2,-2)
-		checked:SetPoint("BOTTOMRIGHT",button,-2,2)
-		button:SetCheckedTexture(checked)
-	end
-end
-
 ------------------------------------------------------
 -- / CREATE ME A FRAME FUNC / --
 ------------------------------------------------------
@@ -556,24 +512,12 @@ function LUI:Configure()
 
 	install_frame:RegisterForClicks("AnyUp")
 	install_frame:SetScript("OnClick", function(self)
-
-		SetCVar("buffDurations", 1)
-		SetCVar("scriptErrors", 1)
-		SetCVar("uiScale", 0.6949)
-		SetCVar("useUiScale", 1)
-		SetCVar("chatMouseScroll", 1)
-		SetCVar("chatStyle", "classic")
-
 		if LUI.db.global.luiconfig[ProfileName].Versions then
 			wipe(LUI.db.global.luiconfig[ProfileName].Versions)
 		end
 
 		LUI.db.global.luiconfig[ProfileName].Versions.lui = LUI.Versions.lui
 		LUI.db.global.luiconfig[ProfileName].IsConfigured = true
-		-- This is commented out for now as it causes issues.
-		-- Sorry, if you're using 1280x1024 things might look
-		-- funky, but LUI will at least install properly.
-		--CheckResolution()
 		ReloadUI()
 	end)
 end
