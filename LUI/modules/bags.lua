@@ -22,17 +22,15 @@ local strsub = string.sub
 local format = format
 local pairs, ipairs = pairs, ipairs
 
-local MAX_WATCHED_TOKENS = MAX_WATCHED_TOKENS
-
-local GetItemInfo = GetItemInfo
-local GetKeyRingSize = GetKeyRingSize
+local GetItemInfo = C_Item.GetItemInfo
 local GetMoneyString = GetMoneyString
 local ItemButtonUtil = ItemButtonUtil
-local GetContainerNumSlots = GetContainerNumSlots
-local GetContainerItemInfo = GetContainerItemInfo
-local GetContainerItemLink = GetContainerItemLink
-local GetContainerItemCooldown = GetContainerItemCooldown
-local GetContainerNumFreeSlots = GetContainerNumFreeSlots
+local GetContainerNumSlots = C_Container.GetContainerNumSlots
+local GetContainerItemInfo = C_Container.GetContainerItemInfo
+local GetContainerItemLink = C_Container.GetContainerItemLink
+local GetContainerItemCooldown = C_Container.GetContainerItemCooldown
+local GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
+local PickupContainerItem = C_Container.PickupContainerItem
 
 local CreateFrame = CreateFrame
 local OpenEditbox = OpenEditbox
@@ -127,7 +125,7 @@ local function LUIBank_OnShow()
 	CheckSortButton()
 end
 
-local function LUIBags_OnHide()  -- Close the Bank if Bags are closed.
+local function LUIBags_OnHide()
 	if LUIBank and LUIBank:IsShown() then
 		LUIBank:Hide()
 		LUIReagents:Hide()
@@ -157,10 +155,8 @@ end
 local function LUIBags_Toggle(forceOpen)
 	if LUIBags:IsShown() and not forceOpen then
 		LUIBags:Hide()
-		--LUI:Print("Closing Bags")
 	else
 		LUIBags:Show()
-		--LUI:Print("OPening Bags")
 	end
 end
 
@@ -196,8 +192,11 @@ function module:InitSelect(bag)
 end
 
 function module:SlotUpdate(item)
-
-	local texture, count, locked, quality, _, _, itemLink, _, _, _, isBound = GetContainerItemInfo(item.bag, item.slot)
+	local itemInfo = C_Container.GetContainerItemInfo(item.bag, item.slot)
+    local texture = itemInfo and itemInfo.iconFileID
+    local itemCount = itemInfo and itemInfo.stackCount
+    local quality = itemInfo and itemInfo.quality
+    local itemLink = itemInfo and itemInfo.hyperlink
 	local color = db.Colors.Border
 
 	if not item.frame.lock then
@@ -213,8 +212,8 @@ function module:SlotUpdate(item)
 	end
 
 	if item.Cooldown then
-		local cd_start, cd_finish, cd_enable = GetContainerItemCooldown(item.bag, item.slot)
-		CooldownFrame_Set(item.Cooldown, cd_start, cd_finish, cd_enable)
+		local startTime, duration, enable = C_Container.GetContainerItemCooldown(item.bag, item.slot)
+		CooldownFrame_Set(item.Cooldown, startTime, duration, enable)
 	end
 
 	-- New item code from Blizzard's ContainerFrame.lua
@@ -224,18 +223,14 @@ function module:SlotUpdate(item)
 	local newItemAnim = item.frame.newitemglowAnim
 	if newItemTexture then
 		if db.Bags.ShowNew and C_NewItems.IsNewItem(item.bag, item.slot) then
-			if IsBattlePayItem(item.bag, item.slot) then
-				newItemTexture:Hide()
-				battlePayTexture:Show()
+			if quality and NEW_ITEM_ATLAS_BY_QUALITY[quality] then
+				newItemTexture:SetAtlas(NEW_ITEM_ATLAS_BY_QUALITY[quality])
 			else
-				if quality and NEW_ITEM_ATLAS_BY_QUALITY[quality] then
-					newItemTexture:SetAtlas(NEW_ITEM_ATLAS_BY_QUALITY[quality])
-				else
-					newItemTexture:SetAtlas("bags-glow-white")
-				end
-				newItemTexture:Show()
-				battlePayTexture:Hide()
+				newItemTexture:SetAtlas("bags-glow-white")
 			end
+			newItemTexture:Show()
+			battlePayTexture:Hide()
+
 			if not flashAnim:IsPlaying() and not newItemAnim:IsPlaying() then
 				flashAnim:Play()
 				newItemAnim:Play()
@@ -253,35 +248,23 @@ function module:SlotUpdate(item)
 		newItemTexture:SetSize(item.frame:GetSize())
 	end
 
-	-- Quest Item code from Blizzard's ContainerFrame.lua
-	local questTexture = _G[item.frame:GetName().."IconQuestTexture"]
-	if questTexture then
-		questTexture:SetSize(item.frame:GetSize())
-		local isQuestItem, questId, isActive = GetContainerItemQuestInfo(item.bag, item.slot)
-		if questId and not isActive and db.Bags.ShowQuest then
-			questTexture:SetTexture(TEXTURE_ITEM_QUEST_BANG)
-			questTexture:Show()
-		elseif (questId or isQuestItem) and db.Bags.ShowQuest then
-			questTexture:SetTexture(TEXTURE_ITEM_QUEST_BORDER)
-			questTexture:Show()
-		else
-			questTexture:Hide()
-		end
-	end
-
 	if (itemLink) then
-		local name, _, rarity, _, _, iType = GetItemInfo(itemLink)
-		item.name, item.rarity = name, rarity
+		local name, _, itemQuality, _, _, iType, _, _, _, _, _, classID = GetItemInfo(itemLink)
+		item.name, item.itemQuality = name, itemQuality
 		-- color slot according to item quality
-		if db.Bags.ItemQuality and not item.frame.lock and rarity and rarity > 1 then
-			item.frame:SetBackdropBorderColor(GetItemQualityColor(rarity))
+		if db.Bags.Rarity and not item.frame.lock and itemQuality > 1 then
+			local r, g, b, hex = C_Item.GetItemQualityColor(itemQuality)
+			item.frame:SetBackdropBorderColor(r, g, b)
+		-- color slot according to quest item.
+		elseif db.Bags.ShowQuest and not item.frame.lock and classID == 12 then
+			item.frame:SetBackdropBorderColor(1,1,0)
 		end
 	else
-		item.name, item.rarity = nil, nil
+		item.name, item.itemQuality = nil, nil
 	end
 
 	SetItemButtonTexture(item.frame, texture)
-	SetItemButtonCount(item.frame, count)
+	SetItemButtonCount(item.frame, itemCount)
 	SetItemButtonDesaturated(item.frame, locked, 0.5, 0.5, 0.5)
 	if db.Bags.ShowOverlay and itemLink then
 		SetItemButtonOverlay(item.frame, itemLink, quality, isBound)
@@ -348,7 +331,7 @@ function module:BagFrameSlotNew(slot, parent, bagType)
 			ret.frame.tooltipText = ""
 		end
 	else
-		ret.frame = CreateFrame("ItemButton", "LUIBags__Bag"..slot.."Slot", parent, "BagSlotButtonTemplate")
+		ret.frame = CreateFrame("ItemButton", "LUIBags__Bag"..slot.."Slot", parent, "BaseBagSlotButtonTemplate")
 		if not ret.frame.SetBackdrop then Mixin(ret.frame, BackdropTemplateMixin) end
 		ret.slot = slot
 		tinsert(BagsSlots, ret)
@@ -388,7 +371,6 @@ function module:SlotNew(bag, slot)
 			b = tonumber(b)
 			s = tonumber(s)
 
-			--print (b .. " " .. s)
 			if b == bag and s == slot then
 				f = i
 				break
@@ -396,7 +378,6 @@ function module:SlotNew(bag, slot)
 		end
 
 		if f ~= -1 then
-			--print("found it")
 			ret.frame = trashButton[f]
 			table.remove(trashButton, f)
 		end
@@ -420,18 +401,6 @@ function module:SlotNew(bag, slot)
 end
 
 function module:BagType(bag)
-	--From OneBag. Still wondering the use of those.
-	--[[
-	local bagProfession = 0x0008 + 0x0010 + 0x0020 + 0x0040 + 0x0080 + 0x0200 + 0x0400
-	local bagType = select(2, GetContainerNumFreeSlots(bag))
-
-	if bit.band(bagType, bagProfession) > 0 then
-		return ST_SPECIAL
-	end
-
-	return ST_NORMAL
-	]]
-
 	local bagType = select(2, GetContainerNumFreeSlots(bag))
 	if bagType and bagType > 0 then
 		return ST_SPECIAL
@@ -525,8 +494,8 @@ function module:CreateBagFrame(bagType)
 	-- Close Button, no embed options anymore
 	if frameName ~= "LUIReagents" then
 		local closeBtn = CreateFrame("Button", frameName.."_CloseButton", frame, "UIPanelCloseButton")
-		closeBtn:SetWidth(LUI:Scale(32))
-		closeBtn:SetHeight(LUI:Scale(32))
+		closeBtn:SetWidth(LUI:Scale(20))
+		closeBtn:SetHeight(LUI:Scale(20))
 		closeBtn:SetPoint("TOPRIGHT", LUI:Scale(-3), LUI:Scale(-3))
 		closeBtn:SetScript("OnClick", function(self, button)
 			self:GetParent():Hide()
@@ -707,12 +676,6 @@ function module:SetBags()
 		self.currency:SetText(GetTrackedCurrency())
 	end)
 
-	--Hooking this function allows to update watched currencies without a ReloadUI
-	function module:BackpackTokenFrame_Update()
-		currency:SetText(GetTrackedCurrency())
-	end
-	module:SecureHook("BackpackTokenFrame_Update")
-
 	LUIBags:RegisterEvent("PLAYER_MONEY")
 	LUIBags:RegisterEvent("PLAYER_LOGIN")
 	LUIBags:RegisterEvent("PLAYER_TRADE_MONEY")
@@ -802,10 +765,10 @@ function module:Layout(bagType)
 		isBank = true
 	else
 		frame.gold:SetText(GetMoneyString(GetMoney(), 12))
-		frame.editbox:SetFont(Media:Fetch("font", db.Bags.Font), 12)
-		frame.search:SetFont(Media:Fetch("font", db.Bags.Font), 12)
-		frame.gold:SetFont(Media:Fetch("font", db.Bags.Font), 12)
-		frame.currency:SetFont(Media:Fetch("font", db.Bags.Font), 12)
+		frame.editbox:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
+		frame.search:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
+		frame.gold:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
+		frame.currency:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
 
 		frame.search:ClearAllPoints()
 		frame.search:SetPoint("TOPLEFT", frame, LUI:Scale(db.Bags.Padding), LUI:Scale(-10))
@@ -960,7 +923,8 @@ function module:Layout(bagType)
 					item.frame:SetHeight(LUI:Scale(32))
 					item.frame:SetWidth(LUI:Scale(32))
 					item.frame:SetPushedTexture("")
-					item.frame:SetNormalTexture("")
+					item.frame:GetNormalTexture():SetAlpha(0)
+					item.frame:SetFrameLevel(21)
 					item.frame:Show()
 
 					item.frame:SetBackdrop( {
@@ -1511,7 +1475,7 @@ function module:PrepareSort(frame)
 
 	for _, bag in pairs(self.sortBags) do
 		for j = 1, GetContainerNumSlots(bag.bagId) do
-			local itemId = GetContainerItemID(bag.bagId, j);
+			local itemId = C_Container.GetContainerItemID(bag.bagId, j);
 
 			if itemId then
 				local _, count, locked = GetContainerItemInfo(bag.bagId, j);
@@ -1524,7 +1488,7 @@ function module:PrepareSort(frame)
 
 				local sortString = rarity .. itemType .. itemSubType .. requiredLevel .. itemLevel .. name .. itemId;
 
-				local itemFamily = GetItemFamily(itemId);
+				local itemFamily = C_Item.GetItemFamily(itemId);
 
 				table.insert(self.sortItems, {
 					sortString = sortString,
