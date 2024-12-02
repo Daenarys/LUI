@@ -20,7 +20,7 @@ modules\frames.lua
 modules\fader.lua
 modules\chat\chat.xml
 modules\minimap.lua
-modules\bags.lua
+modules\bags\bags.xml
 modules\datatext.lua
 modules\faq.lua
 modules\micromenu.lua

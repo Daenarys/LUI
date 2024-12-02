@@ -70,10 +70,10 @@ StaticPopupDialogs["CONFIRM_BUY_BANK_SLOT"] = {
 	button1 = YES,
 	button2 = NO,
 	OnAccept = function(self)
-		PurchaseSlot();
+		PurchaseSlot()
 	end,
 	OnShow = function(self)
-		MoneyFrame_Update(self.moneyFrame, LUIBank.bankCost);
+		MoneyFrame_Update(self.moneyFrame, LUIBank.bankCost)
 	end,
 	hasMoneyFrame = 1,
 	timeout = 0,
@@ -193,14 +193,14 @@ function module:InitSelect(bag)
 end
 
 function module:SlotUpdate(item)
-	local info = GetContainerItemInfo(item.bag, item.slot)
+	local info = C_Container.GetContainerItemInfo(item.bag, item.slot)
 	local texture = info and info.iconFileID
 	local itemCount = info and info.stackCount
 	local locked = info and info.isLocked
 	local quality = info and info.quality
 	local itemLink = info and info.hyperlink
 	local isBound = info and info.isBound
-	local questInfo = GetContainerItemQuestInfo(item.bag, item.slot)
+	local questInfo = C_Container.GetContainerItemQuestInfo(item.bag, item.slot)
 	local isQuestItem = questInfo.isQuestItem
 	local questID = questInfo.questID
 	local isActive = questInfo.isActive
@@ -268,11 +268,12 @@ function module:SlotUpdate(item)
 		end
 	end
 
-	if (itemLink) then
-		local name, _, rarity, _, _, iType = GetItemInfo(itemLink)
+	if itemLink then
+		local name, _, rarity = GetItemInfo(itemLink)
 		item.name, item.rarity = name, rarity
 		if db.Bags.ItemQuality and not item.frame.lock and rarity and rarity > 1 then
-			item.frame:SetBackdropBorderColor(C_Item.GetItemQualityColor(rarity))
+			local r, g, b = GetItemQualityColor(rarity)
+			item.frame:SetBackdropBorderColor(r, g, b)
 		end
 	else
 		item.name, item.rarity = nil, nil
@@ -346,7 +347,7 @@ function module:BagFrameSlotNew(slot, parent, bagType)
 			ret.frame.tooltipText = ""
 		end
 	else
-		ret.frame = CreateFrame("ItemButton", "LUIBags__Bag"..slot.."Slot", parent, "BaseBagSlotButtonTemplate")
+		ret.frame = CreateFrame("ItemButton", "LUIBags__Bag"..slot.."Slot", parent, "BagSlotButtonTemplate")
 		if not ret.frame.SetBackdrop then Mixin(ret.frame, BackdropTemplateMixin) end
 		ret.slot = slot
 		tinsert(BagsSlots, ret)
@@ -509,8 +510,12 @@ function module:CreateBagFrame(bagType)
 	-- Close Button, no embed options anymore
 	if frameName ~= "LUIReagents" then
 		local closeBtn = CreateFrame("Button", frameName.."_CloseButton", frame, "UIPanelCloseButton")
-		closeBtn:SetWidth(LUI:Scale(20))
-		closeBtn:SetHeight(LUI:Scale(20))
+		closeBtn:SetWidth(LUI:Scale(32))
+		closeBtn:SetHeight(LUI:Scale(32))
+		closeBtn:SetDisabledTexture("Interface/Buttons/UI-Panel-MinimizeButton-Disabled")
+		closeBtn:SetNormalTexture("Interface/Buttons/UI-Panel-MinimizeButton-Up")
+		closeBtn:SetPushedTexture("Interface/Buttons/UI-Panel-MinimizeButton-Down")
+		closeBtn:SetHighlightTexture("Interface/Buttons/UI-Panel-MinimizeButton-Highlight")
 		closeBtn:SetPoint("TOPRIGHT", LUI:Scale(-3), LUI:Scale(-3))
 		closeBtn:SetScript("OnClick", function(self, button)
 			self:GetParent():Hide()
@@ -529,14 +534,14 @@ function module:CreateBagFrame(bagType)
 	-- Deposit Reagents
 	if frameName == "LUIReagents" then
 		local depositBtn = CreateFrame("Button", frameName.."_SortButton", frame, "UIPanelButtonTemplate")
-		depositBtn:SetText("Deposit Reagents");
+		depositBtn:SetText("Deposit Reagents")
 		depositBtn:SetWidth(LUI:Scale(depositBtn:GetTextWidth()+20))
 		depositBtn:SetHeight(LUI:Scale(depositBtn:GetTextHeight()+10))
 		depositBtn:SetPoint("BOTTOMLEFT", LUI:Scale(3), LUI:Scale(3))
 		depositBtn:SetScript("OnClick", function(self, button)
-			--PlaySound("igMainMenuOption");
+			--PlaySound("igMainMenuOption")
 			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
-			DepositReagentBank();
+			DepositReagentBank()
 		end)
 		depositBtn:RegisterForClicks("AnyUp")
 		frame.depositBtn = depositBtn
@@ -545,14 +550,14 @@ function module:CreateBagFrame(bagType)
 	-- Purchase Reagents Bank
 	if frameName == "LUIBank" and not IsReagentBankUnlocked() then
 		local reagentsBtn = CreateFrame("Button", frameName.."_ReagentButton", frame, "UIPanelButtonTemplate")
-		reagentsBtn:SetText("Purchase Reagents Bank Vault");
+		reagentsBtn:SetText("Purchase Reagents Bank Vault")
 		reagentsBtn:SetWidth(LUI:Scale(reagentsBtn:GetTextWidth()+20))
 		reagentsBtn:SetHeight(LUI:Scale(reagentsBtn:GetTextHeight()+10))
 		reagentsBtn:SetPoint("BOTTOMLEFT", LUI:Scale(3), LUI:Scale(3))
 		reagentsBtn:SetScript("OnClick", function(self, button)
-			--PlaySound("igMainMenuOption");
+			--PlaySound("igMainMenuOption")
 			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
-			StaticPopup_Show("CONFIRM_BUY_REAGENTBANK_TAB");
+			StaticPopup_Show("CONFIRM_BUY_REAGENTBANK_TAB")
 		end)
 		reagentsBtn:RegisterForClicks("AnyUp")
 		frame.reagentsBtn = reagentsBtn
@@ -560,21 +565,21 @@ function module:CreateBagFrame(bagType)
 
 	-- Sort Button
 	local sortBtn = CreateFrame("Button", frameName.."_SortButton", frame, "UIPanelButtonTemplate")
-	sortBtn:SetText("Stack & Sort");
+	sortBtn:SetText("Stack & Sort")
 	sortBtn:SetWidth(LUI:Scale(sortBtn:GetTextWidth()+20))
 	sortBtn:SetHeight(LUI:Scale(sortBtn:GetTextHeight()+10))
 	sortBtn:SetPoint("BOTTOMRIGHT", LUI:Scale(-3), LUI:Scale(3))
 	sortBtn:SetScript("OnClick", function(self, button)
-		--PlaySound("UI_BagSorting_01");
+		--PlaySound("UI_BagSorting_01")
 		PlaySound(SOUNDKIT.UI_BAG_SORTING_01)
 		-- Make sure we arent calling bag updates a million times
 		module:UnregisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
 		module:UnregisterEvent("PLAYERBANKSLOTS_CHANGED")
 		module:UnregisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
 		-- We can't use the WoD sort function with LUIv3
-		-- SortBankBags();
+		-- SortBankBags()
 		if frameName ~= "LUIReagents" then
-			module:PrepareSort(self:GetParent());
+			module:PrepareSort(self:GetParent())
 		else
 			SortReagentBankBags()
 		end
@@ -831,7 +836,7 @@ function module:Layout(bagType)
 				local Xoffset = padding + idx*bagTexSize + idx*spacing
 
 				local BankSlots, Full = GetNumBankSlots()
-				local cost = GetBankSlotCost(BankSlots);
+				local cost = GetBankSlotCost(BankSlots)
 
 				if isBank and not Full then
 
@@ -844,9 +849,9 @@ function module:Layout(bagType)
 
 						b.frame:SetScript("OnClick", function(self)
 							if ( IsModifiedClick("PICKUPACTION") ) then
-								BankFrameItemButtonBag_Pickup(self);
+								BankFrameItemButtonBag_Pickup(self)
 							else
-								BankFrameItemButtonBag_OnClick(self, button);
+								BankFrameItemButtonBag_OnClick(self, button)
 							end
 						end)
 
@@ -859,7 +864,7 @@ function module:Layout(bagType)
 						-- Add the Click-To-Purchase option.
 						b.frame:SetScript("OnClick", function(self)
 							LUIBank.bankCost = cost
-							StaticPopup_Show("CONFIRM_BUY_BANK_SLOT");
+							StaticPopup_Show("CONFIRM_BUY_BANK_SLOT")
 						end)
 
 						--Unpurchased Bags.
@@ -896,7 +901,7 @@ function module:Layout(bagType)
 		end
 
 		frame:SetWidth(LUI:Scale(cols * 31 + (cols - 1) * spacing + padding * 2))
-		frame:SetHeight(LUI:Scale(rows * 31 + (rows - 1) * spacing + off + padding * 2) + frame.sortButton:GetHeight());
+		frame:SetHeight(LUI:Scale(rows * 31 + (rows - 1) * spacing + off + padding * 2) + frame.sortButton:GetHeight())
 
 	end
 
@@ -940,6 +945,7 @@ function module:Layout(bagType)
 					item.frame:SetPushedTexture("")
 					item.frame:GetNormalTexture():SetAlpha(0)
 					item.frame:SetFrameLevel(21)
+					item.frame.emptyBackgroundAtlas = nil
 					item.frame:Show()
 
 					item.frame:SetBackdrop( {
@@ -1383,7 +1389,6 @@ function module:OnInitialize()
 end
 
 function module:OnEnable()
-
 	module:RegisterEvent("BANKFRAME_OPENED")
 	module:RegisterEvent("BANKFRAME_CLOSED")
 
@@ -1418,7 +1423,6 @@ function module:OnEnable()
 end
 
 function module:OnDisable()
-
 	--Make the bankframe works again
 	BankFrame:RegisterEvent("BANKFRAME_OPENED")
 	BankFrame:RegisterEvent("BANKFRAME_CLOSED")
@@ -1471,39 +1475,39 @@ function module:PrepareSort(frame)
 	local specialBags = {};
 
 	for _, v in pairs(bagOrder) do
-		local maxSlots = GetContainerNumSlots(v);
+		local maxSlots = GetContainerNumSlots(v)
 
 		if maxSlots > 0 then
-			local bagFamily = select(2, GetContainerNumFreeSlots(v));
+			local bagFamily = select(2, GetContainerNumFreeSlots(v))
 
 			if bagFamily > 0 then
-				table.insert(specialBags, {bagId = v, slot = maxSlots, maxSlots = maxSlots, bagFamily = bagFamily});
+				table.insert(specialBags, {bagId = v, slot = maxSlots, maxSlots = maxSlots, bagFamily = bagFamily})
 			else
-				table.insert(self.sortBags, {bagId = v, slot = maxSlots, maxSlots = maxSlots, bagFamily = bagFamily});
+				table.insert(self.sortBags, {bagId = v, slot = maxSlots, maxSlots = maxSlots, bagFamily = bagFamily})
 			end
 		end
 	end
 
 	for _, v in pairs(specialBags) do
-		table.insert(self.sortBags, v);
+		table.insert(self.sortBags, v)
 	end
 
 	for _, bag in pairs(self.sortBags) do
 		for j = 1, GetContainerNumSlots(bag.bagId) do
-			local itemId = C_Container.GetContainerItemID(bag.bagId, j);
+			local itemId = C_Container.GetContainerItemID(bag.bagId, j)
 
 			if itemId then
-				local _, count, locked = GetContainerItemInfo(bag.bagId, j);
+				local _, count, locked = GetContainerItemInfo(bag.bagId, j)
 
 				if locked then
 					return;
 				end
 
-				local name, _, rarity, itemLevel, requiredLevel, itemType, itemSubType, stackCount, equipLocation, _, sellPrice = GetItemInfo(itemId);
+				local name, _, rarity, itemLevel, requiredLevel, itemType, itemSubType, stackCount, equipLocation, _, sellPrice = GetItemInfo(itemId)
 
 				local sortString = rarity .. itemType .. itemSubType .. requiredLevel .. itemLevel .. name .. itemId;
 
-				local itemFamily = C_Item.GetItemFamily(itemId);
+				local itemFamily = C_Item.GetItemFamily(itemId)
 
 				table.insert(self.sortItems, {
 					sortString = sortString,
@@ -1512,7 +1516,7 @@ function module:PrepareSort(frame)
 					itemFamily = itemFamily,
 					count = count,
 					stackCount = stackCount
-				});
+				})
 			end
 		end
 	end
@@ -1523,7 +1527,7 @@ function module:PrepareSort(frame)
 		end
 
 		return a.sortString > b.sortString;
-	end);
+	end)
 
 	-- Set targets
 	for i, v in pairs(self.sortItems) do
@@ -1578,11 +1582,11 @@ function module:PrepareSort(frame)
 		end
 
 		if bag.slot < 1 then
-			table.remove(self.sortBags, bagIndex);
+			table.remove(self.sortBags, bagIndex)
 		end
 	end
 
-	self.sortFrame:SetScript("OnUpdate", module.Sort);
+	self.sortFrame:SetScript("OnUpdate", module.Sort)
 end
 
 function module:Sort(elapsed)
@@ -1599,7 +1603,7 @@ function module:Sort(elapsed)
 
 	module.sorting = true;
 
-	ClearCursor();
+	ClearCursor()
 
 	local changes = 1;
 	local key = 1;
@@ -1609,8 +1613,8 @@ function module:Sort(elapsed)
 
 		if not select(3, GetContainerItemInfo(item.sBag, item.sSlot)) and not select(3, GetContainerItemInfo(item.tBag, item.tSlot)) then
 			if item.sBag ~= item.tBag or item.sSlot ~= item.tSlot then
-				PickupContainerItem(item.sBag, item.sSlot);
-				PickupContainerItem(item.tBag, item.tSlot);
+				PickupContainerItem(item.sBag, item.sSlot)
+				PickupContainerItem(item.tBag, item.tSlot)
 
 				for i = 1, #module.sortItems do
 					if module.sortItems[i].sBag == item.tBag and module.sortItems[i].sSlot == item.tSlot then
@@ -1629,7 +1633,7 @@ function module:Sort(elapsed)
 				item.tBag2 = nil;
 				item.tSlot2 = nil;
 			else
-				table.remove(module.sortItems, key);
+				table.remove(module.sortItems, key)
 				key = key - 1;
 
 				if changes > 5 then
@@ -1645,7 +1649,7 @@ function module:Sort(elapsed)
 	end
 
 	if not module.sortItems[1] then
-		module.sortFrame:SetScript("OnUpdate", nil);
+		module.sortFrame:SetScript("OnUpdate", nil)
 		module.sortTime = nil;
 		module.sorting = nil;
 		module.sortItems = nil;
@@ -1654,4 +1658,47 @@ function module:Sort(elapsed)
 	else
 		module.sorting = false;
 	end
+end
+
+-- template stuff
+function BagSlotButton_OnLoad(self)
+	table.insert(BagsSlots, self)
+
+	PaperDollItemSlotButton_OnLoad(self)
+	self:RegisterEvent("BAG_UPDATE_DELAYED")
+	_G[self:GetName().."NormalTexture"]:SetWidth(50)
+	_G[self:GetName().."NormalTexture"]:SetHeight(50)
+	self.IconBorder:SetSize(30, 30)
+end
+
+function BagSlotButton_OnEvent(self, event, ...)
+	if ( event == "BAG_UPDATE_DELAYED" ) then
+		PaperDollItemSlotButton_Update(self)
+	else
+		PaperDollItemSlotButton_OnEvent(self, event, ...)
+	end
+ends
+
+function BagSlotButton_OnClick(self)
+	local id = self:GetID()
+	local hadItem = PutItemInBag(id)
+	if ( not hadItem ) then
+		ToggleBag(id)
+	end
+end
+
+function BagSlotButton_OnDrag(self)
+	PickupBagFromSlot(self:GetID())
+end
+
+function BagSlotButton_OnEnter(self)
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	if ( GameTooltip:SetInventoryItem("player", self:GetID()) ) then
+		GameTooltip:Show()
+	end
+end
+
+function BagSlotButton_OnLeave(self)
+	GameTooltip:Hide()
+	ResetCursor()
 end
