@@ -464,13 +464,8 @@ end
 
 local function positionChatFrame()
 	local frame = GENERAL_CHAT_DOCK.primary
-	frame:SetMovable(true)
-	frame:SetUserPlaced(true)
 	frame:SetSize(db.width, db.height)
-	frame:ClearAllPoints()
-	frame:SetPoint(db.point, UIParent, db.point, db.x, db.y)
 	FCF_SavePositionAndDimensions(frame)
-	FCF_SetLocked(frame, 1)
 end
 
 local function urlFilterFunc(frame, event, msg, ...)
@@ -554,13 +549,6 @@ function module:FCF_SavePositionAndDimensions(chatFrame)
 	local width, height = GetChatWindowSavedDimensions(chatFrame:GetID())
 	if (width and height) then
 		db.width, db.height = width, height
-	end
-
-	local point, xOffset, yOffset = GetChatWindowSavedPosition(chatFrame:GetID())
-	if point then
-		db.x = xOffset * GetScreenWidth()
-		db.y = yOffset * GetScreenHeight()
-		db.point = point
 	end
 end
 
@@ -696,9 +684,6 @@ function module:LoadOptions()
 		self:Refresh()
 	end
 	local function resetChatPos()
-		db.x = dbd.x
-		db.y = dbd.y
-		db.point = dbd.point
 		db.width = dbd.width
 		db.height = dbd.height
 
