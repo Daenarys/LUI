@@ -406,9 +406,17 @@ function LUI:HideBlizzard()
 		"MicroMenuContainer"
 	)
 
-	hooksecurefunc(_G.HelpTip, 'Show', function(frame)
-		for frame in _G.HelpTip.framePool:EnumerateActive() do
-			frame:Acknowledge()
+	hooksecurefunc(_G.AddonCompartmentFrame, "UpdateDisplay", function(self)
+		self:SetShown(false)
+	end)
+
+	hooksecurefunc(_G.BuffFrame.CollapseAndExpandButton, "UpdateOrientation", function(self)
+		self:Hide()
+	end)
+
+	hooksecurefunc(_G.HelpTip, 'Show', function(self)
+		for self in _G.HelpTip.framePool:EnumerateActive() do
+			self:Acknowledge()
 		end
 	end)
 end

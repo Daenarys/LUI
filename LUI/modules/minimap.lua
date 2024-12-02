@@ -215,27 +215,6 @@ function module:SetMinimap()
 	MinimapCluster.IndicatorFrame.MailFrame:HookScript("OnHide", function()
 	end)
 
-	-- Enable mouse scrolling
-	Minimap:EnableMouseWheel(true)
-	Minimap:SetScript("OnMouseWheel", function(self, d)
-		if IsShiftKeyDown() then
-			db.Minimap.General.Size = db.Minimap.General.Size + ((d > 0 and 0.25) or (d < 0 and -0.25) or 0)
-			if db.Minimap.General.Size > 2.5 then
-				db.Minimap.General.Size = 2.5
-			elseif db.Minimap.General.Size < 0.5 then
-				db.Minimap.General.Size = 0.5
-			end
-
-			module:SetMinimapSize()
-		else
-			if d > 0 then
-				_G.Minimap.ZoomIn:Click()
-			elseif d < 0 then
-				_G.Minimap.ZoomOut:Click()
-			end
-		end
-	end)
-
 	----------------------------------------------------------------------------------------
 	-- Right click menu
 	----------------------------------------------------------------------------------------
@@ -355,7 +334,6 @@ function module:SetMinimap()
 end
 
 function module:GetMinimapPosition()
-
 	local point, _, relativePoint, xOfs, yOfs = Minimap:GetPoint()
 	db.Minimap.General.Position.RelativePoint = relativePoint
 	db.Minimap.General.Position.Point = point
@@ -364,7 +342,7 @@ function module:GetMinimapPosition()
 end
 
 function module:ToggleMissionReport()
-	local button = GarrisonLandingPageMinimapButton
+	local button = ExpansionLandingPageMinimapButton
 	if button:IsShown() and not defaultGarrisonState then
 		button:Hide()
 		return
@@ -429,7 +407,6 @@ local defaults = {
 module.conflicts = "SexyMap"
 
 function module:LoadOptions()
-
 	-- Template Function to ease up maintenance
 	local function createTemplate(frameName, orderNum, friendlyName, frameDesc, extraTables)
 		local frameSet = "Set"..frameName
@@ -757,7 +734,6 @@ function module:LoadOptions()
 end
 
 function module:OnInitialize()
-
 	LUI:MergeDefaults(LUI.db.defaults.profile, defaults)
 	LUI:RefreshDefaults()
 	LUI:Refresh()
@@ -934,8 +910,4 @@ hooksecurefunc(QueueStatusFrame, "Update", function(self)
 	else
 		EyeTemplate_StopAnimating(QueueStatusButton.Eye)
 	end
-end)
-
-hooksecurefunc(AddonCompartmentFrame, "UpdateDisplay", function(self)
-	self:SetShown(false)
 end)
