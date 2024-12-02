@@ -130,8 +130,6 @@ LUI.defaults = {
 		General = {
 			IsConfigured = false,
 			HideErrors = false,
-			HideTalentSpam = false,
-			AutoAcceptInvite = false,
 			BlizzFrameScale = 1,
 			ModuleMessages = true,
 			DamageFont = "neuropol",
@@ -610,7 +608,6 @@ function LUI:Module(name, prototype, ...)
 		end
 	elseif prototype ~= true then -- check silent
 		if not next(self.modules) then
-			self:SetDefaultModuleLibraries("LUIDevAPI")
 			self:SetDefaultModulePrototype(getModulePrototype(self))
 		end
 
