@@ -7,8 +7,6 @@ local widgetLists = AceGUIWidgetLSMlists
 local db, dbd
 local GetBags = {
 	["Bags"] = {0, 1, 2, 3, 4},
-	["Bank"] = {-1, 5, 6, 7, 8, 9, 10, 11},
-	["Reagents"] = {-3},
 }
 local isCreated = {}
 
@@ -40,9 +38,6 @@ local SetItemButtonTexture = SetItemButtonTexture
 local SetItemButtonOverlay = SetItemButtonOverlay
 local SetItemButtonDesaturated = SetItemButtonDesaturated
 
-local BankFrameItemButton_Update = BankFrameItemButton_Update
-local BankFrameItemButton_UpdateLocked = BankFrameItemButton_UpdateLocked
-
 -- Constants. Do NOT Edit those.
 local ST_NORMAL = 1	--Flagged for possible deletion
 local ST_SPECIAL = 3	--Flagged for possible deletion
@@ -52,97 +47,49 @@ local bagTexSize = 30
 local trashButton = {}
 local trashBag = {}
 
-local LUIBags, LUIBank, LUIReagents		-- replace self.frame and self.bankframe
+local LUIBags -- replace self.frame
 
 --Cache tables.
-local BagsInfo = {}		--replace self.bags
-local ItemSlots = {}		--replace self.buttons
-local BagsSlots = {}		--replace self.bagsframe_buttons
+local BagsInfo = {} --replace self.bags
+local ItemSlots = {} --replace self.buttons
+local BagsSlots = {} --replace self.bagsframe_buttons
 
 --Tooltip Frame for to scan item tooltips.
 --At the moment, not sure if tooltip scanning is required.
 --local LUIBagsTT = nil
 
---Making sure the Static Popup uses the good args.
-StaticPopupDialogs["CONFIRM_BUY_BANK_SLOT"] = {
-	preferredIndex = 3,
-	text = CONFIRM_BUY_BANK_SLOT,
-	button1 = YES,
-	button2 = NO,
-	OnAccept = function(self)
-		PurchaseSlot()
-	end,
-	OnShow = function(self)
-		MoneyFrame_Update(self.moneyFrame, LUIBank.bankCost)
-	end,
-	hasMoneyFrame = 1,
-	timeout = 0,
-	hideOnEscape = 1,
-};
-
 --This function returns the correct variable for the bag type.
 local function LUIBags_Select(bag)
-	if bag == "Bank" and LUIBank then return LUIBank end
 	if bag == "Bags" and LUIBags then return LUIBags end
-	if bag == "Reagents" and LUIReagents then return LUIReagents end
 end
 
 local function CheckSortButton()
 	if db.hideSort then
-		if LUIBank then LUIBank.sortButton:Hide() end
 		if LUIBags then LUIBags.sortButton:Hide() end
-		if LUIReagents then LUIReagents.sortButton:Hide() end
 	else
-		if LUIBank then LUIBank.sortButton:Show() end
 		if LUIBags then LUIBags.sortButton:Show() end
-		if LUIReagents then LUIReagents.sortButton:Show() end
 	end
 end
 
 local function LUIBags_OnShow()
-	module:PLAYERBANKSLOTS_CHANGED(nil, 29)	-- XXX: hack to force bag frame update
 	module:ReloadLayout("Bags")
 	module:SearchReset()
 
 	module:RegisterEvent("BAG_UPDATE_DELAYED")
-	module:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
-	module:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
-	module:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
 	module:RegisterEvent("BAG_CLOSED")
 	module:RegisterEvent("ITEM_LOCK_CHANGED")
 	module:RegisterEvent("QUEST_ACCEPTED")
 	module:RegisterEvent("UNIT_QUEST_LOG_CHANGED")
-	if not IsReagentBankUnlocked() then
-		module:RegisterEvent("REAGENTBANK_PURCHASED")
-	end
-	CheckSortButton()
-end
 
-local function LUIBank_OnHide()
-	CloseBankFrame()
-end
-local function LUIBank_OnShow()
-	module:PLAYERBANKSLOTS_CHANGED(nil, 29)
 	CheckSortButton()
 end
 
 local function LUIBags_OnHide()
-	if LUIBank and LUIBank:IsShown() then
-		LUIBank:Hide()
-		LUIReagents:Hide()
-	end
-
 	module:UnregisterEvent("BAG_UPDATE_DELAYED")
-	module:UnregisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
-	module:UnregisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
-	module:UnregisterEvent("PLAYERBANKSLOTS_CHANGED")
 	module:UnregisterEvent("BAG_CLOSED")
 	module:UnregisterEvent("ITEM_LOCK_CHANGED")
 	module:UnregisterEvent("QUEST_ACCEPTED")
 	module:UnregisterEvent("UNIT_QUEST_LOG_CHANGED")
-	if not IsReagentBankUnlocked() then
-		module:UnregisterEvent("REAGENTBANK_PURCHASED")
-	end
 end
 
 local function LUIBags_Open()
@@ -181,14 +128,13 @@ local function LUIBags_StopMoving(self)
 
 	local x, y = self:GetCenter()
 
-	-- Get rid of the "LUI" in the frame name, leaving Bags or Bank
+	-- Get rid of the "LUI" in the frame name, leaving Bags
 	local bag = strsub(self:GetName(), 4)
 	db[bag].CoordX = x
 	db[bag].CoordY = y
 end
 
 function module:InitSelect(bag)
-	if bag == "Bank" and not LUIBank then module:InitBank() end
 	if bag == "Bags" and not LUIBags then module:InitBags() end
 end
 
@@ -314,9 +260,6 @@ function module:BagSlotUpdate(bag)
 		if LUIBags and LUIBags:IsShown() then
 			module:ReloadLayout("Bags")
 		end
-		if LUIBank and LUIBank:IsShown() then
-			module:ReloadLayout("Bank")
-		end
 	end
 end
 
@@ -331,27 +274,10 @@ function module:BagFrameSlotNew(slot, parent, bagType)
 
 	--Make a new slot.
 	local ret = {}
-
-	if bagType == "Bank" then
-		ret.slot = slot
-		slot = slot - 4
-		ret.frame = CreateFrame("ItemButton", "LUIBank__Bag"..slot, parent, "BankItemButtonBagTemplate")
-		if not ret.frame.SetBackdrop then Mixin(ret.frame, BackdropTemplateMixin) end
-		ret.frame:SetID(slot)
-		tinsert(BagsSlots, ret)
-
-		BankFrameItemButton_Update(ret.frame)
-		BankFrameItemButton_UpdateLocked(ret.frame)
-
-		if not ret.frame.tooltipText then
-			ret.frame.tooltipText = ""
-		end
-	else
-		ret.frame = CreateFrame("ItemButton", "LUIBags__Bag"..slot.."Slot", parent, "BagSlotButtonTemplate")
-		if not ret.frame.SetBackdrop then Mixin(ret.frame, BackdropTemplateMixin) end
-		ret.slot = slot
-		tinsert(BagsSlots, ret)
-	end
+	ret.frame = CreateFrame("ItemButton", "LUIBags__Bag"..slot.."Slot", parent, "BagSlotButtonTemplate")
+	if not ret.frame.SetBackdrop then Mixin(ret.frame, BackdropTemplateMixin) end
+	ret.slot = slot
+	tinsert(BagsSlots, ret)
 
 	--Fix the size of the bag button
 	local bagBigTexSize = bagTexSize * 1.65 -- Number found through trial and error. This give the best results.
@@ -367,14 +293,6 @@ function module:SlotNew(bag, slot)
 		if v.bag == bag and v.slot == slot then
 			return v, false
 		end
-	end
-
-	local template = "ContainerFrameItemButtonTemplate"
-
-	if bag == -1 then
-		template = "BankItemButtonGenericTemplate"
-	elseif bag == -3 then
-		template = "ReagentBankItemButtonGenericTemplate"
 	end
 
 	local ret = {}
@@ -400,7 +318,7 @@ function module:SlotNew(bag, slot)
 	end
 
 	if not ret.frame then
-		ret.frame = CreateFrame("ItemButton", "LUIBags_Item" .. bag .. "_" .. slot, BagsInfo[bag], template)
+		ret.frame = CreateFrame("ItemButton", "LUIBags_Item" .. bag .. "_" .. slot, BagsInfo[bag], "ContainerFrameItemButtonTemplate")
 		if not ret.frame.SetBackdrop then Mixin(ret.frame, BackdropTemplateMixin) end
 	end
 
@@ -490,7 +408,7 @@ function module:SearchReset()
 end
 
 function module:CreateBagFrame(bagType)
-	local frameName = "LUI"..bagType -- LUIBags, LUIBank, LUIReagents
+	local frameName = "LUI"..bagType -- LUIBags
 	local frame = CreateFrame("Frame", frameName, UIParent, "BackdropTemplate")
 	frame:EnableMouse(1)
 	frame:SetMovable(1)
@@ -508,60 +426,26 @@ function module:CreateBagFrame(bagType)
 	frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y)
 
 	-- Close Button, no embed options anymore
-	if frameName ~= "LUIReagents" then
-		local closeBtn = CreateFrame("Button", frameName.."_CloseButton", frame, "UIPanelCloseButton")
-		closeBtn:SetWidth(LUI:Scale(32))
-		closeBtn:SetHeight(LUI:Scale(32))
-		closeBtn:SetDisabledTexture("Interface/Buttons/UI-Panel-MinimizeButton-Disabled")
-		closeBtn:SetNormalTexture("Interface/Buttons/UI-Panel-MinimizeButton-Up")
-		closeBtn:SetPushedTexture("Interface/Buttons/UI-Panel-MinimizeButton-Down")
-		closeBtn:SetHighlightTexture("Interface/Buttons/UI-Panel-MinimizeButton-Highlight")
-		closeBtn:SetPoint("TOPRIGHT", LUI:Scale(-3), LUI:Scale(-3))
-		closeBtn:SetScript("OnClick", function(self, button)
-			self:GetParent():Hide()
-		end)
-		closeBtn:RegisterForClicks("AnyUp")
-		closeBtn:GetNormalTexture():SetDesaturated(1)
-		frame.closeButton = closeBtn
-	end
+	local closeBtn = CreateFrame("Button", frameName.."_CloseButton", frame, "UIPanelCloseButton")
+	closeBtn:SetWidth(LUI:Scale(32))
+	closeBtn:SetHeight(LUI:Scale(32))
+	closeBtn:SetDisabledTexture("Interface/Buttons/UI-Panel-MinimizeButton-Disabled")
+	closeBtn:SetNormalTexture("Interface/Buttons/UI-Panel-MinimizeButton-Up")
+	closeBtn:SetPushedTexture("Interface/Buttons/UI-Panel-MinimizeButton-Down")
+	closeBtn:SetHighlightTexture("Interface/Buttons/UI-Panel-MinimizeButton-Highlight")
+	closeBtn:SetPoint("TOPRIGHT", LUI:Scale(-3), LUI:Scale(-3))
+	closeBtn:SetScript("OnClick", function(self, button)
+		self:GetParent():Hide()
+	end)
+	closeBtn:RegisterForClicks("AnyUp")
+	closeBtn:GetNormalTexture():SetDesaturated(1)
+	frame.closeButton = closeBtn
 
 	-- Bag Frame
 	local bagsFrame = CreateFrame("Frame", frameName.."_BagsFrame", frame, "BackdropTemplate")
 	bagsFrame:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0, LUI:Scale(2))
 	bagsFrame:SetFrameStrata("HIGH")
 	frame.BagsFrame = bagsFrame
-
-	-- Deposit Reagents
-	if frameName == "LUIReagents" then
-		local depositBtn = CreateFrame("Button", frameName.."_SortButton", frame, "UIPanelButtonTemplate")
-		depositBtn:SetText("Deposit Reagents")
-		depositBtn:SetWidth(LUI:Scale(depositBtn:GetTextWidth()+20))
-		depositBtn:SetHeight(LUI:Scale(depositBtn:GetTextHeight()+10))
-		depositBtn:SetPoint("BOTTOMLEFT", LUI:Scale(3), LUI:Scale(3))
-		depositBtn:SetScript("OnClick", function(self, button)
-			--PlaySound("igMainMenuOption")
-			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
-			DepositReagentBank()
-		end)
-		depositBtn:RegisterForClicks("AnyUp")
-		frame.depositBtn = depositBtn
-	end
-
-	-- Purchase Reagents Bank
-	if frameName == "LUIBank" and not IsReagentBankUnlocked() then
-		local reagentsBtn = CreateFrame("Button", frameName.."_ReagentButton", frame, "UIPanelButtonTemplate")
-		reagentsBtn:SetText("Purchase Reagents Bank Vault")
-		reagentsBtn:SetWidth(LUI:Scale(reagentsBtn:GetTextWidth()+20))
-		reagentsBtn:SetHeight(LUI:Scale(reagentsBtn:GetTextHeight()+10))
-		reagentsBtn:SetPoint("BOTTOMLEFT", LUI:Scale(3), LUI:Scale(3))
-		reagentsBtn:SetScript("OnClick", function(self, button)
-			--PlaySound("igMainMenuOption")
-			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
-			StaticPopup_Show("CONFIRM_BUY_REAGENTBANK_TAB")
-		end)
-		reagentsBtn:RegisterForClicks("AnyUp")
-		frame.reagentsBtn = reagentsBtn
-	end
 
 	-- Sort Button
 	local sortBtn = CreateFrame("Button", frameName.."_SortButton", frame, "UIPanelButtonTemplate")
@@ -570,39 +454,14 @@ function module:CreateBagFrame(bagType)
 	sortBtn:SetHeight(LUI:Scale(sortBtn:GetTextHeight()+10))
 	sortBtn:SetPoint("BOTTOMRIGHT", LUI:Scale(-3), LUI:Scale(3))
 	sortBtn:SetScript("OnClick", function(self, button)
-		--PlaySound("UI_BagSorting_01")
 		PlaySound(SOUNDKIT.UI_BAG_SORTING_01)
-		-- Make sure we arent calling bag updates a million times
-		module:UnregisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
-		module:UnregisterEvent("PLAYERBANKSLOTS_CHANGED")
-		module:UnregisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
-		-- We can't use the WoD sort function with LUIv3
-		-- SortBankBags()
-		if frameName ~= "LUIReagents" then
-			module:PrepareSort(self:GetParent())
-		else
-			SortReagentBankBags()
-		end
-		module:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
-		module:RegisterEvent("PLAYERBANKSLOTS_CHANGED")
-		module:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
+		module:PrepareSort(self:GetParent())
 	end)
 	sortBtn:RegisterForClicks("AnyUp")
 	frame.sortButton = sortBtn
 	CheckSortButton()
 
 	return frame
-end
-
-function module:InitBank()
-	if LUIBank then
-		return
-	end
-
-	LUIBank = self:CreateBagFrame("Bank")
-	LUIReagents = self:CreateBagFrame("Reagents")
-	LUIBank:SetScript("OnShow", LUIBank_OnShow)
-	LUIBank:SetScript("OnHide", LUIBank_OnHide)
 end
 
 local GetParent_StartMoving = function(self)
@@ -780,20 +639,15 @@ function module:Layout(bagType)
 		frame = LUIBags_Select(bagType)
 	end
 
-	local isBank = false
-	if bagType == "Bank" or bagType == "Reagents" then
-		isBank = true
-	else
-		frame.gold:SetText(GetMoneyString(GetMoney(), 12))
-		frame.editbox:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
-		frame.search:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
-		frame.gold:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
-		frame.currency:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
+	frame.gold:SetText(GetMoneyString(GetMoney(), 12))
+	frame.editbox:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
+	frame.search:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
+	frame.gold:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
+	frame.currency:SetFont(Media:Fetch("font", db.Bags.Font), 12, "")
 
-		frame.search:ClearAllPoints()
-		frame.search:SetPoint("TOPLEFT", frame, LUI:Scale(db.Bags.Padding), LUI:Scale(-10))
-		frame.search:SetPoint("RIGHT", LUI:Scale(-(16 + 24)), 0)
-	end
+	frame.search:ClearAllPoints()
+	frame.search:SetPoint("TOPLEFT", frame, LUI:Scale(db.Bags.Padding), LUI:Scale(-10))
+	frame.search:SetPoint("RIGHT", LUI:Scale(-(16 + 24)), 0)
 
 	local bagsFrame = frame.BagsFrame
 	if not isCreated[bagType] then
@@ -830,56 +684,12 @@ function module:Layout(bagType)
 
 		local idx = 0
 		for x, id in ipairs(bagId) do
-			if (not isBank and id <= 3 ) or (isBank and id >= 5) then
+			if (id <= 3 ) or (id >= 5) then
 				local b = module:BagFrameSlotNew(id, bagsFrame, bagType)
-
 				local Xoffset = padding + idx*bagTexSize + idx*spacing
-
-				local BankSlots, Full = GetNumBankSlots()
-				local cost = GetBankSlotCost(BankSlots)
-
-				if isBank and not Full then
-
-					--Most recently bought bag.
-					if x == GetNumBankSlots() + 1 then
-
-						--Set Things back up to normal after a purchase.
-						b.frame:SetAlpha(1)
-						SetItemButtonTexture(b.frame,"Interface\\paperdoll\\UI-PaperDoll-Slot-Bag")
-
-						b.frame:SetScript("OnClick", function(self)
-							if ( IsModifiedClick("PICKUPACTION") ) then
-								BankFrameItemButtonBag_Pickup(self)
-							else
-								BankFrameItemButtonBag_OnClick(self, button)
-							end
-						end)
-
-						--Bag about to be purcahsed.
-					elseif x == GetNumBankSlots() + 2 then
-
-						b.frame:SetAlpha(1)
-						SetItemButtonTexture(b.frame,GetCoinIcon(cost))
-
-						-- Add the Click-To-Purchase option.
-						b.frame:SetScript("OnClick", function(self)
-							LUIBank.bankCost = cost
-							StaticPopup_Show("CONFIRM_BUY_BANK_SLOT")
-						end)
-
-						--Unpurchased Bags.
-					elseif x > GetNumBankSlots() + 2 then
-						b.frame:SetAlpha(.2)
-					end
-				end
-				if isBank and Full and LUIBank.bankCost then
-					LUIBank.bankCost = nil
-				end
-
 				b.frame:ClearAllPoints()
 				b.frame:SetPoint("LEFT", bagsFrame, "LEFT", LUI:Scale(Xoffset), 0)
 				b.frame:Show()
-
 				idx = idx + 1
 			end
 		end
@@ -981,9 +791,6 @@ function module:Layout(bagType)
 	--adjust the size of the frames now.
 	frame:SetScale(db[bagType].Scale)
 	bagsFrame:SetScale(db[bagType].BagScale)
-	if bagType == "Reagents" then
-		bagsFrame:SetAlpha(0)
-	end
 
 	isCreated[bagType] = true
 end
@@ -994,59 +801,11 @@ end
 
 function module:QUEST_ACCEPTED(event)
 	module:ReloadLayout("Bags")
-	module:ReloadLayout("Bank")
 end
 
 function module:UNIT_QUEST_LOG_CHANGED(event, unit)
 	if unit == "player" then
 		module:ReloadLayout("Bags")
-		module:ReloadLayout("Bank")
-	end
-end
-
-function module:PLAYERBANKBAGSLOTS_CHANGED(event, id)
-	module:ReloadLayout("Bank")
-end
-
-function module:PLAYERREAGENTBANKSLOTS_CHANGED(event, id)
-	module:ReloadLayout("Reagents")
-end
-
-function module:REAGENTBANK_PURCHASED(event, id)
-	if IsReagentBankUnlocked() then
-		LUIBank_ReagentButton:Hide()
-		module:ReloadLayout("Reagents")
-		LUIReagents:Show()
-		LUIReagents:SetAlpha(1)
-		self:UnregisterEvent("REAGENTBANK_PURCHASED")
-	end
-end
-
-function module:PLAYERBANKSLOTS_CHANGED(event, id)
-	if id > 28 then
-		for _, v in ipairs(BagsSlots) do
-			if v.frame and v.frame.GetInventorySlot then
-				if v.slot < GetNumBankSlots() + 5 then
-					BankFrameItemButton_Update(v.frame)
-					BankFrameItemButton_UpdateLocked(v.frame)
-				end
-				if not v.frame.tooltipText then
-					v.frame.tooltipText = ""
-				end
-			end
-		end
-	end
-
-	if LUIBank and LUIBank:IsShown() then
-		for _, id in ipairs(GetBags["Bank"]) do
-			module:BagSlotUpdate(id)
-		end
-	end
-
-	if LUIReagents and LUIReagents:IsShown() then
-		for _, id in ipairs(GetBags["Reagents"]) do
-			module:BagSlotUpdate(id)
-		end
 	end
 end
 
@@ -1065,41 +824,6 @@ function module:ITEM_LOCK_CHANGED(event, bag, slot)
 			break
 		end
 	end
-end
-
-function module:BANKFRAME_OPENED()
-	if not LUIBank then
-		module:InitBank()
-	end
-
-	module:Layout("Bank")
-	module:Layout("Reagents")
-	for _, x in ipairs(GetBags["Bank"]) do
-		module:BagSlotUpdate(x)
-	end
-	LUIBags_Open()
-	LUIBank:Show()
-	LUIBank:SetAlpha(1)
-
-	-- Show purchase button instead of frame if you haven't bought it yet
-	if IsReagentBankUnlocked() then
-		for _, x in ipairs(GetBags["Reagents"]) do
-			module:BagSlotUpdate(x)
-		end
-		LUIReagents:Show()
-		LUIReagents:SetAlpha(1)
-	else
-		LUIReagents:Hide()
-	end
-end
-
-function module:BANKFRAME_CLOSED()
-	if not LUIBank then
-		return
-	end
-
-	LUIBank:Hide()
-	LUIReagents:Hide()
 end
 
 function module:BAG_CLOSED(event, id)
@@ -1132,8 +856,6 @@ function module:BAG_CLOSED(event, id)
 
 	--Hack to get a ReloadLayout on next re-open.
 	isCreated["Bags"] = false
-	isCreated["Bank"] = false
-	isCreated["Reagent"] = false
 end
 
 --Copy bags options over.
@@ -1177,7 +899,7 @@ function module:ReloadLayout(bag)
 	end
 end
 
--- Note: Do not make new tables inside the Bags and Bank Options.
+-- Note: Do not make new tables inside the Bags Options.
 --       It would break the CopyBags function that dynamically copy things.
 module.defaults = {
 	profile = {
@@ -1208,42 +930,6 @@ module.defaults = {
 			BorderInset = -1,
 		},
 		--End of Bags Options
-		--Start of Bank Options
-		Bank = {
-			CopyBags = true,
-			Cols = 14,
-			Padding = 8,
-			Spacing = 3,
-			Scale = 1,
-			BagScale = 1,
-			BagFrame = true,
-			Locked = 0,
-			CoordX = 0,
-			CoordY = 0,
-			BackgroundTexture = "Blizzard Tooltip",
-			BorderTexture = "Stripped_medium",
-			BorderSize = 5,
-			BorderInset = -1,
-		},
-		--End of Bank Options
-		--Start of Reagents Options
-		Reagents = {
-			CopyBags = true,
-			Cols = 14,
-			Padding = 8,
-			Spacing = 3,
-			Scale = 1,
-			BagScale = 1,
-			BagFrame = true,
-			Locked = 0,
-			CoordX = 0,
-			CoordY = 0,
-			BackgroundTexture = "Blizzard Tooltip",
-			BorderTexture = "Stripped_medium",
-			BorderSize = 5,
-			BorderInset = -1,
-		},
-		--End of Reagents Options
 		Colors = {
 			BlackFrameBG = false,
 			Border = {
@@ -1287,18 +973,8 @@ function module:LoadOptions()
 		module:ReloadLayout("Bags")
 		if db.CopyBags then module:CopyBags() end
 	end
-	local function BankOpt()
-		module:ReloadLayout("Bank")
-	end
-	local function ReagentOpt()
-		module:ReloadLayout("Reagents")
-	end
-	local function DisabledCopy()
-		return db.Bank.CopyBags
-	end
 	local function ReloadBoth()
 		module:ReloadLayout("Bags")
-		module:ReloadLayout("Bank")
 	end
 
 	local options = {
@@ -1309,7 +985,7 @@ function module:LoadOptions()
 			args = {
 				Cols = LUI:NewSlider("Items Per Row", "Select how many items will be displayed per rows in your Bags.",
 					2, db.Bags, "Cols", dbd.Bags, 4, 32, 1, BagOpt),
-				Lock = LUI:NewToggle("Lock Frames", "Lock the Bags, Bank and Reagents frames in place", 3, db, "Lock", dbd,nil,"normal"),
+				Lock = LUI:NewToggle("Lock Frames", "Lock the Bags frame in place", 3, db, "Lock", dbd,nil,"normal"),
 				hideSort = LUI:NewToggle("Hide Sort Button", "Hide the Stack & Sort button from the bags window", 4, db, "hideSort", dbd, CheckSortButton, "normal"),
 				Header = LUI:NewHeader("", 5),
 				Padding = LUI:NewSlider("Bag Padding", "This sets the space between the background border and the adjacent items.",
@@ -1323,48 +999,6 @@ function module:LoadOptions()
 				ShowNew = LUI:NewToggle("Show New Item Animation", nil, 12, db.Bags, "ShowNew", dbd.Bags, ReloadBoth),
 				ShowQuest = LUI:NewToggle("Show Quest Highlights", nil, 13, db.Bags, "ShowQuest", dbd.Bags, ReloadBoth),
 				ShowOverlay = LUI:NewToggle("Show Overlays", nil, 14, db.Bags, "ShowOverlay", dbd.Bags, ReloadBoth),
-			},
-		},
-		Bank = {
-			name = "Bank",
-			type = "group",
-			order = 4,
-			args = {
-				CopyBags = LUI:NewToggle("Copy Bags", "Make the Bank and Reagents frames copy the bags options.", 1, db.Bank, "CopyBags", dbd.Bank,
-					function()
-						module:CheckBagsCopy()
-						if db.Bank.CopyBags then module:CopyBags() end
-					end, "normal"),
-				Cols = LUI:NewSlider("Items Per Row", "Select how many items will be displayed per rows in your Bags.", 2,
-					db.Bank, "Cols", dbd.Bank, 4, 32, 1, BankOpt),
-				Header = LUI:NewHeader("", 3),
-				Padding = LUI:NewSlider("Bank Padding", "This sets the space between the background border and the adjacent items.", 4,
-					db.Bank, "Padding", dbd.Bank, 4, 24, 1, BankOpt, nil, DisabledCopy),
-				Spacing = LUI:NewSlider("Bank Spacing", "This sets the distance between items.", 5,
-					db.Bank, "Spacing", dbd.Bank, 1, 15, 1, BankOpt, nil, DisabledCopy),
-				Scale = LUI:NewScale("Bank Frame",6, db.Bank, "Scale", dbd.Bank, BankOpt, nil, DisabledCopy),
-				BagScale = LUI:NewScale("Bank BagBar",7, db.Bank, "BagScale", dbd.Bank, BankOpt, nil, DisabledCopy),
-				BagFrame = LUI:NewToggle("Show Bag Bar", nil, 8, db.Bank, "BagFrame", dbd.Bank, BankOpt, nil, DisabledCopy),
-			},
-		},
-		Reagents = {
-			name = "Reagents",
-			type = "group",
-			order = 5,
-			args = {
-				--[[CopyBags = LUI:NewToggle("Copy Bags", "Make the Reagent frame copy the bags options.", 1, db.Reagents, "CopyBags", dbd.Reagents,
-					function()
-						module:CheckBagsCopy()
-						if db.Reagents.CopyBags then module:CopyBags() end
-					end, "normal"),]]
-				Cols = LUI:NewSlider("Items Per Row", "Select how many items will be displayed per rows in your Bags.", 2,
-					db.Reagents, "Cols", dbd.Reagents, 4, 32, 1, ReagentOpt),
-				Header = LUI:NewHeader("", 3),
-				Padding = LUI:NewSlider("Reagents Padding", "This sets the space between the background border and the adjacent items.", 4,
-					db.Reagents, "Padding", dbd.Reagents, 4, 24, 1, ReagentOpt, nil, DisabledCopy),
-				Spacing = LUI:NewSlider("Reagents Spacing", "This sets the distance between items.", 5,
-					db.Reagents, "Spacing", dbd.Reagents, 1, 15, 1, ReagentOpt, nil, DisabledCopy),
-				Scale = LUI:NewScale("Reagents Frame",6, db.Reagents, "Scale", dbd.Reagents, ReagentOpt, nil, DisabledCopy),
 			},
 		},
 		Colors = {
@@ -1389,9 +1023,6 @@ function module:OnInitialize()
 end
 
 function module:OnEnable()
-	module:RegisterEvent("BANKFRAME_OPENED")
-	module:RegisterEvent("BANKFRAME_CLOSED")
-
 	-- Add LUIBags to the "Can be closed using ESC" table.
 	tinsert(UISpecialFrames,"LUIBags")
 
@@ -1415,18 +1046,12 @@ function module:OnEnable()
 		return 0
 	end, true)
 
-	BankFrame:UnregisterAllEvents()
-
 	module:SetBags()
 	module:EnableBags()
 
 end
 
 function module:OnDisable()
-	--Make the bankframe works again
-	BankFrame:RegisterEvent("BANKFRAME_OPENED")
-	BankFrame:RegisterEvent("BANKFRAME_CLOSED")
-
 	CloseAllBags()
 
 	--Makes the UI functions like they were
@@ -1450,7 +1075,7 @@ function module:OnDisable()
 end
 
 function module:PrepareSort(frame)
-	if frame ~= LUIBags and frame ~= LUIBank and frame ~= LUIReagents then
+	if frame ~= LUIBags then
 		return;
 	end
 
@@ -1466,10 +1091,6 @@ function module:PrepareSort(frame)
 	local bagOrder = {}
 	if self.sortFrame == LUIBags then
 		bagOrder = GetBags["Bags"];
-	elseif self.sortFrame == LUIBank then
-		bagOrder = GetBags["Bank"];
-	elseif self.sortFrame == LUIReagents then
-		bagOrder = GetBags["Reagents"];
 	end
 
 	local specialBags = {};
