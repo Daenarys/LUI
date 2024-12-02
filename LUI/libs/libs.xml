@@ -5,7 +5,6 @@
     <Script file="LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
     <Script file="LibWindow-1.1\LibWindow-1.1.lua"/>
 
-    <Include file="LibBabble-Zone-3.0\lib.xml"/>
     <Include file="LibKeyBound-1.0\lib.xml"/>
     <Include file="LibSharedMedia-3.0\lib.xml"/>
 
