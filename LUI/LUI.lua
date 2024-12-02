@@ -608,6 +608,7 @@ function LUI:Module(name, prototype, ...)
 		end
 	elseif prototype ~= true then -- check silent
 		if not next(self.modules) then
+			self:SetDefaultModuleLibraries("LUIDevAPI")
 			self:SetDefaultModulePrototype(getModulePrototype(self))
 		end
 

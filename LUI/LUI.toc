@@ -10,7 +10,8 @@ libs\libs.xml
 locale\locale.xml
 init.lua
 tools\profiler.lua
-debug.lua
+tools\debug.lua
+tools\devapi.lua
 tools\restore.lua
 LUI.lua
 modules\themes.lua
