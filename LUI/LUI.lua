@@ -79,7 +79,7 @@ LUI.Media = {
 }
 
 LUI.FontFlags = {
-	NONE = L["None"],
+	[""] = L["None"],
 	OUTLINE = L["Outline"],
 	THICKOUTLINE = L["Thick Outline"],
 	MONOCHROME = L["Monochrome"],
