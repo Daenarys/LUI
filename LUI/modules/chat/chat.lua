@@ -1,9 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: chat.lua
-	Description: Chat Module
-]]
-
 -- External references.
 local addonname, LUI = ...
 local module = LUI:Module("Chat", "AceHook-3.0")

@@ -1,9 +1,3 @@
---[[
-	Name........: DevAPI
-	Description.: Developer's API for LUI Module Options
-	Dependencies: LUI, LibStub, AceAddon, AceConfigRegistry-3.0, AceEvent-3.0, LibSharedMedia-3.0
-]]
-
 local MAJOR, MINOR = "LUIDevAPI", 2 -- increase manually when changes are made
 local devapi = LibStub:NewLibrary(MAJOR, MINOR)
 

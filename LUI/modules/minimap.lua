@@ -1,9 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: minimap.lua
-	Description: Minimap Module
-]]
-
 -- External references.
 local _, LUI = ...
 local module = LUI:Module("Minimap", "AceHook-3.0", "AceEvent-3.0")

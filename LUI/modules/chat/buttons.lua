@@ -1,9 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: buttons.lua
-	Description: Chat Buttons Module
-]]
-
 -- External references.
 local addonname, LUI = ...
 local Chat = LUI:Module("Chat")
@@ -17,7 +11,6 @@ local db, dbd
 --------------------------------------------------
 
 local lines = {}
-
 local copyFrame
 
 --------------------------------------------------

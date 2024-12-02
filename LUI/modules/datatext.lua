@@ -1,15 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: datatext.lua
-	Description: Provides LUI datatexts which hold relative info.
-	Version....: 1.9
-	Rev Date...: 16/07/2011 [dd/mm/yyyy]
-
-	Edits:
-		v1.8: Hix
-		v1.9: Zista
-]]
-
 if false then return end -- change false to true if working with new infotext module
 
 -- External references.

@@ -1,15 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: restore.lua
-	Description: Experimental database tools.
-	
-	Notes:
-		Creates a backup of current database settings,
-		invokes a complete reset to defaults (which should remove un-wanted old corruptions... hopefully),
-		then restores only settings that are used.
-]]
-
-
 -- External references.
 local addonname, LUI = ...
 

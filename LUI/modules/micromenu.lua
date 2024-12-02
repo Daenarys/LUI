@@ -1,9 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: LUI_MM.lua
-	Description: Micromenu Module
-]]
-
 -- External references.
 local addonname, LUI = ...
 local module = LUI:Module("Micromenu", "AceEvent-3.0", "AceHook-3.0")

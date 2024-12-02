@@ -1,11 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: DEBUG.lua
-	Description: Debugger for LUI
-	Version....: 0.1
-	Rev Date...: 14/08/11
-]]
-
 local addonname, LUI = ...
 
 local version, revision = C_AddOns.GetAddOnMetadata(addonname, "Version"), C_AddOns.GetAddOnMetadata(addonname, "X-Curse-Packaged-Version")

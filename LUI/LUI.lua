@@ -1,14 +1,6 @@
---[[
-	Project.: LUI NextGenWoWUserInterface
-	File....: LUI.lua
-	Version.: 3.403
-	Rev Date: 13/02/2011
-	Author..: Louí [EU-Das Syndikat] <In Fidem>
-]]
-
+-- External references.
 local addonname, LUI = ...
 local L = LUI.L
-
 local AceAddon = LibStub("AceAddon-3.0")
 
 -- this is a temp globalization (should make it check for alpha verion to globalize or not once all other files don't need global)
@@ -306,8 +298,6 @@ function LUI:SyncAddonVersion()
 		local pos = strfind(luiversion, "%.")
 		if pos then
 			version = version .. format("%03d.", strsub(luiversion, 1, pos-1))
-
-
 			luiversion = strsub(luiversion, pos+1)
 		else
 			version = version .. format("%03d", luiversion)

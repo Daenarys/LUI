@@ -1,16 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: panels.lua
-	Description: Main Panels Module
-	Version....: 1.2
-	Rev Date...: 13/03/2012 [dd/mm/yyyy]
-
-	Edits:
-		v1.0: Loui
-		v1.1: Zista
-		v1.2: Thaly
-]]
-
 -- External references.
 local _, LUI = ...
 local module = LUI:Module("Panels", "AceHook-3.0", "AceEvent-3.0")

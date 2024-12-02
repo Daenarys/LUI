@@ -1,9 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: editbox.lua
-	Description: Chat EditBox Module
-]]
-
 -- External references.
 local addonname, LUI = ...
 local Chat = LUI:Module("Chat")
