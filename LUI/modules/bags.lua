@@ -30,6 +30,7 @@ local GetContainerItemInfo = C_Container.GetContainerItemInfo
 local GetContainerItemLink = C_Container.GetContainerItemLink
 local GetContainerItemCooldown = C_Container.GetContainerItemCooldown
 local GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
+local GetContainerItemQuestInfo = C_Container.GetContainerItemQuestInfo
 local PickupContainerItem = C_Container.PickupContainerItem
 
 local CreateFrame = CreateFrame
@@ -192,45 +193,51 @@ function module:InitSelect(bag)
 end
 
 function module:SlotUpdate(item)
-	local itemInfo = C_Container.GetContainerItemInfo(item.bag, item.slot)
-    local texture = itemInfo and itemInfo.iconFileID
-    local itemCount = itemInfo and itemInfo.stackCount
-    local quality = itemInfo and itemInfo.quality
-    local itemLink = itemInfo and itemInfo.hyperlink
+	local info = GetContainerItemInfo(item.bag, item.slot)
+	local texture = info and info.iconFileID
+	local itemCount = info and info.stackCount
+	local locked = info and info.isLocked
+	local quality = info and info.quality
+	local itemLink = info and info.hyperlink
+	local isBound = info and info.isBound
+	local questInfo = GetContainerItemQuestInfo(item.bag, item.slot)
+	local isQuestItem = questInfo.isQuestItem
+	local questID = questInfo.questID
+	local isActive = questInfo.isActive
 	local color = db.Colors.Border
 
 	if not item.frame.lock then
 		item.frame:SetBackdropBorderColor(color.r, color.g, color.b, color.a)
-
-		--Check for Profession Bag
 		local bagType = module:BagType(item.bag)
 		if (bagType == ST_SPECIAL) then
 			local color = db.Colors.Professions
 			item.frame:SetBackdropBorderColor(color.r, color.g, color.b, color.a)
 		end
-
 	end
 
 	if item.Cooldown then
-		local startTime, duration, enable = C_Container.GetContainerItemCooldown(item.bag, item.slot)
-		CooldownFrame_Set(item.Cooldown, startTime, duration, enable)
+		local cd_start, cd_finish, cd_enable = GetContainerItemCooldown(item.bag, item.slot)
+		CooldownFrame_Set(item.Cooldown, cd_start, cd_finish, cd_enable)
 	end
 
-	-- New item code from Blizzard's ContainerFrame.lua
 	local newItemTexture = item.frame.NewItemTexture
 	local battlePayTexture = item.frame.BattlepayItemTexture
 	local flashAnim = item.frame.flashAnim
 	local newItemAnim = item.frame.newitemglowAnim
 	if newItemTexture then
 		if db.Bags.ShowNew and C_NewItems.IsNewItem(item.bag, item.slot) then
-			if quality and NEW_ITEM_ATLAS_BY_QUALITY[quality] then
-				newItemTexture:SetAtlas(NEW_ITEM_ATLAS_BY_QUALITY[quality])
+			if C_Container.IsBattlePayItem(item.bag, item.slot) then
+				newItemTexture:Hide()
+				battlePayTexture:Show()
 			else
-				newItemTexture:SetAtlas("bags-glow-white")
+				if quality and NEW_ITEM_ATLAS_BY_QUALITY[quality] then
+					newItemTexture:SetAtlas(NEW_ITEM_ATLAS_BY_QUALITY[quality])
+				else
+					newItemTexture:SetAtlas("bags-glow-white")
+				end
+				newItemTexture:Show()
+				battlePayTexture:Hide()
 			end
-			newItemTexture:Show()
-			battlePayTexture:Hide()
-
 			if not flashAnim:IsPlaying() and not newItemAnim:IsPlaying() then
 				flashAnim:Play()
 				newItemAnim:Play()
@@ -243,24 +250,32 @@ function module:SlotUpdate(item)
 				newItemAnim:Stop()
 			end
 		end
-		--Make sure that the textures are the same size as the itemframe.
 		battlePayTexture:SetSize(item.frame:GetSize())
 		newItemTexture:SetSize(item.frame:GetSize())
 	end
 
+	local questTexture = _G[item.frame:GetName().."IconQuestTexture"]
+	if questTexture then
+		questTexture:SetSize(item.frame:GetSize())
+		if questInfo.questID and not questInfo.isActive and db.Bags.ShowQuest then
+			questTexture:SetTexture(TEXTURE_ITEM_QUEST_BANG)
+			questTexture:Show()
+		elseif (questInfo.questID or questInfo.isQuestItem) and db.Bags.ShowQuest then
+			questTexture:SetTexture(TEXTURE_ITEM_QUEST_BORDER)
+			questTexture:Show()
+		else
+			questTexture:Hide()
+		end
+	end
+
 	if (itemLink) then
-		local name, _, itemQuality, _, _, iType, _, _, _, _, _, classID = GetItemInfo(itemLink)
-		item.name, item.itemQuality = name, itemQuality
-		-- color slot according to item quality
-		if db.Bags.Rarity and not item.frame.lock and itemQuality > 1 then
-			local r, g, b, hex = C_Item.GetItemQualityColor(itemQuality)
-			item.frame:SetBackdropBorderColor(r, g, b)
-		-- color slot according to quest item.
-		elseif db.Bags.ShowQuest and not item.frame.lock and classID == 12 then
-			item.frame:SetBackdropBorderColor(1,1,0)
+		local name, _, rarity, _, _, iType = GetItemInfo(itemLink)
+		item.name, item.rarity = name, rarity
+		if db.Bags.ItemQuality and not item.frame.lock and rarity and rarity > 1 then
+			item.frame:SetBackdropBorderColor(C_Item.GetItemQualityColor(rarity))
 		end
 	else
-		item.name, item.itemQuality = nil, nil
+		item.name, item.rarity = nil, nil
 	end
 
 	SetItemButtonTexture(item.frame, texture)
