@@ -1677,7 +1677,7 @@ function BagSlotButton_OnEvent(self, event, ...)
 	else
 		PaperDollItemSlotButton_OnEvent(self, event, ...)
 	end
-ends
+end
 
 function BagSlotButton_OnClick(self)
 	local id = self:GetID()
