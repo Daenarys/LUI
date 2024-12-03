@@ -1,3 +1,17 @@
+--[[
+	Project....: LUI NextGenWoWUserInterface
+	File.......: themes.lua
+	Description: Themes Module
+	Version....: 1.4
+	Rev Date...: 24/07/2011 [dd/mm/yyyy]
+
+	Edits:
+		v1.0: Loui
+		v1.2: Zista
+		v1.3: Zista
+		v1.4: Zista
+]]
+
 -- External references.
 local addonname, LUI = ...
 local module = LUI:Module("Themes", "AceSerializer-3.0")

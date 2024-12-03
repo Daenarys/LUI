@@ -1,7 +1,27 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="GMOTD.lua"/>
+
     <Script file="chat.lua"/>
     <Script file="buttons.lua"/>
     <Script file="editbox.lua"/>
+	<Script file="stickychannels.lua"/>
+
+    <Button name="LUI_Chat_ScrollButtonTemplate" parentKey="downButton" hidden="true" virtual="true">
+        <Size x="20" y="20"/>
+        <Anchors>
+            <Anchor point="TOPRIGHT"/>
+        </Anchors>
+        <Scripts>
+            <OnClick>
+                self.frame:ScrollToBottom()
+            </OnClick>
+        </Scripts>
+        <NormalTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollEnd-Up"/>
+        <PushedTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollEnd-Down"/>
+        <DisabledTexture file="Interface\ChatFrame\UI-ChatIcon-ScrollEnd-Disabled"/>
+        <HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+    </Button>
+
     <Button name="LUI_Chat_CopyButtonTemplate" parentKey="copyButton" alpha="0.6" virtual="true">
         <Size x="10" y="10"/>
         <Anchors>
@@ -26,6 +46,7 @@
         <NormalTexture file="Interface\AddOns\LUI\media\textures\icons\chatcopy"/>
         <HighlightTexture file="Interface\Buttons\ButtonHilight-Square"/>
     </Button>
+
     <Frame name="LUI_Chat_EditBoxBGTemplate" parentKey="bg" frameStrata="DIALOG" setAllPoints="true" virtual="true">
         <Frames>
             <Frame parentKey="lDrag" toplevel="true">

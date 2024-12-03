@@ -1,28 +1,13 @@
-## Interface: 110005
-## IconTexture: Interface/AddOns/LUI/media/icon
+## Interface: 90205
+## Version: 3.38
 ## Title: LUI
+## Author: Siku, Mule, Hix, Thaly, Zista
+## FormerAuthor: Louí @EU-Das Syndikat
 ## Notes: User Interface Modification
-## Author: luckfore
-## Version: 1.00
 ## SavedVariables: LUIDB, LUIGold, LUI_Themes, LUI_Layouts
 ## SavedVariablesPerCharacter: LUICONFIG
+## OptionalDeps: Masque, Masque_Darion
+## X-oUF: oUF_LUI
+
 libs\libs.xml
-locale\locale.xml
-init.lua
-tools\profiler.lua
-tools\debug.lua
-tools\devapi.lua
-tools\restore.lua
-LUI.lua
-modules\themes.lua
-modules\panels.lua
-modules\frames.lua
-modules\fader.lua
-modules\chat\chat.xml
-modules\minimap.lua
-modules\bags\bags.xml
-modules\datatext.lua
-modules\faq.lua
-modules\micromenu.lua
-modules\artwork.lua
-scripts\errorhider.lua
+LUI.xml

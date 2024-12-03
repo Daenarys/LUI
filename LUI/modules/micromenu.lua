@@ -1,3 +1,19 @@
+--[[
+	Project....: LUI NextGenWoWUserInterface
+	File.......: LUI_MM.lua
+	Description: Micromenu Module
+	Version....: 1.5
+	Rev Date...: 14/03/2012
+
+	Edits:
+		v1.0: Loui
+		v1.1: Loui/Thaly
+		v1.2: Thaly
+		v1.3: Thaly
+		v1.4: Xus
+		v1.5: Thaly
+]]
+
 -- External references.
 local addonname, LUI = ...
 local module = LUI:Module("Micromenu", "AceEvent-3.0", "AceHook-3.0")
@@ -100,7 +116,7 @@ function module:SetMicroMenu()
 			Panels.db.profile.MicroMenu.IsShown = false
 
 			LUI.MicroMenu.Anchor:SetBackdrop({
-				bgFile = fdir..(GetMouseFoci() == LUI.MicroMenu.Clicker and "micro_anchor2" or "micro_anchor"),
+				bgFile = fdir..(GetMouseFocus() == LUI.MicroMenu.Clicker and "micro_anchor2" or "micro_anchor"),
 				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 				tile = false, tileSize = 0, edgeSize = 1,
 				insets = {left = 0, right = 0, top = 0, bottom = 0}
@@ -112,7 +128,7 @@ function module:SetMicroMenu()
 			Panels.db.profile.MicroMenu.IsShown = true
 
 			LUI.MicroMenu.Anchor:SetBackdrop({
-				bgFile = fdir..(GetMouseFoci() == LUI.MicroMenu.Clicker and "micro_anchor4" or "micro_anchor3"),
+				bgFile = fdir..(GetMouseFocus() == LUI.MicroMenu.Clicker and "micro_anchor4" or "micro_anchor3"),
 				edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 				tile = false, tileSize = 0, edgeSize = 1,
 				insets = {left = 0, right = 0, top = 0, bottom = 0}
@@ -294,13 +310,15 @@ function module:SetMicroMenu()
 
 	local bagsFrame
 	local getBagsFrame = function()
-	if C_AddOns.IsAddOnLoaded("Stuffing") then
+		if LUI:Module("Bags").db.profile.Enable then
+			bagsFrame = LUIBags
+		elseif IsAddOnLoaded("Stuffing") then
 			bagsFrame = StuffingFrameBags
-		elseif C_AddOns.IsAddOnLoaded("Bagnon") then
+		elseif IsAddOnLoaded("Bagnon") then
 			bagsFrame = BagnonFrameinventory
-		elseif C_AddOns.IsAddOnLoaded("ArkInventory") then
+		elseif IsAddOnLoaded("ArkInventory") then
 			bagsFrame = ARKINV_Frame1
-		elseif C_AddOns.IsAddOnLoaded("OneBag") then
+		elseif IsAddOnLoaded("OneBag") then
 			bagsFrame = OneBagFrame
 		else
 			bagsFrame = nil
@@ -465,7 +483,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Store.Clicker:SetScript("OnUpdate", function(self)
-		if C_AddOns.IsAddOnLoaded("Blizzard_StoreUI") then
+		if IsAddOnLoaded("Blizzard_StoreUI") then
 			if not LUI.MicroMenu.Buttons.Store.Clicker.State and not StoreFrame_IsShown() then
 				LUI.MicroMenu.Buttons.Store.Clicker:SetAlpha(0)
 			else
@@ -517,7 +535,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Pets.Clicker:SetScript("OnUpdate", function(self)
-		if C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
+		if IsAddOnLoaded("Blizzard_Collections") then
 			if not LUI.MicroMenu.Buttons.Pets.Clicker.State and not CollectionsJournal:IsShown() then
 				LUI.MicroMenu.Buttons.Pets.Clicker:SetAlpha(0)
 			else
@@ -622,7 +640,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Journal.Clicker:SetScript("OnUpdate", function(self)
-		if C_AddOns.IsAddOnLoaded("Blizzard_EncounterJournal") then
+		if IsAddOnLoaded("Blizzard_EncounterJournal") then
 			if not LUI.MicroMenu.Buttons.Journal.Clicker.State and not EncounterJournal:IsShown() then
 				LUI.MicroMenu.Buttons.Journal.Clicker:SetAlpha(0)
 			else
@@ -712,7 +730,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Guild.Clicker:SetScript("OnLeave", function(self)
-		if not FriendsFrame:IsShown() and not CommunitiesFrame:IsShown() then
+		if not FriendsFrame:IsShown() and not GuildFrame:IsShown() then
 			self:SetAlpha(0)
 		end
 		self.State = nil
@@ -723,7 +741,7 @@ function module:SetMicroMenu()
 		if button == "RightButton" then
 			ToggleFriendsFrame(1)
 		else
-			ToggleCommunitiesFrame()
+			ToggleGuildFrame()
 		end
 	end)
 
@@ -732,13 +750,27 @@ function module:SetMicroMenu()
 	end)
 
 	FriendsFrame:HookScript("OnHide", function(self)
-		if not CommunitiesFrame:IsShown() and not LUI.MicroMenu.Buttons.Guild.Clicker.State then
+		if not GuildFrame:IsShown() and not LUI.MicroMenu.Buttons.Guild.Clicker.State then
+			LUI.MicroMenu.Buttons.Guild.Clicker:SetAlpha(0)
+		end
+	end)
+
+	if not GuildFrame then
+		LoadAddOn("Blizzard_GuildUI")
+	end
+
+	GuildFrame:HookScript("OnShow", function(self)
+		LUI.MicroMenu.Buttons.Guild.Clicker:SetAlpha(1)
+	end)
+
+	GuildFrame:HookScript("OnHide", function(self)
+		if not FriendsFrame:IsShown() and not CommunitiesFrame:IsShown() and not LUI.MicroMenu.Buttons.Guild.Clicker.State then
 			LUI.MicroMenu.Buttons.Guild.Clicker:SetAlpha(0)
 		end
 	end)
 
 	if not CommunitiesFrame then
-		C_AddOns.LoadAddOn("Blizzard_Communities")
+		Communities_LoadUI()
 	end
 
 	CommunitiesFrame:HookScript("OnShow", function(self)
@@ -746,7 +778,7 @@ function module:SetMicroMenu()
 	end)
 
 	CommunitiesFrame:HookScript("OnHide", function(self)
-		if not FriendsFrame:IsShown() and not CommunitiesFrame:IsShown() and not LUI.MicroMenu.Buttons.Guild.Clicker.State then
+		if not FriendsFrame:IsShown() and not GuildFrame:IsShown() and not LUI.MicroMenu.Buttons.Guild.Clicker.State then
 			LUI.MicroMenu.Buttons.Guild.Clicker:SetAlpha(0)
 		end
 	end)
@@ -848,7 +880,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.AC.Clicker:SetScript("OnUpdate", function(self)
-		if C_AddOns.IsAddOnLoaded("Blizzard_AchievementUI") then
+		if IsAddOnLoaded("Blizzard_AchievementUI") then
 			if not LUI.MicroMenu.Buttons.AC.Clicker.State and not AchievementFrame:IsShown() then
 				LUI.MicroMenu.Buttons.AC.Clicker:SetAlpha(0)
 			else
@@ -891,7 +923,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Talents.Clicker:SetScript("OnLeave", function(self)
-		if not PlayerSpellsFrame:IsShown() then
+		if not PlayerTalentFrame:IsShown() then
 			self:SetAlpha(0)
 		end
 		self.State = nil
@@ -900,26 +932,26 @@ function module:SetMicroMenu()
 
 	LUI.MicroMenu.Buttons.Talents.Clicker:SetScript("OnClick", function(self)
 		if UnitLevel("player") >= 10 then
-			if PlayerSpellsFrame:IsShown() then
-				HideUIPanel(PlayerSpellsFrame)
+			if PlayerTalentFrame:IsShown() then
+				HideUIPanel(PlayerTalentFrame)
 			else
-				ShowUIPanel(PlayerSpellsFrame)
+				ShowUIPanel(PlayerTalentFrame)
 			end
 		end
 	end)
 
-	if not PlayerSpellsFrame then
-		C_AddOns.LoadAddOn("Blizzard_PlayerSpells")
+	if not PlayerTalentFrame then
+		LoadAddOn("Blizzard_TalentUI")
 		-- Fix for Events firing before TalentFrame is fully loaded (aka: blizz fail with patch 4.0.6)
-		ShowUIPanel(PlayerSpellsFrame)
-		HideUIPanel(PlayerSpellsFrame)
+		ShowUIPanel(PlayerTalentFrame)
+		HideUIPanel(PlayerTalentFrame)
 	end
 
-	PlayerSpellsFrame:HookScript("OnShow", function(self)
+	PlayerTalentFrame:HookScript("OnShow", function(self)
 		LUI.MicroMenu.Buttons.Talents.Clicker:SetAlpha(1)
 	end)
 
-	PlayerSpellsFrame:HookScript("OnHide", function(self)
+	PlayerTalentFrame:HookScript("OnHide", function(self)
 		if not LUI.MicroMenu.Buttons.Talents.Clicker.State then
 			LUI.MicroMenu.Buttons.Talents.Clicker:SetAlpha(0)
 		end
@@ -956,7 +988,7 @@ function module:SetMicroMenu()
 	end)
 
 	LUI.MicroMenu.Buttons.Spellbook.Clicker:SetScript("OnLeave", function(self)
-		if not PlayerSpellsFrame:IsShown() then
+		if not SpellBookFrame:IsShown() then
 			self:SetAlpha(0)
 		end
 		self.State = nil
@@ -965,18 +997,18 @@ function module:SetMicroMenu()
 
 	LUI.MicroMenu.Buttons.Spellbook.Clicker:SetScript("OnClick", function(self)
 		if InCombatLockdown() then return end
-		if PlayerSpellsFrame:IsShown() then
-			HideUIPanel(PlayerSpellsFrame)
+		if SpellBookFrame:IsShown() then
+			HideUIPanel(SpellBookFrame)
 		else
-			ShowUIPanel(PlayerSpellsFrame)
+			ShowUIPanel(SpellBookFrame)
 		end
 	end)
 
-	PlayerSpellsFrame.SpellBookFrame:HookScript("OnShow", function(self)
+	SpellBookFrame:HookScript("OnShow", function(self)
 		LUI.MicroMenu.Buttons.Spellbook.Clicker:SetAlpha(1)
 	end)
 
-	PlayerSpellsFrame.SpellBookFrame:HookScript("OnHide", function(self)
+	SpellBookFrame:HookScript("OnHide", function(self)
 		if not LUI.MicroMenu.Buttons.Spellbook.Clicker.State then
 			LUI.MicroMenu.Buttons.Spellbook.Clicker:SetAlpha(0)
 		end
@@ -1039,6 +1071,12 @@ function module:SetMicroMenu()
 	end)
 
 	self:SetMicroMenuPosition()
+
+	-- Alert Frames
+	module:SecureHook(HelpTip, "Show", "ScanHelpTips")
+	if HelpTip.framePool.numActiveObjects > 0 then
+		module:ScanHelpTips()
+	end
 end
 
 function module:ScanHelpTips()

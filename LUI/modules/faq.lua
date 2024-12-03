@@ -1,3 +1,12 @@
+--[[
+	Project....: LUI NextGenWoWUserInterface
+	File.......: faq.lua
+	Description: FAQ Options
+	Version....: 1.0
+	Rev Date...: 08/07/2010
+	Author.....: Louí [EU - Das Syndikat] <In Fidem>
+]]
+
 -- External references.
 local addonname, LUI = ...
 local module = LUI:Module("FAQ")

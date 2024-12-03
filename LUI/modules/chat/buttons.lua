@@ -1,3 +1,9 @@
+--[[
+	Project....: LUI NextGenWoWUserInterface
+	File.......: buttons.lua
+	Description: Chat Buttons Module
+]]
+
 -- External references.
 local addonname, LUI = ...
 local Chat = LUI:Module("Chat")
@@ -11,6 +17,7 @@ local db, dbd
 --------------------------------------------------
 
 local lines = {}
+
 local copyFrame
 
 --------------------------------------------------
@@ -106,6 +113,58 @@ local function configCopyButton(show)
 	end
 end
 
+local function createScrollButton(frame)
+	local button = frame.downButton
+
+	if not button then
+		button = CreateFrame("Button", nil, frame, "LUI_Chat_ScrollButtonTemplate")
+		button.frame = frame
+	end
+
+	button:SetScale(db.ScrollScale)
+
+	if module:IsHooked(frame, "ScrollUp") then return end
+
+	module:SecureHook(frame, "ScrollUp", "Scroll")
+	module:SecureHook(frame, "ScrollToTop", "Scroll")
+	module:SecureHook(frame, "PageUp", "Scroll")
+	module:SecureHook(frame, "ScrollDown", "Scroll")
+	module:SecureHook(frame, "ScrollToBottom", "Scroll")
+	module:SecureHook(frame, "PageDown", "Scroll")
+
+	if frame:GetScrollOffset() ~= 0 then
+		button:Show()
+	end
+
+	if frame ~= COMBATLOG then
+		module:SecureHook(frame, "AddMessage")
+	end
+end
+
+local function configScrollButton(show)
+	if show then
+		for i, name in ipairs(CHAT_FRAMES) do
+			createScrollButton(_G[name])
+		end
+	else
+		for i, name in ipairs(CHAT_FRAMES) do
+			local frame = _G[name]
+
+			if frame.downButton then
+				module:Unhook(frame, "ScrollUp")
+				module:Unhook(frame, "ScrollToTop")
+				module:Unhook(frame, "PageUp")
+				module:Unhook(frame, "ScrollDown")
+				module:Unhook(frame, "ScrollToBottom")
+				module:Unhook(frame, "PageDown")
+				module:Unhook(frame, "AddMessage")
+
+				frame.downButton:Hide()
+			end
+		end
+	end
+end
+
 local function hideButtons(frame)
 	frame.buttonFrame.Show = LUI.dummy
 	frame.buttonFrame:Hide()
@@ -166,6 +225,8 @@ local function configButtons(hide)
 			frame.buttonFrame.Show = nil
 			frame.buttonFrame:Show()
 		end
+
+		configScrollButton(false)
 	end
 end
 
@@ -196,6 +257,9 @@ function module:FCF_OpenTemporaryWindow()
 	local frame = FCF_GetCurrentChatFrame()
 
 	hideButtons(frame)
+	if db.ScrollReminder then
+		createScrollButton(frame)
+	end
 end
 
 --------------------------------------------------
@@ -220,12 +284,17 @@ function module:LoadOptions()
 	local function buttonsDisabled()
 		return not db.HideButtons
 	end
+	local function scrollButtonDisabled()
+		return not db.HideButtons and not db.ScrollReminder
+	end
 	local function copyButtonDisabled()
 		return not db.CopyChat
 	end
 
 	local options = self:NewGroup(L["Buttons"], 3, "generic", "Refresh", {
 		HideButtons = self:NewToggle(L["Hide Buttons"], nil, 1, true),
+		ScrollReminder = self:NewToggle(L["Scroll to bottom button"], L["Show scroll to bottom button when scrolled up"], 2, true, "normal", buttonsDisabled),
+		ScrollScale = self:NewSlider(L["Scale"], L["Scale of the scroll to bottom button"], 3, 0.5, 2, 0.05, true, true, nil, scrollButtonDisabled),
 		CopyChat = self:NewToggle(L["Copy chat button"], L["Show copy chat button"], 4, true, "normal"),
 		CopyScale = self:NewSlider(L["Scale"], L["Scale of the copy chat button"], 5, 0.5, 2, 0.05, true, true, nil, copyButtonDisabled),
 	})
@@ -239,6 +308,7 @@ function module:Refresh(info, value)
 	end
 
 	configButtons(db.HideButtons)
+	configScrollButton(db.HideButtons and db.ScrollReminder)
 	--configCopyButton(db.CopyChat)
 end
 
@@ -251,6 +321,9 @@ module.DBCallback = module.OnInitialize
 function module:OnEnable()
 	if db.HideButtons then
 		configButtons(true)
+		if db.ScrollReminder then
+			configScrollButton(true)
+		end
 	end
 	-- if db.CopyChat then
 	-- 	configCopyButton(true)

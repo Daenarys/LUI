@@ -1,3 +1,12 @@
+--[[
+	Project....: LUI NextGenWoWUserInterface
+	File.......: artwork.lua
+	Description: Control the various artwork around LUI.
+	Version....: 1.0
+	Rev Date...: 04/06/2014 [dd/mm/yyyy]
+	Author.....: Mule
+]]
+
 -- External references.
 local addonname, LUI = ...
 local module = LUI:Module("Artwork")

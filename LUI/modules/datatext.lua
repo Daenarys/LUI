@@ -1,3 +1,15 @@
+--[[
+	Project....: LUI NextGenWoWUserInterface
+	File.......: datatext.lua
+	Description: Provides LUI datatexts which hold relative info.
+	Version....: 1.9
+	Rev Date...: 16/07/2011 [dd/mm/yyyy]
+
+	Edits:
+		v1.8: Hix
+		v1.9: Zista
+]]
+
 if false then return end -- change false to true if working with new infotext module
 
 -- External references.
@@ -196,7 +208,7 @@ function module:SetBags()
 
 	if db.Bags.Enable and not stat.Created then
 		-- Localized functions
-		local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
+		local GetContainerNumFreeSlots, GetContainerNumSlots = GetContainerNumFreeSlots, GetContainerNumSlots
 
 		local bagTypes = {
 			[0x0000] = "Normal", -- 0
@@ -1176,7 +1188,7 @@ function module:SetGold()
 				end
 				GameTooltip:AddDoubleLine("Total:", formatTooltipMoney(factionGold[myPlayerFaction] + factionGold[otherFaction]), 1,1,1, 1,1,1)
 
-				for i = 1, 3 do
+				for i = 1, MAX_WATCHED_TOKENS do
 					local info = C_CurrencyInfo.GetBackpackCurrencyInfo(i)
 
 					if info and info.name and i == 1 then
@@ -1459,7 +1471,7 @@ function module:SetGF()
 					toast.class:SetTexture("")
 				end
 			else
-				toast.class:SetTexture("Interface\\FriendsFrame\\Battlenet-WoWicon")
+				toast.class:SetTexture(BNet_GetClientTexture(client))
 				toast.class:SetTexCoord(0.2, 0.8, 0.2, 0.8)
 				toast.name:SetTextColor(0.8, 0.8, 0.8)
 				toast.faction:SetTexture("")
@@ -2481,8 +2493,8 @@ function module:SetMemory()
 
 	if db.Memory.Enable and not stat.Created then
 		-- Localized functions
-		local UpdateAddOnMemoryUsage, IsAddOnLoaded, InCombatLockdown = UpdateAddOnMemoryUsage, C_AddOns.IsAddOnLoaded, InCombatLockdown
-		local GetNumAddOns, GetAddOnInfo, GetAddOnMemoryUsage = C_AddOns.GetNumAddOns, C_AddOns.GetAddOnInfo, GetAddOnMemoryUsage
+		local UpdateAddOnMemoryUsage, IsAddOnLoaded, InCombatLockdown = UpdateAddOnMemoryUsage, IsAddOnLoaded, InCombatLockdown
+		local GetNumAddOns, GetAddOnInfo, GetAddOnMemoryUsage = GetNumAddOns, GetAddOnInfo, GetAddOnMemoryUsage
 		local floor, format, sort, collectgarbage, select = floor, format, sort, collectgarbage, select
 
 		-- Local variables

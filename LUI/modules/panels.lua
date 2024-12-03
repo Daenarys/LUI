@@ -1,3 +1,16 @@
+--[[
+	Project....: LUI NextGenWoWUserInterface
+	File.......: panels.lua
+	Description: Main Panels Module
+	Version....: 1.2
+	Rev Date...: 13/03/2012 [dd/mm/yyyy]
+
+	Edits:
+		v1.0: Loui
+		v1.1: Zista
+		v1.2: Thaly
+]]
+
 -- External references.
 local _, LUI = ...
 local module = LUI:Module("Panels", "AceHook-3.0", "AceEvent-3.0")
@@ -23,8 +36,8 @@ local addonAnchors = {
 		Grid2 = "Grid2LayoutFrame",
 		Healbot = "f1_HealBot_Action",
 		Vuhdo = "Vd1",
-		BlizzardParty = "CompactPartyFrame",
-		BlizzardRaid = "CompactRaidFrameContainer",
+		oUF = "oUF_LUI_raid",
+		Blizzard = "CompactRaidFrameContainer",
 	},
 	meter = {
 		Recount = "Recount_MainWindow",
@@ -301,10 +314,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, a)
 		f.br:SetVertexColor(r, g, b, a)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, a)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, a)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, a)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, a)
 	elseif d == "LEFT" then
 		f.c:SetTexture(fdir.."panelbg2.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -315,10 +328,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, a)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, a)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
 	elseif d == "TOP" then
 		f.c:SetTexture(fdir.."panelbg2.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -329,10 +342,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, a)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, a)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, a)
 	elseif d == "RIGHT" then
 		f.c:SetTexture(fdir.."panelbg2.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -343,10 +356,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, a)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, a)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, a)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, a)
 	elseif d == "BOTTOM" then
 		f.c:SetTexture(fdir.."panelbg2.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -357,10 +370,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, a)
 		f.br:SetVertexColor(r, g, b, a)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, a))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, a)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, 0)
 	elseif d == "TOPLEFT" then
 		f.c:SetTexture(fdir.."panelbg3.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -371,10 +384,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, a)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
 	elseif d == "TOPRIGHT" then
 		f.c:SetTexture(fdir.."panelbg3.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -385,10 +398,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, a)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, a)
 	elseif d == "BOTTOMRIGHT" then
 		f.c:SetTexture(fdir.."panelbg3.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -399,10 +412,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, 0)
 		f.br:SetVertexColor(r, g, b, a)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, a))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, a)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, 0)
 	elseif d == "BOTTOMLEFT" then
 		f.c:SetTexture(fdir.."panelbg3.tga")
 		f.c:SetVertexColor(rc, gc, bc, ac)
@@ -413,10 +426,10 @@ local Set = function(f, d, p, w, h, s, r, g, b, a, rc, gc, bc, ac)
 		f.bl:SetVertexColor(r, g, b, a)
 		f.br:SetVertexColor(r, g, b, 0)
 
-		f.t:SetGradient("HORIZONTAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
-		f.b:SetGradient("HORIZONTAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.l:SetGradient("VERTICAL", CreateColor(r, g, b, a), CreateColor(r, g, b, 0))
-		f.r:SetGradient("VERTICAL", CreateColor(r, g, b, 0), CreateColor(r, g, b, 0))
+		f.t:SetGradientAlpha("HORIZONTAL", r, g, b, 0, r, g, b, 0)
+		f.b:SetGradientAlpha("HORIZONTAL", r, g, b, a, r, g, b, 0)
+		f.l:SetGradientAlpha("VERTICAL", r, g, b, a, r, g, b, 0)
+		f.r:SetGradientAlpha("VERTICAL", r, g, b, 0, r, g, b, 0)
 	end
 
 end
@@ -689,7 +702,7 @@ module.defaults = {
 			IsShown = false,
 			Direction = "TOPRIGHT",
 			Animation = "AlphaSlide",
-			Width = 389,
+			Width = 429,
 			Height = 181
 		},
 		Tps = {
@@ -699,19 +712,19 @@ module.defaults = {
 			Additional = "",
 			AlwaysShow = false,
 			IsShown = false,
-			Direction = "TOPLEFT",
+			Direction = "TOP",
 			Animation = "AlphaSlide",
 			Width = 193,
 			Height = 181
 		},
 		Dps = {
 			OffsetX = 0,
-			OffsetY = 0,
-			Anchor = "SkadaBarWindowSkada",
+			OffsetY = -30,
+			Anchor = "Recount_MainWindow",
 			Additional = "",
 			AlwaysShow = false,
 			IsShown = false,
-			Direction = "TOPLEFT",
+			Direction = "TOP",
 			Animation = "AlphaSlide",
 			Width = 193,
 			Height = 181
@@ -719,7 +732,7 @@ module.defaults = {
 		Raid = {
 			OffsetX = 0,
 			OffsetY = 0,
-			Anchor = "BlizzardRaid",
+			Anchor = "oUF_LUI_raid",
 			Additional = "",
 			AlwaysShow = false,
 			IsShown = false,
@@ -817,6 +830,8 @@ function module:LoadOptions()
 				order = 3,
 			} or nil,
 			Anchor = isNotChat and self:NewInput("Anchor", "Type in your "..tag.." Anchor manually.", 4, UIRL) or nil,
+			FrameIdentifierDesc = isNotChat and self:NewDesc("Use the LUI Frame Identifier to search for the Parent Frame of your "..tag.." Addon.\nYou can also use the Blizzard Debug Tool: Type /framestack", 5) or nil,
+			FrameIdentifier = isNotChat and self:NewExecute("LUI Frame Identifier", "Click to show the LUI Frame Identifier", 6, function() LUI_Frame_Identifier:Show() end) or nil,
 			Additional = isNotChat and self:NewInput("Additional Frames", "Type in any additional Frames (seperated by commas), that you would like to show/hide.", 7, function() module:LoadAdditional(db[tag].Additional, true) end) or nil,
 			empty1 = isNotChat and self:NewDesc(" ", 8) or nil,
 			OffsetX = self:NewInputNumber("Offset X", "Choose the X Offset for your "..tag.." Frame to it's Anchor.", 9, dryCall),
