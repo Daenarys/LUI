@@ -15,6 +15,26 @@ function module:SetAdditionalFrames()
 	self:SecureHook(TicketStatusFrame, "SetPoint", "TicketStatus_SetPoint")
 	self:SecureHook(UIWidgetBelowMinimapContainerFrame, "SetPoint", "CaptureBar_SetPoint")
 	self:SecureHook(GroupLootContainer, "SetPoint", "GroupLootContainer_SetPoint")
+
+	_G.Minimap:HookScript("OnEvent", function(self, event, ...)
+		if ( event == "PLAYER_ENTERING_WORLD" ) then
+			ExpansionLandingPageMinimapButton:SetScale(0.6)
+			ExpansionLandingPageMinimapButton:ClearAllPoints()
+			ExpansionLandingPageMinimapButton:SetPoint("TOPLEFT", 70, -245)
+
+			hooksecurefunc(ExpansionLandingPageMinimapButton, "UpdateIcon", function(self)
+				ExpansionLandingPageMinimapButton:SetScale(0.6)
+				ExpansionLandingPageMinimapButton:ClearAllPoints()
+				ExpansionLandingPageMinimapButton:SetPoint("TOPLEFT", 70, -245)
+			end)
+
+			hooksecurefunc(ExpansionLandingPageMinimapButton, "UpdateIconForGarrison", function(self)
+				ExpansionLandingPageMinimapButton:SetScale(0.6)
+				ExpansionLandingPageMinimapButton:ClearAllPoints()
+				ExpansionLandingPageMinimapButton:SetPoint("TOPLEFT", 70, -245)
+			end)
+		end
+	end)
 end
 
 function module:SetPosition(frame)
