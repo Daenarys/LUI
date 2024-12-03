@@ -24,7 +24,8 @@ local addonAnchors = {
 		Healbot = "f1_HealBot_Action",
 		Vuhdo = "Vd1",
 		oUF = "oUF_LUI_raid",
-		Blizzard = "CompactRaidFrameContainer",
+		BlizzardParty = "CompactPartyFrame",
+		BlizzardRaid = "CompactRaidFrameContainer",
 	},
 	meter = {
 		Recount = "Recount_MainWindow",

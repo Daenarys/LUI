@@ -16,14 +16,6 @@ LUI.Versions = {lui = 3403}
 
 LUI.dummy = function() return end
 
-local LIVE_TOC = 90001
-local LIVE_BUILD = 36322 --36322, 90001
--- Check the build to compare with PTR
-local _, CURRENT_BUILD, _, CURRENT_TOC = GetBuildInfo()
-if tonumber(CURRENT_BUILD) > LIVE_BUILD then
-	LUI.PTR = true
-	--LUI:Print("Using Code Designed for New Patch")
-end
 local ProfileName = UnitName("player").." - "..GetRealmName()
 
 -- Work around for IsDisabledByParentalControls() errors. Simply hide the frame. It will still error but that's OK.
@@ -394,6 +386,7 @@ function LUI:HideBlizzard()
 	end
 
 	apply(banish,
+		"StatusTrackingBarManager",
 		"MicroButtonAndBagsBar",
 		"BagsBar",
 		"MicroMenu",
@@ -401,6 +394,7 @@ function LUI:HideBlizzard()
 	)
 
 	apply(unregisterEvents,
+		"StatusTrackingBarManager",
 		"BagsBar",
 		"MicroMenu",
 		"MicroMenuContainer"
