@@ -1086,7 +1086,7 @@ local function getOptions()
 									width = "full",
 									type = "description",
 									fontSize = "medium",
-									name = "Current V3 Devs: |cffe6cc80Siku, Mule|r\n",
+									name = "Current V3 Devs: |cffe6cc80luckfore|r\n",
 								},
 								OldStaff = {
 									order = 5,

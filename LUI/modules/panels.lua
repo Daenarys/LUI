@@ -689,7 +689,7 @@ module.defaults = {
 			IsShown = false,
 			Direction = "TOPRIGHT",
 			Animation = "AlphaSlide",
-			Width = 429,
+			Width = 389,
 			Height = 181
 		},
 		Tps = {
