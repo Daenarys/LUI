@@ -1,9 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: editbox.lua
-	Description: Chat EditBox Module
-]]
-
 -- External references.
 local addonname, LUI = ...
 local Chat = LUI:Module("Chat")
@@ -338,7 +332,7 @@ module.defaults = {
 				end
 			end)(),
 			Size = 14,
-			Flag = "NONE",
+			Flag = "",
 		},
 		Background = {
 			Texture = "Blizzard Tooltip",

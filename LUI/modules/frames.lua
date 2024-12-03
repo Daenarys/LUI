@@ -1,15 +1,3 @@
---[[
-	Project....: LUI NextGenWoWUserInterface
-	File.......: frames.lua
-	Description: Frames module.
-	Version....: 1.1
-	Rev Date...: 13/03/2012 [dd/mm/yyyy]
-	Edits:
-		v1.0: Loui
-		v1.1: Zista
-		v1.2: Thaly
-]]
-
 -- External references.
 local addonname, LUI = ...
 local module = LUI:Module("Frames")
