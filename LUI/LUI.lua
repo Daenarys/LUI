@@ -552,8 +552,6 @@ function LUI:Configure()
 
 	install_frame:RegisterForClicks("AnyUp")
 	install_frame:SetScript("OnClick", function(self)
-		SetCVar("uiScale", 0.6949)
-		SetCVar("useUiScale", 1)
 		if LUI.db.global.luiconfig[ProfileName].Versions then
 			wipe(LUI.db.global.luiconfig[ProfileName].Versions)
 		end
