@@ -391,9 +391,9 @@ local defaults = {
 			GMTicket = "TOP",
 		},
 		Frames = {
-			AlwaysUpFrameX = "300",
-			AlwaysUpFrameY = "-35",
-			CaptureBarX = "-5",
+			AlwaysUpFrameX = "0",
+			AlwaysUpFrameY = "-70",
+			CaptureBarX = "0",
 			CaptureBarY = "-235",
 			TicketStatusX = "-175",
 			TicketStatusY = "-70",
