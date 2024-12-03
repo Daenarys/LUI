@@ -23,7 +23,6 @@ local addonAnchors = {
 		Grid2 = "Grid2LayoutFrame",
 		Healbot = "f1_HealBot_Action",
 		Vuhdo = "Vd1",
-		oUF = "oUF_LUI_raid",
 		BlizzardParty = "CompactPartyFrame",
 		BlizzardRaid = "CompactRaidFrameContainer",
 	},
@@ -720,7 +719,7 @@ module.defaults = {
 		Raid = {
 			OffsetX = 0,
 			OffsetY = 0,
-			Anchor = "oUF_LUI_raid",
+			Anchor = "BlizzardRaid",
 			Additional = "",
 			AlwaysShow = false,
 			IsShown = false,

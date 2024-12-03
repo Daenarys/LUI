@@ -341,23 +341,6 @@ function module:GetMinimapPosition()
 	db.Minimap.General.Position.Y = yOfs
 end
 
-function module:ToggleMissionReport()
-	local button = ExpansionLandingPageMinimapButton
-	if button:IsShown() and not defaultGarrisonState then
-		button:Hide()
-		return
-	elseif not defaultGarrisonState then
-		return
-	end
-	if db.Minimap.General.MissionReport then
-		button.Show = nil
-		button:Show()
-	else
-		button.Show = button.Hide
-		button:Hide()
-	end
-end
-
 local defaults = {
 	Minimap = {
 		Enable = true,
