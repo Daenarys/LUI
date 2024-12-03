@@ -386,6 +386,7 @@ function LUI:HideBlizzard()
 	end
 
 	apply(banish,
+		"StanceBar",
 		"BuffFrame",
 		"DebuffFrame",
 		"MicroButtonAndBagsBar",
@@ -395,6 +396,7 @@ function LUI:HideBlizzard()
 	)
 
 	apply(unregisterEvents,
+		"StanceBar",
 		"BuffFrame",
 		"DebuffFrame",
 		"BagsBar",
