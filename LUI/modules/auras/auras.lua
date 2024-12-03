@@ -1,15 +1,11 @@
----
---  Name ...... : Auras
---  Description : Player Buffs, Debuffs, and Weapon Enchants
---
-
+-- External references.
 local addonName, LUI = ...
 
 -- Localized API
 local GameTooltip = _G.GameTooltip
-local RAID_CLASS_COLORS, NUM_TEMP_ENCHANT_FRAMES = RAID_CLASS_COLORS, NUM_TEMP_ENCHANT_FRAMES
-local UnitName, UnitClass, UnitAura, UnitIsPlayer, GameTooltip_UnitColor = UnitName, UnitClass, UnitAura, UnitIsPlayer, GameTooltip_UnitColor
-local GetInventoryItemTexture, GetInventoryItemQuality, GetItemQualityColor, GetWeaponEnchantInfo = GetInventoryItemTexture, GetInventoryItemQuality, GetItemQualityColor, GetWeaponEnchantInfo
+local RAID_CLASS_COLORS = RAID_CLASS_COLORS
+local UnitName, UnitClass, UnitIsPlayer, GameTooltip_UnitColor = UnitName, UnitClass, UnitIsPlayer, GameTooltip_UnitColor
+local GetInventoryItemTexture, GetInventoryItemQuality, GetItemQualityColor, GetWeaponEnchantInfo = GetInventoryItemTexture, GetInventoryItemQuality, C_Item.GetItemQualityColor, GetWeaponEnchantInfo
 local GetTime, ceil, select, unpack, pairs, strfind, strmatch, gsub, format, tonumber = GetTime, math.ceil, select, unpack, pairs, string.find, string.match, string.gsub, string.format, tonumber
 
 ----------------------------------------------------------------------
@@ -97,6 +93,16 @@ local function formatTime(seconds)
 	end
 
 	return timeFormats[factor], ceil(seconds / factor)
+end
+
+local function UnitAura(unitToken, index, filter)
+	local auraData = C_UnitAuras.GetAuraDataByIndex(unitToken, index, filter)
+	
+	if not auraData then
+		return nil
+	end
+
+	return AuraUtil.UnpackAuraData(auraData)
 end
 
 ----------------------------------------------------------------------
@@ -378,7 +384,7 @@ do
 
 		local unit = self:GetAttribute('unit')
 
-		for i = 1, NUM_TEMP_ENCHANT_FRAMES do
+		for i = 1, 3 do
 			local weaponEnchant = self.weaponEnchants[i]
 
 			if weaponEnchant and weaponEnchant:IsShown() then
@@ -458,7 +464,7 @@ do
 		if self.helpful then
 			self:SetAttribute('consolidateTo', settings.Consolidate and 1 or 0)
 
-			for i = 1, NUM_TEMP_ENCHANT_FRAMES do
+			for i = 1, 3 do
 				local weaponEnchant = self.weaponEnchants[i]
 
 				if weaponEnchant then
@@ -699,7 +705,7 @@ local function OnAnyEvent(self, event, addon)
 		if not debuff then break end
 	end
 	
-	for i=1, NUM_TEMP_ENCHANT_FRAMES do
+	for i=1, 3 do
 		local f = _G["TempEnchant"..i]
 		if TempEnchant then
 			group:AddButton(f)
@@ -750,8 +756,6 @@ function module:OnInitialize()
 end
 
 function module:OnEnable()
-	LUI.Blizzard:Hide("aura")
-
 	self:NewAuraHeader("Buffs", true)
 	self:NewAuraHeader("Debuffs")
 	if Masque then
@@ -764,6 +768,4 @@ function module:OnDisable()
 	for auraType, header in pairs(headers) do
 		header:Hide()
 	end
-
-	LUI.Blizzard:Show("aura")
 end

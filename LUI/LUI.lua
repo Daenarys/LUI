@@ -386,7 +386,8 @@ function LUI:HideBlizzard()
 	end
 
 	apply(banish,
-		"StatusTrackingBarManager",
+		"BuffFrame",
+		"DebuffFrame",
 		"MicroButtonAndBagsBar",
 		"BagsBar",
 		"MicroMenu",
@@ -394,7 +395,8 @@ function LUI:HideBlizzard()
 	)
 
 	apply(unregisterEvents,
-		"StatusTrackingBarManager",
+		"BuffFrame",
+		"DebuffFrame",
 		"BagsBar",
 		"MicroMenu",
 		"MicroMenuContainer"
