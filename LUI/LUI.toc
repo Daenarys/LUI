@@ -26,4 +26,3 @@ modules\datatext.lua
 modules\faq.lua
 modules\micromenu.lua
 modules\artwork.lua
-scripts\errorhider.lua

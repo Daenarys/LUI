@@ -684,7 +684,7 @@ module.defaults = {
 		},
 		Chat = {
 			OffsetX = 0,
-			OffsetY = 0,
+			OffsetY = -4,
 			AlwaysShow = false,
 			IsShown = false,
 			Direction = "TOPRIGHT",
