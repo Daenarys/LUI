@@ -233,7 +233,7 @@ function module:SetMicroMenu()
 	LUI.MicroMenu.ButtonLeft.Clicker:RegisterForClicks("AnyUp")
 
 	LUI.MicroMenu.ButtonLeft.Clicker:SetScript("OnClick", function(self, button)
-			RaidMenu:OverlapPrevention("RM", "toggle")
+		RaidMenu:OverlapPrevention("RM", "toggle")
 	end)
 
 	LUI.MicroMenu.ButtonLeft.Clicker:SetScript("OnEnter", function(self)
@@ -1039,27 +1039,6 @@ function module:SetMicroMenu()
 	end)
 
 	self:SetMicroMenuPosition()
-end
-
-function module:ScanHelpTips()
-	for frame in HelpTip.framePool:EnumerateActive() do
-		local parent = frame.relativeRegion:GetName()
-		if parent == "CollectionsMicroButton" then
-			module:AnchorAlertFrame(frame, LUI.MicroMenu.Buttons.Pets)
-		elseif parent == "TalentMicroButton" then
-			module:AnchorAlertFrame(frame, LUI.MicroMenu.Buttons.Talents)
-		elseif parent == "EJMicroButton" then
-			module:AnchorAlertFrame(frame, LUI.MicroMenu.Buttons.Journal)
-		end
-	end
-end
-
-function module:AnchorAlertFrame(frame, anchor)
-	frame.relativeRegion = anchor
-	frame:ClearAllPoints()
-	frame:SetPoint("TOP", anchor, "BOTTOM")
-	frame.Arrow:ClearAllPoints()
-	frame.Arrow:SetPoint("BOTTOM", frame, "TOP", 0, -30)
 end
 
 module.defaults = {
